@@ -1,0 +1,58 @@
+DEFINITION MODULE Strings;
+ 
+  (* Facilities for manipulating strings *)
+ 
+TYPE
+  String1 = ARRAY [0..0] OF CHAR;
+    (* String1 is provided for constructing a value of a single-character string type from a
+       single character value in order to pass CHAR values to ARRAY OF CHAR parameters.
+    *)
+ 
+PROCEDURE Length (stringVal: ARRAY OF CHAR): CARDINAL;
+  (* Returns the length of stringVal (the same value as would be returned by the
+     standard function LENGTH).
+  *)
+ 
+ 
+(* The following seven procedures construct a string value, and attempt to assign it to a
+   variable parameter.  They all have the property that if the length of the constructed string
+   value exceeds the capacity of the variable parameter, a truncated value is assigned, while
+   if the length of the constructed string value is less than the capacity of the variable
+   parameter, a string terminator is appended before assignment is performed.
+*)
+ 
+PROCEDURE Assign (source: ARRAY OF CHAR; VAR destination: ARRAY OF CHAR);
+  (* Copies source to destination *)
+ 
+PROCEDURE Extract (source: ARRAY OF CHAR; startPos, numberToExtract: CARDINAL;
+                   VAR destination: ARRAY OF CHAR);
+  (* Copies at most numberToExtract characters from source to destination, starting at position
+     startPos in source.
+  *)
+ 
+PROCEDURE Delete (VAR stringVar: ARRAY OF CHAR; startPos, numberToDelete: CARDINAL);
+  (* Deletes at most numberToDelete characters from stringVar, starting at position
+     startPos.
+  *)
+ 
+PROCEDURE Insert (source: ARRAY OF CHAR; startPos: CARDINAL;
+                  VAR destination: ARRAY OF CHAR);
+  (* Inserts source into destination at position startPos *)
+ 
+PROCEDURE Replace (source: ARRAY OF CHAR; startPos: CARDINAL;
+                   VAR destination: ARRAY OF CHAR);
+  (* Copies source into destination, starting at position startPos. Copying stops when
+     all of source has been copied, or when the last character of the string value in
+     destination has been replaced.
+  *)
+ 
+PROCEDURE Append (source: ARRAY OF CHAR; VAR destination: ARRAY OF CHAR);
+  (* Appends source to destination. *)
+ 
+PROCEDURE Concat (source1, source2: ARRAY OF CHAR; VAR destination: ARRAY OF CHAR);
+  (* Concatenates source2 onto source1 and copies the result into destination. *)
+
+PROCEDURE Capitalize (VAR stringVar: ARRAY OF CHAR);
+  (* Applies the function CAP to each character of the string value in stringVar. *)
+ 
+END Strings.

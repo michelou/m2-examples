@@ -1,0 +1,12 @@
+GENERIC DEFINITION MODULE ValidStacks(StackSize : CARDINAL;
+				      Element : TYPE;
+				      Validate : ValidProcType);
+
+TYPE
+    ValidProcType = PROCEDURE(Element) : BOOLEAN;
+
+PROCEDURE Push(item : Element) : BOOLEAN;
+
+PROCEDURE Pop(VAR item : Element);
+
+END ValidStacks.

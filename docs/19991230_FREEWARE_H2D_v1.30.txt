@@ -1,0 +1,112 @@
+<http://computer-programming-forum.com/26-programming-language/> 	 
+
+Board index <http://computer-programming-forum.com/> » Programming
+language
+<http://computer-programming-forum.com/viewforum/26-programming-language/81.htm>
+
+All times are UTC
+
+
+    ANNOUNCE: H2D v1.30 is out (free Modula-2 to C binding tool)
+
+
+ ANNOUNCE: H2D v1.30 is out (free Modula-2 to C binding tool) 
+Author 	Message
+Dmitry V. Lesk
+#1 / 1
+	
+ ANNOUNCE: H2D v1.30 is out (free Modula-2 to C binding tool)
+
+New OS/2 and Windows NT/95 versions of H2D, a .H->.DEF translation utility,
+have been released. H2D v1.30 contains a lot of changes and new
+features, major
+of them being:
+
+- Generalized #variant directive
+- Custom mapping of C base types to Modula-2 types
+- Non-standard directives extraction
+- Options renamed to follow XDS compilers style
+- Control file syntax now closely matches used by XDS compilers
+
+Due to deadlines in our custom projects, v1.30 was not intensively
+tested yet,
+so your feedback is more than welcome. The manual has some
+inconsistencies too.
+If you prefer stable software, v1.18 is still available.
+
+H2D v1.30 for Windows NT/95 and OS/2 is available from the XDS Download
+page at
+http://www.*-*-*.com/
+days.
+
+Owners of Linux, Solaris, HP-UX, etc. editions of XDS products or other
+Modula-2 compiler for these platforms are kindly requested to wait until we
+have enough resources to build and package H2D 1.30 for these platforms.
+
+With best regards,
+
+Dmitry Leskov
+
+-----------------------------------
+Dmitry V. Leskov
+XDS Products Division Manager
+
+XDS Home Page is http://www.*-*-*.com/
+
+
+
+Thu, 30 Dec 1999 03:00:00 GMT 	 
+ 
+
+ Page *1* of *1*
+	 [ 1 post ]  	
+
+
+ Relevant Pages 
+
+1. ANNOUNCE: H2D v1.30 is out (free Modula-2 to C binding tool)
+<http://computer-programming-forum.com/28-oberon/d41077d4e2e3f40d.htm>
+
+2. ANNOUNCE: H2D v1.30 is out (free Modula-2 to C binding tool)
+<http://computer-programming-forum.com/27-modula2/d41077d4e2e3f40d.htm>
+
+3. FREEWARE: H2D v1.14 - C headers to Modula-2 definition modules
+translator
+<http://computer-programming-forum.com/26-programming-language/7dfc05553b9ed129.htm>
+
+4. FREEWARE: H2D v1.14 - C headers to Modula-2 definition modules
+translator
+<http://computer-programming-forum.com/28-oberon/1871491f8e651fde.htm>
+
+5. FREEWARE: H2D v1.14 - C headers to Modula-2 definition modules
+translator
+<http://computer-programming-forum.com/27-modula2/7dfc05553b9ed129.htm>
+
+6. ANNOUNCE: X-Files v1.30, GUI filemanager
+<http://computer-programming-forum.com/57-tcl/faae4c03a6357fb6.htm>
+
+7. HLA v1.30 is now available
+<http://computer-programming-forum.com/45-asm/6ba070c98d105368.htm>
+
+8. PMODE/W v1.30 Released
+<http://computer-programming-forum.com/45-asm/4c87575122ac05e2.htm>
+
+9. HLA v1.30 is now available
+<http://computer-programming-forum.com/46-asm/6ba070c98d105368.htm>
+
+10. ANNOUNCE: Sage v1.0, Tcl/Tk profiling tool
+<http://computer-programming-forum.com/57-tcl/cb57bc41e2fe56e0.htm>
+
+11. TOOLS'92 (March 30-April 2) Announcement
+<http://computer-programming-forum.com/21-eiffel/991573d01fe1993e.htm>
+
+12. ANNOUNCE: Native XDS-x86 v2.30 Released
+<http://computer-programming-forum.com/26-programming-language/e060ce4e3743623d.htm>
+
+	 
+
+
+	 
+
+Powered by phpBB® Forum Software
+

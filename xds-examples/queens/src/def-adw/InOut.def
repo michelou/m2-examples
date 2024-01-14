@@ -1,0 +1,13 @@
+DEFINITION MODULE InOut;
+
+PROCEDURE Write (ch : CHAR);
+
+PROCEDURE WriteString (str : ARRAY OF CHAR);
+
+PROCEDURE WriteLn;
+
+PROCEDURE WriteCard (n: CARDINAL; w: CARDINAL);
+
+PROCEDURE WriteInt (n: INTEGER; w: CARDINAL);
+
+END InOut.

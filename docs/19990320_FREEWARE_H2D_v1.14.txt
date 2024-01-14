@@ -1,0 +1,113 @@
+<http://computer-programming-forum.com/27-modula2/> 	 
+
+Board index <http://computer-programming-forum.com/> » modula2
+<http://computer-programming-forum.com/viewforum/27-modula2/52.htm>
+
+All times are UTC
+
+
+    FREEWARE: H2D v1.14 - C headers to Modula-2 definition modules
+    translator
+
+
+ FREEWARE: H2D v1.14 - C headers to Modula-2 definition modules translator 
+Author 	Message
+Dmitry V. Lesk
+#1 / 1
+	
+ FREEWARE: H2D v1.14 - C headers to Modula-2 definition modules translator
+
+
+
+Source:       xTech Ltd.
+
+                H2D v1.14 is available
+
+                Copyright (c) 1996 xTech Ltd.
+
+OS/2 and Windows NT/95 Editions of H2D v1.14 are now available.
+Linux edition is about to be released soon.
+
+H2D is an utility which translates C header files (*.h) into Modula-2
+definition modules. It enables a Modula-2 programmer to use the huge
+set of free, shareware, and commercial libraries, which interfaces are
+usually defined in terms of C language, as well as APIs of the most
+popular operating systems and products.
+
+We distribute H2D as freeware in order to encourage more programmers
+to use Modula-2 and Oberon-2.
+
+H2D is intended to be used with our XDS family of Modula-2/Oberon-2
+systems, but it can be easiliy adapted to other Modula-2 compilers.
+
+For more information about H2D and other xTech products, please visit
+our Web pages at:
+
+  http://www.*-*-*.com/ ~johnm/xds.html
+  http://www.*-*-*.com/
+
+
+--------------------------------
+Dmitry V. Leskov
+OS/2 Products Division Manager
+xTech Ltd.
+Novosibirsk, Russia
+http://www.*-*-*.com/
+
+
+
+
+Sat, 20 Mar 1999 03:00:00 GMT 	 
+ 
+
+ Page *1* of *1*
+	 [ 1 post ]  	
+
+
+ Relevant Pages 
+
+1. FREEWARE: H2D v1.14 - C headers to Modula-2 definition modules
+translator
+<http://computer-programming-forum.com/26-programming-language/7dfc05553b9ed129.htm>
+
+2. FREEWARE: H2D v1.14 - C headers to Modula-2 definition modules
+translator
+<http://computer-programming-forum.com/28-oberon/1871491f8e651fde.htm>
+
+3. FREEWARE: H2D 1.18 (C headers translator)
+<http://computer-programming-forum.com/28-oberon/8829a0b87b09f883.htm>
+
+4. FREEWARE: H2D 1.18 (C headers translator)
+<http://computer-programming-forum.com/27-modula2/8829a0b87b09f883.htm>
+
+5. ANNOUNCE: H2D v1.30 is out (free Modula-2 to C binding tool)
+<http://computer-programming-forum.com/26-programming-language/d41077d4e2e3f40d.htm>
+
+6. ANNOUNCE: H2D v1.30 is out (free Modula-2 to C binding tool)
+<http://computer-programming-forum.com/28-oberon/d41077d4e2e3f40d.htm>
+
+7. ANNOUNCE: H2D v1.30 is out (free Modula-2 to C binding tool)
+<http://computer-programming-forum.com/27-modula2/d41077d4e2e3f40d.htm>
+
+8. FREEWARE: H2D 1.18 for SPARC (Solaris)
+<http://computer-programming-forum.com/26-programming-language/abd5cfc7f0bd8d78.htm>
+
+9. FREEWARE: H2D 1.18 for SPARC (Solaris)
+<http://computer-programming-forum.com/28-oberon/abd5cfc7f0bd8d78.htm>
+
+10. FREEWARE: H2D 1.18 for SPARC (Solaris)
+<http://computer-programming-forum.com/27-modula2/abd5cfc7f0bd8d78.htm>
+
+11. HLA V1.14 is now up
+<http://computer-programming-forum.com/45-asm/0e376bf2f2708024.htm>
+
+12. HLA v1.14 is now available
+<http://computer-programming-forum.com/46-asm/318d35ee77ea3402.htm>
+
+	 
+
+
+	 
+
+Powered by phpBB® Forum Software
+

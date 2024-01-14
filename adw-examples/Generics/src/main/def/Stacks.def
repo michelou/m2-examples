@@ -1,0 +1,7 @@
+GENERIC DEFINITION MODULE Stacks(StackSize : CARDINAL; element : TYPE);
+
+PROCEDURE Push(item : element) : BOOLEAN;
+
+PROCEDURE Pop(VAR item : element);
+
+END Stacks.

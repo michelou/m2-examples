@@ -1,0 +1,2 @@
+Source: 
+Source 2: https://oberoncore.ru/_media/library/wirth_modula-2_2nd_ed.pdf

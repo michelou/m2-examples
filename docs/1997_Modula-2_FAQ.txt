@@ -1,0 +1,1501 @@
+From: rsutc@twu.ca (Rick Sutcliffe, Modula-2 FAQ maintainer)
+Subject: Modula-2 FAQ/part1
+Summary: This file contains the answers to some commonly asked questions
+  about the programming language Modula-2.
+Keywords: languages, Modula-2
+Newsgroups: comp.lang.modula2,comp.answers,news.answers
+Date: 28 Feb 1997 11:57:16 GMT
+Followup-To: comp.lang.modula2
+Organization: none
+Path: news.mu-luebeck.de!news-ham1.dfn.de!news-ber1.dfn.de!fu-berlin.de!news.mathworks.com!bloom-beacon.mit.edu!senator-bedfellow.mit.edu!faqserv
+Supersedes: <computer-lang/Modula2-faq/part1_854536810@rtfm.mit.edu>
+Lines: 817
+Approved: news-answers-request@MIT.EDU
+Distribution: world
+Expires: 13 Apr 1997 11:55:45 GMT
+Message-ID: <computer-lang/Modula2-faq/part1_857130945@rtfm.mit.edu>
+NNTP-Posting-Host: bloom-picayune.mit.edu
+X-Last-Updated: 1997/01/28
+Originator: faqserv@bloom-picayune.MIT.EDU
+Xref: news.mu-luebeck.de comp.lang.modula2:2785 comp.answers:6738 news.answers:8516
+
+Archive-name: computer-lang/Modula2-faq/part1
+Version: 2.7
+Last-modified: 1997 01 28
+Posting-frequency: Monthly
+
+                 Modula-2 Frequently Asked Questions
+What is new in version 2.7?
+The FAQ location has not changed after all.  What did change was the
+location of
+the shareware textbook, which now starts at http://www.twu.ca/rsbook/ The
+reference to Yahoo is updated. A rather strange question is asked and
+answered as
+4.15. Some vendor info has been updated (XTech, Mill Hill, Stonybrook, ULM).
+The Sun site reference to Linux is here now. Section 1.12 on the advantages
+over C
+has been expanded a little. New random number generator and math library
+references have been added.
+
+
+What was new in version 2.6?
+Stonybrook Modula-2 for Windows95/NT is here!!!  There are more references to
+source code.  Multigraph has a new home page. There are some new references to
+source code. Section 3.3 has a new summary of ISO compatible products for
+micros.
+
+=====================================================
+
+SUMMARY:
+1. Answers to frequently asked questions about Modula-2 will be collected at
+Trinity Western University and included in this document from time to time
+as it is
+revised.
+
+2. Submissions should be mailed to -- rsutc@twu.ca
+Anyone making a submission guarantees that they have the right to do so
+(copyright holder, or information in the public domain.) and that the
+information
+is not from any source whose copyright lies with another.
+
+3. I will update this summary file and post to the newsgroups
+comp.lang.modula2
+and to comp.answers and news.answers
+
+4. The latest version will always be available in a Nisus (Mac) form in
+ftp://FTP.twu.ca/pub/modula2/m2faq.html
+The folder modula2 has a variety of other materials. This version of the
+FAQ is
+readible as text by other word processors, but without any formatting. It
+is also
+available from the site rtfm.mit.edu in plain text form as
+file://rtfm.mit.edu/pub/usenet-by-group/comp.answers/computer-
+lang/Modula2-faq/part1 and as file://rtfm.mit.edu/pub/usenet-by-
+group/comp.answers/computer-lang/Modula2-faq/part2
+
+5. An automatically generated .html version of the FAQ is available as
+http://www.cis.ohio-state.edu/hypertext/faq/usenet/computer-lang/Modula2-
+faq/part1/faq.html
+and
+http://www.cis.ohio-state.edu/hypertext/faq/usenet/computer-lang/Modula2-
+faq/part2/faq.html
+However, this one seems to be a couple of versions out of date.
+
+=====================================================
+
+CONTENTS:
+Part 1
+1. WHAT IS MODULA-2?
+2. WHERE IS MODULA-2 DISCUSSED?
+3. WHERE CAN I GET MODULA-2 COMPILERS?
+Part 2
+4. WHERE CAN I GET SOURCE CODE, OTHER INFO?
+5. SPECIFIC QUESTIONS ON CODE AND ALGORITHMS
+6. WHAT ARE SOME REFERENCE MATERIALS ON MODULA-2?
+7. REVIEWS
+Appendix: AUTHOR INFORMATION AND DISCLAIMERS
+
+=====================================================
+
+1. WHAT IS MODULA-2?
+A. Modula-2 is a programming notation that corrects some of the
+deficiencies of
+Pascal. It is suitable for learning programming, for large projects written
+and
+maintained in the fashion of professional software engineers, and for real
+time
+embedded systems.
+
+
+1.1 Who developed Modula-2?
+A. Modula-2 was developed by Niklaus Wirth at ETH in Zurich, Switzerland in
+the late 70's. Wirth also developed Pascal and Oberon.
+see: http://www.stfx.ca/people/jandrea/m2/nwirth/
+
+
+1.2 Where is this language described?
+A. In Programming in Modula-2 3rd edition published by Springer-Verlag in
+1985.
+For the purposes of distinguishing this from later variants, this
+description will be
+referred to herein as classical Modula-2.
+
+
+1.3 How do you pronounce Herr Wirth's name?
+A. It is incorrect to call him by his value (worth.) Instead his name is veart.
+
+1.4 Can I get a simple introduction to ISO Modula-2?
+Yes, the latest revised edition of the shareware text as of 1996 09 06 is at
+http://www.twu.ca/rsbook/
+Mirrors: http://eiunix.tuwien.ac.at/Modula-2/rsbook/
+
+
+1.5 How does Modula-2 fit into the language zoo?
+A. It is a descendent of Pascal and Modula, and one predecessor of Modula-2+,
+Modula-2*, Modula-3, Oberon, Oberon-2, and various object oriented versions of
+these. The latter languages are not replacements for  Modula-2, merely later
+notations in the same family, having strengths and weaknesses of their own.
+Modula-2 is sometimes classified with Ada and C as the trio of modern
+languages
+in view of their expressive power. Modula-2 is smaller and more readable than
+either.
+
+
+1.6 What are the differences between Modula-2 and Pascal?
+A. Modula-2 has separately compiled library modules, and makes much less
+use of
+blocks (begin...) than Pascal. Identifiers are case sensitive; there is no
+goto label;
+and I/O is in libraries rather than built in. The IF statement is more
+versatile; and
+there are facilities for concurrent programming via coroutines.
+
+
+1.7 What is ISO Standard Modula-2?
+A. A committee of ISO JTC1/SC22/WG13 with delegates from several countries
+has met since 1987 to work on a standard description of Modula-2 and a set of
+standard library modules.
+
+A2. The official home of the ISO Modula-2 working group WG13 is at
+http://sc22wg13.twi.tudelft.nl/
+
+1.7.1 What is the status of ISO Standard Modula-2?
+A. The international standard (IS 10514) has been voted on and is now official.
+
+
+1.7.2 Where can I get the Modula-2 standard?
+A1. Contact your national standards body or ISO (the publisher.)
+
+A2. For an older version, try looking in ftp://ftp.mathematik.uni-
+ulm.de/pub/soft/modula/standard/draft4/
+
+1.7.3 What format is the standard document in?
+A. Latex.
+
+
+1.7.4 Who is the convenor of the standards group (WG13)?
+A.Martin Schoenhacker of Vienna has been approved by SC22 as the new
+convenor.
+
+
+1.7.5 When was the last WG13 meeting?
+A1. It was June 3-7 in Oxford, UK.  For more details, follow
+http://sc22wg13.twi.tudelft.nl/docs/meetings.html
+
+
+1.7.6 When is the next WG13 meeting?
+A1. It will be in the Spring of 1997 at Linz in conjunction with the
+conference on
+Modular Languages.
+
+
+1.7.7 Will I be able to read the standard?
+A1. The concrete syntax is written in a variation of EBNF (Extended
+Backus-Naur
+Formalism) and should be accessible to most.
+
+A2. Much of the document's details are written in VDM-SL (Vienna Development
+Method - Specification Language) which is a formalism for giving a precise
+definition of a programming language in a denotational style. It is worth
+learning
+VDM-SL if you plan to write a compiler or take a course in formal methods.
+
+
+1.7.8 Can I at least get electronic copies of the definition modules?
+A. Yes, in ftp://FTP.twu.ca/pub/modula2/ISOLibraries/ISODEFMods/ or
+ftp://ftp.mathematik.uni-ulm.de/pub/soft/modula/standard/libdefs/
+
+
+1.7.9 Can I get copies of the grammer?
+A1. Yes, in http://www.twu.ca/rsbook/Appendices/Ap3.html
+A2. For classical Modula-2, see also COCO (section 4.9)
+A3. There are nice syntax diagrams for classical Modula-2 in
+http://cuiwww.unige.ch/db-
+research/Enseignement/analyseinfo/Modula2/BNFindex.html
+ and there are syntax diagrams for ISO Modula-2 stored at
+http://www.twu.ca/rsbook/Appendices/Ap2.html
+
+
+1.8 What difference is there between classical and ISO Modula-2?
+A. ISO Modula-2 has resolved most of the ambiguities in classical Modula-2. It
+adds the data type COMPLEX and LONGCOMPLEX, exceptions, module
+termination (FINALLY clause) and a complete standard I/O library. There are
+numerous minor differences and clarifications.
+
+
+1.8.1 What else is WG13 doing?
+A. WG13 is working on two additional standards (separate from the main one)
+for
+(a) object oriented Modula-2 and (b) generic programming facilities. Both
+passed
+the registration ballot as CDs and will now proceed to final drafting. Various
+versions of the latest generics proposal (ca101) and the disposition of
+comments
+(ca100) are stored in the directory ftp://FTP.twu.ca/pub/modula2/WG13/
+
+1.9 What is (was) Turbo Modula-2
+A. Borland prepared CP/M versions of Modula-2 and sold them for a time in
+Europe (also in North America via a distributer.) One of these versions later
+migrated to become TopSpeed Modula-2.
+
+1.10 Where and for what is Modula-2 used?
+A1. Modula-2 is widely used for teaching the fundamentals of sound
+programming techniques, data structures, and software engineering in many
+parts
+of the world. It is the language of choice in much of Europe. It has
+features that
+make it superior to other languages for large projects and for programming and
+real time controllers.
+
+
+A2. Here is a message sent in by a maker of test equipment:
+Our BoardWizard range of test equipment has compilers,pseudo-code interpreters
+and a complete test operating system written in M2.  The code was written
+for one
+tester in 1987 and has been maintained from that date to the present. New
+tester
+models have added and new interface and UI code has been written, indeed
+sections have been completely re-written but much of the core test logic is
+untouched since about 1990 when I shifted to management.  Much of the code is
+unknown to those who maintain it - yet when i look at it after several
+years I can
+still explain it to others even though comments are sparse. I believe that
+that is the
+hallmark of a great programming language. (Emphasis added.)
+Dave Appleton,
+Technical Manager
+Goldtron Technologies                       Tel : (065)-870-9886
+(Ex- Proteq Technologies)                   Fax: (065)-777-2118
+26 Ayer Rajah Crescent #07-01               www:
+http://www.proteq.com.sg
+Singapore  139944
+
+A3. The following survey results were recently posted by Mat. Maher
+ssu94114@reading.ac.uk
+
+ORGANISATION              LOCATION   WORK                   COMPILER
+Statoil                   Norway                            StonyBrook
+Inst. for Space Nerology  Austria    datafile conversion    TopSpeed
+                                     dataviewers
+Boeing                    Washington Aerospace Eng.         p1(MAC)
+CDSS                      UK         embedded control sys.  TopSpeed
+                                     for submarines
+(self-employed)           UK         embedded Pcs and       TopSpeed
+                                     pc-like chips
+(manufacturer)            Finland,   8051 embedded control  Mod51
+                          S.Africa,
+                          Australia,
+                          NZ, USA
+Pacific Software          California Point-Of-Sale systems   -
+Tele-Soft                 S. Africa  Scientific CAD progs   TopSpeed
+                                     Databases
+(confidential)            UK         Instrumentation &      TopSpeed &
+                                     telemetry              Custom tools
+USA Dept. of Energy       Idaho      Reusable components    StonyBrook
+Idaho Nat. eng. labs                 systems programming
+Locheed Idaho technologies company
+Applied software resuse Products
+GiaStar Ltd               UK         Satcoms/Comms. Elect.  TopSpeed
+                                     design & m/facture.
+University of Reading     UK         Teaching,embedded ctrl  TopSpeed
+University of Loughborough UK                               StonyBrook
+and Hertsfordshire                                          TopSpeed
+(sole trader)             UK         Electronic Design      TopSpeed
+Atomic Energy of Canada   Canada     Shutdown system for    prototype in
+Ltd. (AECL)                          nuclear reactor        TopSpeed
+                                                         final version in
+                                                         Hicross (HiWare)
+Wallac Oy                 Finland    beta/gamma counters    Logitech,
+                                     control & data acquis. Multiscope
+Inspectron AG             Switzerland remote surveillance   Logitech,
+                                                            Multiscope
+Bank of New York          USA        funds transfer &       Terra
+Dutentechnik
+                                     customer enquirys      (VAX/VMS)
+(freelance)                          Motorola IC production Logitech
+                                     line tools. (Asia)
+Dexdyne Ltd               UK         Single-board Pcs &     TopSpeed
+                                     applications.
+(freelance)               Australia  Shareware              p1 (mac)
+Multi-Master AS           Norway     Embedded systems,      Logitech,
+                                     remote control & acquis. Multiscope
+(confidential)                       room acoustic sim &    TopSpeed
+                                     (audio) virtual reality
+
+
+1.12 Why do universities use Modula-2 for teaching instead of C or C++?
+A. Modula-2 is a type-safe language and its compilers will therefore catch
+many
+errors that otherwise show up at run time. While professional programmers need
+to learn C because it is commonly used, it is important to begin a
+discipline of
+deliberate, engineered programming at the outset. Modula-2 is easier to
+write in,
+easier to read (it reads left to right) and easier to debug in. It lends
+itself well to
+software engineering. Modula-2 is a Higher Level Language than C, particularly
+with respect to pointers, all of which have types that depend on what is
+pointed to,
+and which can be treated as addresses only by flagging this in the program.
+A2. Here are the results of a survey of university usage of Modula-2 done by
+Bernhard Leitch
+
+ lang.    total perc.   group
+Pascal     159  35.57%    1
+Ada         73  16.33%    2
+Scheme      51  11.41%    4
+Modula-2    49  10.96%    1
+C           36   8.05%    3
+C++         28   6.26%    3
+Fortran     10   2.24%    5
+Turing       6   1.34%    5
+Eiffel       5   1.12%    5
+SML          5   1.12%    5
+Miranda      4   0.89%    5
+Modula-3     4   0.89%    5
+ML           3   0.67%    5
+Oberon       2   0.45%    1
+ISETL        2   0.45%    5
+Smalltalk    1   0.22%    5
+Beta         1   0.22%    5
+Prolog       1   0.22%    5
+Simula       1   0.22%    5
+Orwell       1   0.22%    5
+Basic        1   0.22%    5
+Trine        1   0.22%    5
+Cobol        1   0.22%    5
+Pop-11       1   0.22%    5
+Lisp         1   0.22%    4
+           --- -------
+           447 100.00%
+in language groups:
+
+Wirth lang.  210  47%  1
+Ada           73  16%  2
+C/C++         64  14%  3
+Lisp like     52  12%  4
+other         48  11%  5
+             --- ----
+             447 100%
+
+
+1.13 Why is Modula-2 a good language for large commercial projects?
+A1. It supports modular design which reduces errors and cuts down on
+maintenance time.  This also allows platform dependencies to be isolated,
+increasing portability.
+
+A2. see: Griffith, Laurie Modula-2 is three times less error prone than C,
+Proceedings of
+the Second International Modula-2 Conference, Loughborough University of
+Technology, UK, September 1991, pp 332-338.
+
+1.14 Where do I get information on Oberon and Modula-3?
+A. These languages have their own newsgroups. The Modula-3 FAQ is located at
+http://www.vlsi.polymtl.ca/m3/faq.html and Oberon has an interesting page at
+http://www.math.tau.ac.il/~laden/Ob-pkgs.html
+
+1.15 Where do I get information on Modula-2*?
+A. Try http://wwwipd.ira.uka.de/Tichy/m2star
+
+1.16 Where do I get information on YAFL?
+A. This is yet another OO and Generic derivative of Modula-2. The homepage for
+the language is at http://www.phidani.be/yafl/index.html
+
+***************************************************
+
+2. WHERE IS MODULA-2 DISCUSSED?
+
+2.1 COMP.LANG.MODULA-2
+This is an internet newsgroup for questions, answers, and discussions on
+Modula-
+2. You may read it under this name on any machine on which you have a news
+account.
+
+
+2.1.1 How do I post a message to comp.lang.modula2?
+A. Post it directly into that group using a news program on any computer
+connected to the network.
+
+
+2.1.2 How do I retrieve old messages from comp.lang.modula2?
+A. Your local news server probably keeps old messages only for a few weeks.
+You
+should be able to mark the entire group as unread and browse whatever is
+available there.
+
+
+2.2 Compuserve
+If you have a Compuserve account, GO CODEPORT to join the portable
+programming forum.
+
+
+2.3 Amiga lists
+2.4.1 A general list for Amiga Modula2/Oberon programming.  This is
+available in
+a similar manner at amiga-m2@virginia.edu. It is not oriented toward any
+specific
+compiler.Mail to cbt-general-request@virginia.edu to subscribe.
+
+
+2.4.2 A mailing-list for the Amiga Turbo Modula-2 Compiler written by Amritpal
+S. Mann. To subscribe, send a message to maillist@econet.demon.co.uk with
+SignOn turbo-list as the Subject. Once subscribed, you will receive a copy
+of all
+messages sent to the address turbo-list@econet.demon.co.uk.
+
+
+2.4 Gardens Point Modula-2
+To join the GPM mailing list, send mail to majordomo@dstc.qut.edu.au with
+the subject line blank and the body
+ of the message containing:
+  subscribe gpm
+  info gpm
+  end
+Mail sent to gpm@dstc.qut.edu.au gets automatically forwarded to all
+ subscribers on the list. The development team are of course subscribers.
+
+2.5 XDS
+To subscribe to the XDS mailing list, send message with the following
+body:
+    subscribe xds
+    end
+to majordomo@listserv.iis.nsk.su.
+To submit a posting to the list, send it to xds@listserv.iis.nsk.su.
+To learn more about listserver commands, send message
+    help
+    end
+to majordomo@listserv.iis.nsk.su
+
+
+***************************************************
+
+3. WHERE CAN I GET MODULA-2 COMPILERS?
+
+3.1 Where can I get commercial Modula-2 compilers?
+
+In this section, the listings are by name of the manufacturer (marked M)
+or distributor (marked D.)
+
+ACE Associated Computer Experts bv
+activity  M
+products  Compilers, Operating systems and Consultancy
+platforms SPARC, 68K, Transputer and more
+office    Van Eeghenstraat 100
+          1071 GL  Amsterdam
+          The Netherlands
+contact   Kees Dik
+e-mail    kees@ace.nl
+voice     +31 20 6646416
+fax       +31 20 6750389
+
+
+A+L AG
+activity  D
+products  Compilers, applications, and books.
+platforms various
+office    Daderiz 61
+          CH-2540 Grenchen
+          Switzerland
+contact   Albert Meier
+e-mail    aplusl@spectraweb.ch
+voice     +41/65/52 03 11
+fax       +41/65/52 03 79
+
+
+Byte Works, Inc.
+activity  MD
+products  ORCA/Modula-2 for the Apple IIGS
+offices   8000 Wagon Mound Dr. NW
+          Albuquerque NM 87120
+contact     Mike Westerfield
+voice     (505) 898-8183
+e-mail     MikeW50@AOL.COM
+
+
+Edinburgh Portable Compilers, Ltd
+activity  MD
+products  EPC Modula-2
+platforms SCO Unix V.[34],
+          Motorola 88000 UNIX V.[34],
+          SPARC UNIX & Solaris,
+          RS/6000 AIX
+office1   17 Alva Street
+          Edinburgh, EH2 4PH, UK
+contact   Kathleen Smith
+e-mail    support@epc.ed.ac.uk
+voice     +441 131 225 6262
+fax       +441 131 225 6644
+office2   20 Victor Square
+          Scotts Valley
+          California 95066, USA
+USA tel   1-800-EPC-1110
+
+
+Gardens Point
+activity  MD
+products  Gardens Point Modula-2
+platforms Various Unix, including Linux and FreeBSD, DJGPP, EMX (OS/2)
+            and MS-DOS (no Mac)
+office    Queensland University of Technology
+          Gardens Point Branch
+          2 George Street
+          POB 2434 Brisbane
+          Queensland Australia 4001
+contact   John Gough
+e-mail    GOUGH@qut.edu.au
+contact   Jeffrey Ledermann
+e-mail    lederman@dstc.qut.edu.au
+web       http://www.fit.qut.edu.au/CompSci/PLAS/GPM/
+voice     +61 7-864-2132
+fax       +61 7-864-1801
+see mail list and net sections
+
+Mandeno Granville Electronics Ltd
+activity   MD
+products  80x51: Mod51 -  80x51 Cross Compiler, ISO extensions
+platforms DOS Hosted
+office    128 Grange Rd
+          Auckland 3
+          New Zealand
+contact
+e-mail
+voice     +64 9 6300 558
+fax       +64 9 6301 720
+
+
+Metrowerks
+activity  M
+products  standalone and MPW hosted compilers; Code Warrier environment
+platforms Macintosh
+  NOTE: Modula-2 NO LONGER SUPPORTED, but probably still available from:
+          Bookmasters
+          POB 2039 Mansfield
+          OH, USA 44905
+          Tel +1 (800) 247-6553
+          Fax +1 (419) 281 6883
+(see p1 GmbH)
+
+
+The Mill Hill & Canterbury Group, Ltd.
+activity  MD
+products  Extended 32-bit Modula-2 with Oberon extensions (non-ISO),
+Mathpak library
+platforms OS/2 with full API incl. SOM/WPS and PM
+Note: Object oriented language extensions similar to Oberon-2
+contact  Neuhoff, Juergen
+e-mail    76721.303@CompuServe.com  OR  mhc@webcom.com
+WWW       http://www.webcom.com/mhc/welcome.html
+demo      Try:  ftp-os2.nmsu.edu/os2/dev32/MOD201H.ZIP
+           ftp-os2.cdrom.com
+           ftp.leo.org
+           ftp://ftp-os2.cdrom.com/pub/os2/lang/mod201j.zip
+CompuServe: GO CODEPORT (File Name MOD201J.ZIP)
+
+
+ModulaWare
+activity  MD
+prod/plat Unix (680x0, SunSparc, I386, Linux, OS/9): MCS Modula-2 V4.5
+          DEC VAX/OpenVMS & Alpha AXP/OpenVMS: MVR & MaX V4.0
+          DOS/Windows: OM2 V1.1 (Modula-2 & Oberon-2 Compiler)
+          DOS/Windows: Mithril V2 GUI/IDE/OOP-API for OM2
+          Vendor for: OM2-XDS V2.06: (Oberon-2 and ISO Modula-2,
+            generates ANSI C, with ANSI C source of ISO Modula-2 lib)
+          Vendor for: MCS Modula-2 SVR3 (Interactive, SCO), SVR4
+             (Novell UnixWare), PC/Linux, Solaris
+office1   ModulaWare
+          La Chanenche
+          F-04340 Meolans Revel
+          France
+tel/fax   +33 92.81.30.99
+contact   Guenter Dotzel
+e-mail    100023.2527@compuserve.com
+office2   ModulaWare
+          Haselbachstr. 113
+          D-97653 Bischofsheim
+          Germany
+tel/Fax  +49 (9772) 7101
+
+
+p1 GmbH
+activity  MD
+products  MPW and Metrowerks Code Warrier hosted ISO compliant compilers
+platforms Macintosh
+office    Hogenbergstrasse. 20
+          80686 Munich
+          Germany
+contact   Elmar Henne
+e-mail    eh@p1.space.net
+voice     +49 89-546 13 10
+fax       +49 89-580 25 97
+
+
+PMI Software
+activity  MD
+products  Modula-2 tools; dealer for Mandino Granville, XDS (see
+listings)
+platforms DOS and OS/2
+contact   John McMonagle
+office    PO Box 8402
+          Green Bay WI 54311
+voice     414-468-6040
+fax       414-465-0464
+bbs       414-465-1656
+e-mail    johnm@online.dct.com
+web       http://www.dct.com/~johnm/
+
+
+Real Time Associates Ltd.
+activity  D
+products  Compilers, books, and training courses
+platforms numerous
+office    Canning House 59
+          Canning Road Croyden Surrey
+          CR0 6QF UK
+voice     (+44) 081 656 7333
+fax       (+44) 081 655 0401
+
+
+Stony Brook Software
+activity MD
+products  Stonybrook Modula-2 ISO compatible. (Environment, editor,
+resource editor, librarian, optimizing compiler, linker, debugger, many
+extra libraries) Also offers Pascal+
+platforms 16bit DOS, 32bit DOS extended, 16bit Windows, 32bit Windows
+office    187 E. Wilbur, Suite 4
+          Thousand Oaks
+          CA 91360, USA
+contact   Norman Black
+e-mail    70274.611@compuserve.com
+voice     +1 (805) 496-5837
+BBS       +1 (805) 379-3357
+
+
+TERRA Datentechnik
+activity  D
+products  Logitech/Multiscope support
+platforms DOS
+office    Bahnhofstrasse 33
+          CH-8703 Erlenbach
+          Switzerland
+voice     +41 01 910 35 55
+fax       +41 01 910 19 92
+bbs       +41 01 910 35 31
+
+TopSpeed Corp (formerly Clarion)
+activity  MD
+products  Topspeed Modula-2
+          CDBW (has Windows VID, can link with TopSpeed M2
+          Windows debugger WID available on Compuserve or on BBS)
+platforms DOS, DOS Extender, MS-Windows 3.1 (with some work)
+          OS/2
+Plans:    (According to rumour) will sell Modula-2 only as an add-on to
+            Clarion for Windows and not as a separate product. Several
+            people have tried to get more info but without much luck.
+office1   Clarion Software (Europe) Ltd.
+          Clare House, Thompsons Close
+          Harpenden, Herts, UK, AL5 4ES
+voice    +441 582 763 200
+fax      +441 582 768 222
+tech sup +441 582 763 999
+BBS      +441 582 763 666
+office2   150 East Sample Road
+          Pompano Beach
+          FL  USA 33064
+voice    1-800-354-5444 (free call in US)
+voice2   1-305-785-4555 EXT. 105
+fax      1-305-946-1650
+BBS      1-305-785-2594
+retail   http://www.singnet.com.sg/customers/cirrus/cirrus1.htm
+
+xTech Ltd
+activity  M
+products  Native XDS-x86 - Modula-2/Oberon-2 compiler for x86 all OS
+          XDS-C - Modula-2/Oberon-2 to ANSI C translator (all platforms)
+          H2D (freeware) translates C header files to M2 Def Mods
+platforms PC/DOS and DOS sessions under Windows 3.1 and OS/2 2.x,
+          V3 (Warp), PC/OS/2 V2.x, V3 (Warp), PC/Win95, PC/WNT
+          PC/Linux, - DEC Alpha AXP (Digital Unix, OpenVMS, WNT)
+          Sun/Sparc Solaris, Sun/Sparc SunOS, DecStations, MIPS/Unix
+          HP PA-Risc/HP-UX,others on request. (Mac no longer supported.)
+
+e-mail    xds@iis.nsk.su
+          also sold by ModulaWare and see PMI (above)
+           and the shareware/demo section (below)
+           for product availability
+XDS WWW home page:
+http://www.iis.nsk.su/xtech/xds/ or
+http://www.dct.com/~johnm/xds.html    (US mirror)
+XDS mailing list
+  send "subscribe xds" to majordomo@listserv@iis.nsk.su
+evalutaion kits are available from these sites
+also see ModulaWare and PMI (above) for product availability
+
+
+3.2 Where can I get a free/shareware compiler on the net?
+Note:  A net project to produce an OS/2 version of Modula-2 has apparently
+died
+in the light of commercial releases.
+
+Fitted Software Tools Modula-2 for DOS
+  ftp://ftp.psg.com/pub/modula-2/fst/fst-40s.lzh
+  ftp://cs.ru.ac.za/pub/languages/fst-40s.lzh
+P. O. Box 867403 Plano, TX 75023 USA
+contact: Roger Carvalho
+e-mail:  rogerc@metronet.com
+snail    P. O. Box 867403 Plano, TX 75023 USA
+Note:   This compiler was developed by Roger Carvalho but is no longer
+  actively supported. It essentially conforms to PIM version 3, but also
+  supports some simple  and interesting OOP extensions.
+  P. O. Box 867403 Plano, TX 75023 USA
+
+
+Gardens Point Modula-2 for DOS, Linux and FreeBSD
+  ftp://pluto.fit.qut.edu.au/pub/gpm
+  ftp://ftp.fit.qut.edu.au//pub/gpm_modula2/
+  ftp://ftp.psg.com/pub/modula-2/gpm
+(The EMX version runs under OS/2 in protected mode and can be used to
+generate OS/2 PM applications. It relies on the GNU tools from the EMX
+package ported by Eberhard Mattes mattes@azu.informatik.uni-stuttgart.de
+which can be found at: ftp.uni-stuttgart.de/pub/systems/os2/ and various
+other mirror sites.
+
+MacLogimo for the Macintosh
+  ftp://ftp.psg.com/pub/modula-2/mac/maclogimo/
+
+MacMETH Modula-2 for Macintosh
+  ftp://ftp.inf.ethz.ch/pub/macmeth/
+  ftp://ftp.psg.com/pub/modula-2/mac/macMETH/
+
+MOCKA - Modula Compiler Karlsruhe (Non ISO)
+  Universitaet Karlsruhe
+  Institut fuer Programm- und Datenstrukturen
+  Vincenz-Priessnitz-Strasse 3
+  D-76128 Karlsruhe (FRG)
+  Phone: *-49-721-608 6088        FAX: *-49-721-691462
+  contact: Thilo Gaul
+  email: [modula|gaul]@ipd.info.uni-karlsruhe.de
+
+  SUN 4        | SUN OS              | SPARC               |
+  SUN 4        | Solaris2.x/SunOS 5.0| SPARC               |
+  DEC Station  | ULTRIX              | R3000, R2000 (MIPS) |
+  Silicon      | IRIX                | R3000, R2000 (MIPS) |
+    Graphics   |                     |                     |
+  Sony NEWS    | News                | MC 68020 with 68881 |
+  SUN 3        | SUN OS              | MC 68020 with 68881 |
+  HP 9000/300  | HPUX                | MC 68020 with 68881 |
+  HP 9000/700  | HPUX                | C back end          |
+  RS6000       | AIX                 | C back end          |
+  PC           | Linux               | 80386               | +
+  PC           | 386BSD              | 80386               | +
+  C-back end   | UNIX                | different           |
+  translates   |                     |                     |
+  M-2 To C     |                     |                     |
+
+The versions marked with a + are free; no order form must be sent, no
+license fee to be paid. If you use them, please send an email to
+modula@ipd.info.uni-karlsruhe.de.
+For more information have a look to
+  http://i44www.info.uni-karlsruhe.de/~modula
+See also ftp://tsx-11.mit.edu/pub/linux/packages/modula-2/  or
+ftp://ftp.informatik.hu-berlin.de/pub/os/linux/mirrors/tsx-
+11.mit.edu/packages/modula-2/ for a Linux version.
+
+Turbo Modula-2 for Amiga
+  (contact Amritpal Mann, Turbo@econet.demon.co.uk)
+  Amiga Turbo Modula-2 may be obtained from your favourite AmiNet site as
+the following files:
+   /pub/aminet/dev/m2/TurboV1.3Part1.lha
+   /pub/aminet/dev/m2/TurboV1.3Part2.lha
+
+Ulm's Modula-2 System for SPARCv8 Workstations (non-ISO)
+   ftp://ftp.mathematik.uni-ulm.de/pub/soft/modula/ulm/sun4/
+
+xTech Ltd
+ ( Windows 95/NT, OS-2, Linux native code and translators. ISO
+compatible.)
+Makes demo and pre-release versions with some restrictions available.
+The download site for all versions is:
+http://www.dct.com/~johnm/xdsavail.html#demo
+
+3.3 How about a Summary of Commercial ISO Products for the Major
+Microcomputer platforms?
+
+MS-DOS:
+GPM, ModulaWare, Stony Brook
+Windows95/NT:
+ModulaWare, Stony Brook, XDS
+OS/2:
+Mill Hill, XDS
+MacOS:
+p1
+
+***************************************************
+
+Rick Sutcliffe Math/Cmpt Trinity Western University <http://www.twu.ca/>
+CDN Chair WG13, FAQ maintainer comp.lang.modula-2
+<http://www.twu.ca/faculty/fnas/rsutcliffe.html> <Not speaking officially>
+
+
+
+
+From: Rick Sutcliffe <rsutc@twu.ca>
+Subject: Modula-2 FAQ/part2
+Summary: This file contains the answers to some commonly asked questions
+  about the programming language Modula-2.
+Keywords: languages, Modula-2
+Newsgroups: comp.lang.modula2,comp.answers,news.answers
+Date: 28 Feb 1997 11:57:19 GMT
+Followup-To: poster
+Organization: none
+Path: news.mu-luebeck.de!news-ham1.dfn.de!news-ber1.dfn.de!fu-berlin.de!news.mathworks.com!bloom-beacon.mit.edu!senator-bedfellow.mit.edu!faqserv
+Supersedes: <computer-lang/Modula2-faq/part2_854536810@rtfm.mit.edu>
+Lines: 632
+Approved: news-answers-request@MIT.EDU
+Distribution: world
+Expires: 13 Apr 1997 11:55:45 GMT
+Message-ID: <computer-lang/Modula2-faq/part2_857130945@rtfm.mit.edu>
+References: <computer-lang/Modula2-faq/part1_857130945@rtfm.mit.edu>
+NNTP-Posting-Host: bloom-picayune.mit.edu
+X-Last-Updated: 1997/01/28
+Originator: faqserv@bloom-picayune.MIT.EDU
+Xref: news.mu-luebeck.de comp.lang.modula2:2786 comp.answers:6739 news.answers:8517
+
+Archive-name: computer-lang/Modula2-faq/part2
+Version: 2.7
+Last-modified: 1997 01 28
+Posting-frequency: Monthly
+
+4. WHERE CAN I GET SOURCE CODE, OTHER INFO?
+
+4.1.1 Is there source or other info available on the net?
+A. Here are some net sites I have accessed at one time or another. I am not
+sure if
+all are still available or what is in them.
+  ftp://ee.newcastle.edu.au/pub/modula2/
+  ftp://ftp.psg.com/pub/modula-2/
+  ftp://FTP.twu.ca/pub/modula2/m2faq.html ( Home of this FAQ)
+  ftp://ftp.inf.ethz.ch/pub/
+  ftp://NIC.SWITCH.CH
+  ftp://sageftp.inel.gov/ftp/pub/sage/
+  ftp://ftp.mathematik.uni-ulm.de/pub/soft/modula/
+
+WWW sites
+http://www.yahoo.com/Computers_and_Internet/Programming_Languages/M
+odula_2/
+
+http://www.jumbo.com/prog/dos/modula2/
+
+http://www.stfx.ca/people/jandrea/m2/
+
+http://www.info.apple.com/dev/devinfo/languages.html (sparse M2 compiler
+info)
+http://i44www.info.uni-karlsruhe.de/~vollmer/mocka.html
+http://www.dct.com/~johnm/M2info.html
+
+http://www.ualberta.ca/~pkobly/
+
+http://www.pitt.edu/~jesst63/modula2.html
+
+4.2 What other FAQs or lists of pages are available?
+A. Try  http://www.ee.newcastle.edu.au/users/staff/peter/m2/Modula2.html
+A2. http://www.stfx.ca/people/jandrea/m2/
+A3. (commercial) http://www.dct.com/~johnm/M2info.html
+A4. http://www.ualberta.ca/~foka/Computer.html#Modula-2
+
+A5. http://www.pitt.edu/~jesst63/modula2.html
+
+A6. http://www.ualberta.ca/~foka/Computer.html#Modula-2
+
+A7. http://www.dct.com/~johnm/xdslinks.html
+
+
+
+4.3  Where can I find graphics libraries, etc?
+A1. Try the PMOS library for various platformsat
+  <A
+HREF=3D"http://www.ee.newcastle.edu.au/users/staff/peter/m2/PMOS/PMOS.html
+">http://www.ee.newcastle.edu.au/users/staff/peter/m2/PMOS/PMOS.html
+ (Australia)
+   or, at one of the following sites:
+  ftp://ftp.psg.com/pub/modula-2/code  (North America)
+  ftp://cs.ru.ac.za/pub/languages   (South Africa)
+  ftp://dutiba.twi.tudelft.nl/pub/modula2   (Western Europe)
+  ftp://ftp.cnit.nsk.su/pub/msdos/programm.ing/modula2   (Eastern Europe).
+
+A2. there is a graphics library MultiGraph available through the MultiGraph
+home
+page at
+http://www.ccas.ru/~iak/mg2.htm
+  It supports nearly all the Super-VGA graphics modes on VESA-compatible
+graphics boards, including high-color and true-color modes.
+You may also contact
+   Databiten AB
+   P O Box 115
+   811 22 Sandviken
+   SWEDEN
+   phone: +46 26 256493
+   fax:   +46 26 253641
+OR
+   Department of Applied Acoustics
+   Chalmers University of Technology
+   Gothenburg, SWEDEN
+   e-mail: bid@ta.chalmers.se
+   fax : +46 31 145154
+OR
+   Alex Iakovlev
+   Computing Center of the Russian Academy of Sciences
+   40, Vavilov Street, Moscow, GSP-1, 117967, Russia
+   mailto:iak@ccas.ru
+
+
+4.4 Are there any mathematical libraries available?
+A1. See Numerical Procedures in Modula-2 -- authorized translation of
+Numerical
+recipes in Pascal from PolyWare 1992 420 Ruston Rd Toronto, Ontario Canada
+
+A2. A numerical analysis package (as Modula-2 source files) is now available=
+=2E
+Information can be found at:
+http://www.ee.newcastle.edu.au/users/staff/peter/m2/NumAnal.html
+=46rom this point one can download a classical (PIM) version or a standard (=
+ISO)
+version.
+
+The modules in this package are:
+    Complex arithmetic: most of the usual operations, including the
+         recently-requested SIN and COS.
+    Matrices: operations on matrices of any size (up to a maximum
+         size limit, of course) - things like addition, multiplication,
+         inverse, solving linear equations, eigenvalues.
+    Polynomials: including root-finding.
+    Fast Fourier Transform.
+    Solving ordinary differential equations.
+
+A3. LMathLib is a library that defines a number of mathematical functions fo=
+r
+Modula 2 programs. Unlike other libraries of the same kind, LMathLib
+patches the
+Modula 2 compiler. All library functions are inlined as assembler code for t=
+he
+=46loating Point Unit. This results in faster code compared to the
+traditional solution
+with subroutine calls. Due to this machine dependent technique, you can use
+the
+library ONLY with the (free) GMD Modula System Mocka for Linux on INTEL
+based machines. You can get the LMathLib library via anonymous ftp from
+ftp://tee-1.tee.uni-essen.de/pub/Mocka/(132.252.131.33) Documentation is
+included.
+
+
+
+4.5  Where can I get a Modula-2 to C converter?
+A: The program mtc is available by anonymous ftp from
+  file://ftp.psg.com/pub/modula-2/grosch/mtc.tar.Z
+  file://ftp.ira.uka.de/pub/programming/cocktail/mtc.tar.Z
+  file://rs1.rrz.uni-koeln.de/usenet/comp.archives/languages/modula-2/mtc
+    An already ported version for DOS+DJGPP can be found at
+file://ftp.uni-stuttgart.de/pub/unix/programming/compilerbau/dos/mtc/
+    There is an already ported Linux version too.  It can be found on the
+Sun site at
+http://sunsite.unc.edu/pub/Linux/devel/lang/modula-2/
+    Several of the compilers available work by producing C code and can
+also serve
+this purpose. See p1 and XDS listings.
+
+
+4.6  Where can I get a Modula-2 to Modula-3 converter?
+A. m2tom3 is available under the terms of the GNU Library General Public
+License from
+ftp://ftp-i3.informatik.rwth-aachen.de/pub/Modula-3-Contrib/m2tom3/
+   m2tom3 is a system to port Modula-2 programs to Modula-3. It consists
+of two parts:
+ - A conversion program which tries to create a Modula-3 source text
+   with the same semantics as the Modula-2 input while retaining the
+   original look and feel as good as possible.
+ - A base library which tries to emulate the Modula-2 standard library
+   using the Modula-3 standard library.
+  contact: Peter Klein
+  office:  Ahornstrasse 55, 52074 Aachen, Germany
+  e-mail:  pk@i3.informatik.rwth-aachen.de.
+  Tel.: +49/241/80-21316
+  Fax.: +49/241/8888-218
+
+
+4.7 Are there any Modula-2 applications around?
+A. The Idaho National Engineering Laboratory (INEL) develops and maintains a
+now ~350,000 line public domain MODULA-2 reusable component library called
+SAGE. For more information on SAGE send E-Mail to hotline@sage.inel.gov and
+see the FTP server at ftp://sageftp.inel.gov/ftp/pub/sage/
+
+
+4.8 Is there a Modula-2 version available for parallel processing?
+A. IPD Modula-2* team has released version 9401 of the new Modula-2*
+programming environment for several architectures.
+You can get the IPD Modula-2* distributions for all supported architectures =
+by
+anonymous ftp from ftp://ftp.ira.uka.de/pub/programming/modula2star/
+Please do not forget to use binary mode when retrieving any of them! Registe=
+r
+your copy with the registration secretary: ipdm2s@ira.uka.de For further
+information and bug reports please contact the IPD Modula-2* team at
+msc@ira.uka.de
+
+
+4.9 Are there any compiler construction tools available?
+A1. Some old ones appear in ftp://ftp.gmd.de/GMD/cocktail/
+
+AA2. Coco/R generates recursive descent parsers and their associated scanner=
+s
+from attribute grammars.  Full source code, and a variety of simple example
+applications are supplied in the distribution kits.  The Modula versions
+(1.39 is the
+latest) are available from
+ftp://ftp.inf.ethz.ch:/pub/software/Coco
+ftp://ftp.psg.com:/pub/modula-2/coco
+ftp://cs.ru.ac.za:/pub/coco
+ftp://ftp.fit.qut.edu.au:/pub/coco
+There are versions for the MS-DOS compilers (JPI, FST, Logitech, StonyBrook,
+Gardens Point), for the Mocka compiler for Linux and FreeBSD, as well as
+for the
+Gardens Point Unix compilers, including Linux and FreeBSD.  There is also a
+version that produces TurboPascal units very similar to the Modula modules. =
+A
+port for the P1 compiler on the Mac should be available soon.  A port by Rol=
+f
+Schrader for TDI Atari Modula-2 is now available from
+ftp://cs.ru.ac.za:/pub/coco/ATARI136.EXE  in the form of an MS-DOS self-
+extracting file.  This may also be unpacked by using the LHA decompressor on
+other systems.
+
+A2. A copy of the EBNF for ISO Modula-2 can be found in
+http://www.twu.ca/faculty/rsbook/Appendices/Ap3.nisus.html
+
+
+4.10 Does anyone know of a lexical analysis tool that is written in
+Modula-2 and
+for Modula-2 code?
+A.You want rex, part of Cocktail (also ll and lalr parser generators,
+abstract syntax
+trees, attribute grammar evaluators, tree  Free version:
+
+ftp://ftp.ira.uka.de:/pub/programming/cocktail/
+
+  ftp://ftp.uni-stuttgart.de/pub/unix/programming/compilerbau/  (includes a
+dos version using DJGPP)
+
+ Commercial version and support:
+  Dr.-Ing. Josef Grosch        Tel.  : 0721-697061
+  CoCoLab                      Fax   : 0721-661966
+  Hagsfelder Allee 16          EMail : grosch@cocolab.sub.com
+  D-76131 Karlsruhe
+
+
+4.11 What can you tell me about debuggers?
+A. For gnu, try http://www.cis.ohio-state.edu/htbin/info/info/gdb.info,Modul=
+a-
+2
+
+4.12 Is there an applications framework for Windows programming?
+A. Try looking at
+ftp://ftp.ifi.uio.no/pub/sjr/m2afx.zip
+orftp://ftp.leo.org/pub/comp/platforms/pc/windows/programming/modula/
+m2afx.zip
+
+This software is an application framework that implements a number of classe=
+s
+that encapsulate the weirdness of the Windows C API and attempts to present
+it in
+a cleaner way to the Modula-2 programmer.
+
+4.13 Does there exist something to convert a C header file to a Modula-2
+DEFINITION MODULE file for me?
+A. Try looking at the xTech Ltd site for the H2D freeware product on some
+platforms
+<A
+4.14 Is there any Benchmark code out there?
+A. Try looking at the xTech Ltd site for their benchmark suite.
+http://www.dct.com/~johnm/xdsfbdlo.html#benchmarks
+
+
+4.15 Where can I get the C code of a Modula-2 compiler?
+
+A. Most Modula-2 compilers are written in Modula-2.  It seems
+rather strange to me that one would want to trust the compilation of a
+good language to a tool written in a poor one.
+
+4.16 Can you help me with my assignments?
+A. Some people may give you hints, but please do not subvert your professor
+and
+your education by submitting work other people do for you.
+
+***************************************************
+
+5. SPECIFIC QUESTIONS ON CODE AND ALGORITHMS
+
+5.1 Where can I get an algorithm for an efficient random number generator?
+A1. Pierre L'Ecuyer: Efficient and Portable Combined Random Number Generator=
+s,
+Communications of the ACM, vol. 31, no. 6, pp. 742-749. The RNG has a
+period of
+approximately 2.3E+18. Generating 1 000 000 numbers per second, that means
+that
+it would take over 73 000 years before it repeated a sequence.
+
+A2.Have a look at
+http://www.pitt.edu/~jesst63/modula2.html
+
+A3.Look in the PMOS library. This one uses the 'Minimal standard random
+number generator' described by Park & Miller, CACM 31,10,Oct 88 p1192. The
+code has been checked for the 10001st random as specified in Park & Miller
+p1195.
+One site is:
+ftp://ftp.psg.com/pub/modula-2/code/random/
+
+
+***************************************************
+
+6. WHAT ARE SOME REFERENCE MATERIALS ON MODULA-2?
+
+A1. A shareware text I have written is available as html in
+http://www.twu.ca/rsbook/Welcome.html
+mirrors: http://eiunix.tuwien.ac.at/Modula-2/rsbook/
+and as postscript in ftp://FTP.twu.ca/pub/modula2/Modula-
+2Text/Chapters.ps/
+
+A2. A tutorial is available at the Jumbo site in
+http://www.jumbo.com/prog/dos/modula2
+A3.The manuals for some of the commercial products such as TopSpeed contain
+much useful information.
+
+A4. The Gardens Point sites have documentation available (see their listing
+above.)
+
+A5. A document called Modula-2 for Pascal programmers (Postscript,10 pages)
+may
+be fetched by anonymous ftp at
+ftp://ee.newcastle.edu.au/pub/modula2/Modula2.ps.Z
+The author has not updated the contents for a couple of years, so there may =
+be
+minor inaccuracies in terms of the current language standard.
+
+A6. A variety of ETH papers are stored at ftp.ftp.ethz.ch in /doc/diss,
+/doc/tech-
+reports and /pub/oberon/docu
+
+A7. What follows is a BIBLIOGRAPHY of some published materials in a table
+delimited by two spaces between fields:
+
+Author  Title  City  Publisher  Year  Subject
+
+	Adams, J. Mack Gabrini, Philippe J & Kurtz, Barry L.  An
+Introduction to
+Computer Science with Modula-2  Lexington, MA  D.C. Heath & Co  1988
+	Backhurst, Nigel G.  Mastering Modula 2  Wilmslow  Sigma  1988
+	Beidler, John & Jackowitz, Paul  Modula-2  Boston  Prindle Weber &
+Schmidt
+1985
+	Blaschek, G. & Pomberger, G.  Introduction To Programming With
+Modula-2
+Springer-Verlag  1990
+	Budgen, David  Software Development with Modula-2  Reading, MA
+Addison-
+Wesley  1989
+	Carmony, Lowell A. & Holliday, Robert L.  A First Course In
+Modula-2  New
+York  Computer Science Press  c1990
+	Carroll, D. W.  Advanced Modula-2 Programming for the IBM PC  XT
+and AT
+Elsevier  1986
+	Chirlian, Paul M.  Introduction to Modula-2  Beaverton, Or.  Matrix
+Publishers
+	Christian, Kaare  A guide to Modula-2  New York  Springer-Verlag  1986
+	Cooling, J.E.  Modula-2 for Microcomputer Systems    Van Nostrand
+Reinhold
+1988
+	Cooper, Doug  Oh My!  Modula-2!  New York  Norton  1990
+	Cornelius, Barry  Programming with TopSpeed Modula-2  Reading, MA
+Addison Wesley  1991
+	Eisenbach, Susan & Sadler, Cristopher  Program Design with Modula-2
+Reading, MA  Addison-Wesley  1989
+	Elder, Jim   Compiler Construction: A Recursive Descent model  Hemel
+Hempstead  England:  Prentice-Hall  1994
+	Etling, Don  Modula-2 Programmer's Resource Book  Blue Ridge
+Summit, PA
+Tab Books  1988
+	Feldman, Michael B.  Data Structures with Modula-2  Englewood
+Cliffs, NJ
+Prentice Hall  1988
+	Ford, Gary & Wiener, Richard.  Modula-2: A Software Development
+Approach
+New York  Wiley  1985
+	Gabrini, Philippe J. & Kurtz, Barry L.  Data Structures And
+Algorithms With
+Modula-2  Lexington, MA  DC Heath  c1992
+	Gleaves, Richard  Modula-2 for Pascal Programmers  New York  Springer-
+Verlag  1984
+	Gough, K. John & Mohay, George M.  Modula-2: A Second Course In
+Programming  Englewood Cliffs, NJ  Prentice Hall  1988
+	Greenfield, Stuart B.  Invitation to Modula-2    Petrocelli Books  1985
+	Harrison, Rachael  Abstract Data Types in Modula-2  New York  Wiley
+1989
+Wiley
+	Harter, Edward D.  Modula-2 Programming.  A First Course  Englewood
+Cliffs, NJ  Prentice-Hall  1990
+	Helman, Paul & Veroff, Robert  Walls and Mirrors: Intermediate Problem
+Solving and Data. Modula-2  Menlo Park, CA  Benjamin Cummings  1988
+	Hewitt, Jill A. & Frak, Raymond J.  Software Engineering in
+Modula-2:  an
+object-oriented approach   London  Macmillan  1989.
+Hille, R.F.  Data Abstraction and Program Development Using Modula-2  Sydney
+Prentice Hall  1989
+	Hopper, Keith.  The Magic of Modula-2  Melbourne  Prentice Hall  1991
+	Johnston, Chris  Applying Modula-2   Academic Press  1991
+	Jones, William C. Jr.  Data Structures Using Modula-2  New York
+Wiley  1988
+	Jones, William C. Jr.  Modula-2 Problem Solving and Programming
+with Style
+New York  Harper & Row  1987
+	Joyce, Edward J.  Modula-2: A Seafarer's Manual & Shipyard Guide
+Reading,
+MA  Addison-Wesley   1985
+	Kaplan, Ian & Miller, Mike  Modula-2 Programming  Rochelle Park, NJ
+Hayden Book Co.  1986
+	Kelly-Bootle, Stan  Modula-2 Primer    Howard W. Sams & Co.  1987
+	King, K.N.  Modula-2: A Complete Guide  Lexington, MA  D.C. Heath &
+Co
+1988
+	Knepley, Ed & Platt, Robert  Modula-2 Programming  Reston, VA  Reston
+Pub. Co.  1985
+	Koffman, Elliot B.  Problem Solving and Structured Programming in
+Modula-2
+Reading, MA  Addison-Wesley  1988
+	Kruse, Robert L.  Programming With Data Structures Modula-2 Version
+Englewood Cliffs, NJ  Prentice-Hall  1988
+	Lawrence, Mike  Modula-2 And The Amiga  Avant-Garde Software  1990?
+	Leestma, Sanford & Nyhoff, Larry  Programming & Problem-Solving in
+Modula-2  New York  Macmillan  1989
+	Lins, C. (Charles)  The Modula-2 Software Component Library Volumes
+I-IV
+New York  Springer-Verlag  1989-
+	Mayer, Herbert G.  Programming in Modula-2.  the Art & the Craft
+New York
+Macmillan  1988
+	McCracken, Daniel D. & W. Salmon  A Second Course in Computer Science
+with Modula-2  New York  Wiley  1987
+	Messer, P. A. & I. Marshall  Modula-2 Constructive Program
+Development
+Oxford  Blackwell Scientific Publications  1986
+	Metrowerks, Inc. Staff  Metrowerks Modula-2 Start Pak  New York
+Macmillan
+1990
+	Mitchell, R. J.  Modula-2 Applied   London  Macmillan  1991
+	Mitchell, Richard  Abstract Data Types And Modula-2  A Worked
+Example Of
+Design Using Data Abstraction   Englewood Cliffs, NJ  Prentice Hall  1992
+	Moore, John B. & McKay, Kenneth N.  Modula-2 Text and Reference
+Englewood Cliffs, NJ  Prentice-Hall  1987
+	Novak, M.M.  Modula-2 in Science & Engineering  London  McGraw  1990
+	Nyhoff, Larry & Leestma ,Sanford  Data Structures & Advanced
+Programming
+in Modula-2  New York  Macmillan  1990
+	Ogilvie, John W. L.  Modula-2 Programming  New York  McGraw-Hill  1985
+	Pinson, Lewis Sincovec, Richard & Weiner, Richard  A First Course in
+Computer Science with Modula-2  New York  Wiley  1987
+	Pittman, Thomas & Peters, James  The Art Of Compiler Design Theory And
+Practice  Englewood Cliffs, NJ  Prentice-Hall  1992
+	Pomberger, Gustav.   Software Engineering and Modula-2  Englewood
+Cliffs,
+NJ  Prentice Hall  1984
+	Rechenberg, P. & M=F6ssenb=F6ck, H. (tr. O'Meara, John)  A Compiler
+Generator
+for Microcomputers  Englewood Cliffs, NJ  Prentice Hall / Carl Hanser
+Verlag  1989
+	Riley, David D.  Data Abstraction and Structures: An Introduction
+To Computer
+Science II  Boston  Boyd & Fraser Pub. Co.  1987
+	Riley, David D.  Using Modula-2: An Introduction To Computer
+Science I
+Boston  Boyd & Fraser Pub. Co.  1987
+	Sale, Arthur H. J.  Modula-2: Discipline & Design  Sydney
+Addison-Wesley
+1986
+	Sawyer, Brian & Foster, Dennis.   Programming Expert Systems in
+Modula-2
+New York  Wiley  1986
+	Schildt, Herbert  Advanced Modula-2  Berkeley, CA  Osborne
+McGraw-Hill
+1987
+	Schildt, Herbert  Modula-2 Made Easy  Berkeley, CA  Osborne
+McGraw-Hill
+1986
+	Schiper, Andre; (tr. Howlett, Jack)  Concurrent programming:
+Illustrated With
+Examples in Portal, Ada, and Modula-2    Halsted Press  1989
+	Schnapp, Russell L.  Macintosh Graphics in Modula-2  Englewood
+Cliffs, NJ
+Prentice-Hall  1986
+	Sincovec, Richard F. & Richard S. Wiener.   Data Structures Using
+Modula-2
+New York  Wiley  1986
+	Sincovec, Richard F. & Wiener, Richard S.  Modula-2 Software
+Components
+New York  Wiley  1987
+	Stubbs, Daniel F. & Webre, Neil W.  Data Structures With Abstract
+Data Types
+and Modula-2  Monterey, CA  Brooks/Cole Pub. Co.  1987
+	Sutcliffe, Richard J.  Introduction to Programming Using Modula-2
+Columbus,
+OH  Merrill  1987
+	Sutcliffe, Richard J. mailto:rsutc@charity.twu.ca. Modula-2:
+Abstractions for Data and Programming Structures (Using ISO-Standard
+Modula-2) Mt. Lehman: Arjay Enterprises 1996.
+http://www.twu.ca/rsbook/Welcome.html (1996 09 16)
+	Sutcliffe, Richard J. Standard Generic Modula-2 (Document
+ISO/IEC/JTC1/SC22/WG13 D235) 1996 07 12
+ftp://FTP.twu.ca/pub/modula2/WG13/ca101.GenericModula2CD(1996
+09 16)
+	Sutherland, Robert J.  The Professional Programmer's Guide to
+Modula-2
+London  Pitman  1988
+	Terry, Patrick D.  An Introduction To Programming with Modula-2
+Reading,
+MA  Addison-Wesley  1987
+	Thalmann, Daniel  Modula-2: An Introduction  New York
+Springer-Verlag
+1985
+	Tremblay, Jean-Paul DeDourek, John M. & Daoust, David A.  Programming
+in Modula-2  New York  McGraw-Hill  1989
+	Tucker, Allen B. Jr.  Computer science: A Second Course Using
+Modula-2
+New York   McGraw-Hill  1988
+	Ullmann, Jeffrey  Compiling in Modula-2 - A First Introduction To
+Classical
+Recursive Descent Compiling   Hemel Hempstead  England: Prentice-Hall  1994
+	Ural, Saim & Ural, Suzan  Introduction to Programming with Modula-2
+New
+York  Harper & Row  1987
+	Walker, Billy K  Modula-2 Programming With Data Structures
+Belmont, CA
+Wadsworth Pub. Co.  1986
+	Walker, Robert D.  Modula-2 Library Modules: A Programmer's
+Reference  Blue
+Ridge Summit, PA  Tab Books  1988
+	Ward, Terry A.  Advanced Programming Techniques in Modula-2
+Glenview, IL
+Scott Foresman  1987
+	Welsh, Jim & Elder, John  Introduction to Modula-2  Englewood
+Cliffs, NJ
+Prentice-Hall  1987
+	Wiatrowski, Claude A. & Wiener, Richard S.  From C to Modula-2--and
+Back -
+Bridging The Language Gap  New York  Wiley
+	Wiener, Richard  Modula-2 Wizard's Programming Reference  New York
+Wiley  1986
+	Wiener, Richard & Ford, G.  Modula-2 A Software Development Approach
+New York  Wiley  1985
+	Wiener, Richard & Sincovec, R. F.  Software Engineering with
+Modula-2 and
+Ada  New York  Wiley  1984
+	Willis, Claire & Paddon, Derek  Abstraction And Specification With
+Modula-2
+London  Pitman  1992
+	Wirth, Niklaus  Programming in Modula-2 (3rd corrected ed.)  New York
+Springer-Verlag  1985
+	Wirth, Niklaus  Algorithms and Data Structures (1986 edition)
+Englewood
+Cliffs, NJ  Prentice-Hall  1986
+	Wirth, Niklaus  Programming in Modula-2 (4th ed.)   New York  Springer-
+Verlag  1990
+	Woodman, Mark et al  Portable Modula-2 Programming  Maidenhead,
+Berkshire UK  McGraw-Hill  1989
+
+7. REVIEWS OF MODULA-2 PRODUCTS.
+
+Note: The reviews have been contributed by others and I take no
+responsibility for
+their accuracy or for any opinions expressed therein. I have updated some
+of the
+facts.
+
+p1 Modula-2 v5.2 for Macintosh, by Marc Martin, Dec 1994.This is an excellen=
+t
+Modula-2 compiler, implemented as an MPW Tool. Highlights include ISO
+language extensions & library, a full set of Macintosh toolbox definitions,
+language
+extensions to simplify toolbox programming, object-oriented extensions and
+support for MacApp, greater than 32k code and globals, code generation
+comparable to Apple's official compilers, several FPU code options,
+multi-window
+debugger, linkable with other MPW languages, detailed documentation, and
+superb technical support via e-mail. Downsides include high cost (US$400),
+dependency on MPW, lack of SADE support, and no native PowerPC version.
+Version 5.3 is in alpha testing, and adds ANSI C output for creating PowerPC
+programs under MPW or CodeWarrier.  (Now at 5.4 and still no native PC back
+end -RS)
+
+GPM, MOD32, TopSpeed and XDS are reviewed at
+http://www.eng.newcastle.edu.au/ee/Moylan/os2/os2m2.html
+
+Appendix: AUTHOR INFORMATION AND DISCLAIMERS
+
+Personal: I have used, written about, and taught Modula-2 (since 1983) and
+have
+maintained some of the information in this list for over seven years. I
+have used at
+least a dozen different compiler/environments in that time on five different
+platforms, and have written numerous articles and reviews for publication.
+I have
+been a member of the ISO committee WG13 (Modula-2 standardization) since its
+inception and have participated in all the debates and meetings of WG13 exce=
+pt
+for meeting #9 at Lake Wanaka. I have written a text on Modula-2 (now
+shareware), made numerous submissions to WG13 and directed an
+implementation of the ISO I/O library in order to verify its concepts. I am
+the
+author and project editor of Standard Generic Modula-2.
+
+Disclaimers:
+(i) I take no responsibility for anyone's use or misuse of this information.
+(ii) Apart from having been a beta tester, textbook writer, programmer and
+a long
+time user of Modula-2, I have no financial connection with any manufacturer =
+or
+distributor of software. I am the author of some Modula-2 materials (some of
+which are shareware) as noted herein.
+(iii) In producing this material, I am NOT acting in an official capacity
+for TWU,
+WG13, ABC, IEEE, ACM, comp.lang.modula2, or any other organization.
+(iv) Mention of a book or product is NOT an endorsement unless specifically
+noted.
+(v) Inclusion of materials on this list is based on relevance to Modula-2
+and factual
+content and is otherwise entirely without prejudice. I edit all submissions
+for
+brevity, clarity, and usage.
+
+To remain authoritative, this and all versions of this FAQ are copyright
+1991-1996
+by Rick Sutcliffe. This document may be copied and distributed provided it
+is not
+altered and no fee is charged with the exception of normal downloading costs=
+=2E
+
+Compiled by:
+Rick Sutcliffe (aka The Northern Spy in the old days)
+Trinity Western University
+7600 Glover Rd.,
+Langley, B.C. Canada V2Y 1Y1
+(604) 888-7511 Fax 888-1225 mailto:rsutc@twu.ca
+
+Rick Sutcliffe Math/Cmpt Trinity Western University <http://www.twu.ca/>
+CDN Chair WG13, FAQ maintainer comp.lang.modula-2
+<http://www.twu.ca/faculty/fnas/rsutcliffe.html> <Not speaking officially>
+
+
+
+
+
+
+
+
+

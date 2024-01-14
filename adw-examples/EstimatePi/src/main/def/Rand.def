@@ -1,0 +1,21 @@
+DEFINITION MODULE Rand;
+
+        (********************************************************)
+        (*                                                      *)
+        (*              Random number generator                 *)
+        (*                                                      *)
+        (*      This version is about 50% slower than the       *)
+        (*      PMOS random number generator, but it's more     *)
+        (*      portable.  I haven't done enough tests to       *)
+        (*      judge which one is "more random".               *)
+        (*                                                      *)
+        (*  Programmer:         P. Moylan                       *)
+        (*  Last edited:        7 August 1996                   *)
+        (*  Status:             OK                              *)
+        (*                                                      *)
+        (********************************************************)
+
+PROCEDURE RANDOM(): REAL;
+
+END Rand.
+

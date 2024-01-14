@@ -1,0 +1,11 @@
+DEFINITION MODULE Liste;
+
+TYPE ListenPtr;
+
+PROCEDURE anhaengen(VAR nach: ListenPtr; von: ListenPtr);
+PROCEDURE ausgabe(reihe: ListenPtr);  
+PROCEDURE einfuegen(VAR reihe: ListenPtr; wert: INTEGER);
+PROCEDURE sortiertEinfuegen(VAR reihe: ListenPtr; wert: INTEGER);
+
+END Liste. 
+
