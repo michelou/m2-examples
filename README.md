@@ -9,7 +9,7 @@
   </tr>
 </table>
 
-[Ada][ada_examples], [Akka][akka_examples], [C++][cpp_examples], [Dart][dart_examples], [Deno][deno_examples], [Docker][docker_examples], [GraalVM][graalvm_examples], [Haskell][haskell_examples], [Kafka][kafka_examples], [Kotlin][kotlin_examples], [LLVM][llvm_examples], [Node.js][nodejs_examples], [Scala 3][dotty_examples], [Spark][spark_examples], [Spring][spring_examples], [TruffleSqueak][trufflesqueak_examples] and [Wix Toolset][wix_examples] are other topics we are continuously monitoring.
+[Ada][ada_examples], [Akka][akka_examples], [C++][cpp_examples], [Dart][dart_examples], [Deno][deno_examples], [Docker][docker_examples], [Flix][flix_examples], [Golang][golang_examples], [GraalVM][graalvm_examples], [Haskell][haskell_examples], [Kafka][kafka_examples], [Kotlin][kotlin_examples], [LLVM][llvm_examples], [Node.js][nodejs_examples], [Rust][rust_examples], [Scala 3][dotty_examples], [Spark][spark_examples], [Spring][spring_examples], [TruffleSqueak][trufflesqueak_examples] and [Wix Toolset][wix_examples] are other topics we are continuously monitoring.
 
 ## <span id="proj_deps">Project dependencies</span>
 
@@ -43,10 +43,10 @@ C:\opt\XDS-Modula-2\<sup id="anchor_02"><a href="#footnote_02">2</a></sup>   <i>
 This project is organized as follows:
 
 <pre style="font-size:80%;">
-adw-examples\{a href="adw-examples/README.md">README.md</a>}
+adw-examples\{<a href="adw-examples/README.md">README.md</a>}
 docs\
-examples\{<a href="examples/README.md">README.md</a>, ..}
-xds-examples\{a href="xds-examples/README.md">README.md</a>}
+examples\{<a href="examples/README.md">README.md</a>, <a href="./examples/Factorial/">Factorial</a>, <a href="./examples/Hello/">Hello</a>, <a href="./examples/PascalTriangle/">PascalTriangle</a>, ..}
+xds-examples\{<a href="xds-examples/README.md">README.md</a>}
 README.md
 <a href="RESOURCES.md">RESOURCES.md</a>
 <a href="setenv.bat">setenv.bat</a>
@@ -107,10 +107,10 @@ In our case we downloaded the following installation files (<a href="#proj_deps"
 <span id="footnote_02">[2]</span> ***Excelsior XDS Modula-2*** [↩](#anchor_02)
 
 <dl><dd>
-The XDS Modula-2 SDK 2.6 is included in the Zip archive <a href="https://github.com/excelsior-oss/xds-ide/releases" rel="external">Excelsior XDS Modula-2 IDE 1.7.0</a>. Concretely we simply extract the <code><b>xds-ide\sdks\XDS-x86\</b></code> subdirectory (thus ignoring the Eclipse IDE related stuff). In our case we created a directory <code><b>C:\opt\XDS-Modula-2\</b></code> :
+The <a href="https://github.com/excelsior-oss/xds-2.60">XDS Modula-2 SDK 2.6</a> is included in the Zip archive <a href="https://github.com/excelsior-oss/xds-ide/releases" rel="external">Excelsior XDS Modula-2 IDE 1.7.0</a>. Concretely we simply extract the <code><b>xds-ide\sdks\XDS-x86\</b></code> subdirectory (thus ignoring the Eclipse IDE related stuff). In our case we created a directory <code><b>C:\opt\XDS-Modula-2\</b></code> :
 
 <pre style="font-size:80%;">
-<b>&gt; <a href="">tree</a> /a c:\opt\XDS-Modula-2 | <a href="">findstr</a> /b +</b>
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a c:\opt\XDS-Modula-2 | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b +</b>
 +---bin
 +---c
 +---def
@@ -121,7 +121,7 @@ The XDS Modula-2 SDK 2.6 is included in the Zip archive <a href="https://github.
 +---readme
 +---samples
 &nbsp;
-<b>&gt; <a href="">dir</a> /b c:\opt\XDS-Modula-2\bin\*.exe</b>
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">dir</a> /b c:\opt\XDS-Modula-2\bin\*.exe</b>
 h2d.exe        <i>(<a href="http://computer-programming-forum.com/26-programming-language/d41077d4e2e3f40d.htm">C headers to Modula-2 definition modules translator</a>)</i>
 his.exe        <i>(XDS History formatter)</i>
 xc.exe         <i>(XDS Compiler for Oberon-2/Modula-2)</i>
@@ -184,11 +184,13 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 [deno_examples]: https://github.com/michelou/deno-examples
 [docker_examples]: https://github.com/michelou/docker-examples
 [dotty_examples]: https://github.com/michelou/dotty-examples
+[flix_examples]: https://github.com/michelou/flix-examples
 [git_downloads]: https://git-scm.com/download/win
 [git_cli]: https://git-scm.com/docs/git
 [git_releases]: https://git-scm.com/download/win
 [git_relnotes]: https://raw.githubusercontent.com/git/git/master/Documentation/RelNotes/2.43.0.txt
 [github_markdown]: https://github.github.com/gfm/
+[golang_examples]: https://github.com/michelou/golang-examples
 [graalvm_examples]: https://github.com/michelou/graalvm-examples
 [haskell_examples]: https://github.com/michelou/haskell-examples
 [kafka_examples]: https://github.com/michelou/kafka-examples
@@ -209,6 +211,7 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 [nodejs_examples]: https://github.com/michelou/nodejs-examples
 [nodejs_home]: https://www.nodejs.org
 [pim4]: https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1
+[rust_examples]: https://github.com/michelou/rust-examples
 [sh_cli]: https://man7.org/linux/man-pages/man1/sh.1p.html
 [spark_examples]: https://github.com/michelou/spark-examples
 [spring_examples]: https://github.com/michelou/spring-examples
