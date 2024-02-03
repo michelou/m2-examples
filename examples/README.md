@@ -13,7 +13,26 @@
 
 ### <span id="factorial">`Factorial` Example</span>
 
-The `Factorial` code example contains source file [`Factorial.mod`](./Factorial/src/main/mod/Factorial.mod). We generate the application using one of the build scripts [`build.bat`](./Factorial/build.bat), [`build.sh`](./Factorial/build.sh) or [`Makefile`](./Factorial/Makefile).
+The project directory is organized as follows :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
+|   <a href="./Factorial/build.bat">build.bat</a>
+|   <a href="./Factorial/build.sh">build.sh</a>
+|   <a href="./Factorial/Makefile">Makefile</a>
+|
+\---src
+    \---main
+        +---mod
+        |       <a href="./Factorial/src/main/mod/Factorial.mod">Factorial.mod</a>
+        |
+        \---mod-adw
+                <a href="./Factorial/src/main/mod-adw/Factorial.mod">Factorial.mod</a>
+</pre>
+
+> **Note**: We maintain two source versions of `Factorial.mod` as the import clauses differ between ADW Modula-2 and XDS Modula-2 (options `-adw` and `-xds` &ndash; the default &ndash; allow us to switch between both versions).
+
+We generate the application using one of the build scripts [`build.bat`](./Factorial/build.bat), [`build.sh`](./Factorial/build.sh) or [`Makefile`](./Factorial/Makefile).
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Factorial/build.bat">build</a> -verbose clean run</b>
@@ -53,7 +72,7 @@ The output directory `target\` looks as follows :
         Factorial.mod
 </pre>
 
-The generated file `target\Factorial.prj` contains the XDS compiler options and the source files (`mod\Factorial.mod` in this case) :
+The generated project file `target\Factorial.prj` contains the XDS compiler options and the source files (`mod\Factorial.mod` in this case) :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/type">type</a> target\Factorial.prj</b>
@@ -73,7 +92,24 @@ The generated file `target\Factorial.prj` contains the XDS compiler options and 
 
 ### <span id="hello">`Hello` Example</span>
 
-The `Hello` code example contains source file [`Hello.mod`](./Hello/src/main/mod/Hello.mod). We generate the application using one of the build scripts such as [`build.bat`](./Hello/build.bat), [`build.sh`](./Hello/build.sh) or [`Makefile`](./Hello/Makefile).
+The project directory is organized as follows :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
+|   <a href="./Hello/build.bat">build.bat</a>
+|   <a href="./Hello/build.sh">build.sh</a>
+|   <a href="./Hello/Makefile">Makefile</a>
+|
+\---src
+    \---main
+        +---mod
+        |       <a href="./Hello/src/main/mod/Hello.mod">Hello.mod</a>
+        |
+        \---mod-adw
+                <a href="./Hello/src/main/mod-adw/Hello.mod">hello.mod</a>
+</pre>
+
+We generate the application using one of the build scripts such as [`build.bat`](./Hello/build.bat), [`build.sh`](./Hello/build.sh) or [`Makefile`](./Hello/Makefile).
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Hello/build.bat">build</a> -verbose clean run</b>
@@ -93,7 +129,7 @@ Execute program "target\Hello.exe"
 Hello world!
 </pre>
 
-> **Note:** The generated files in output directory `target\` as similar to the ones in example [`Factorial`](#factorial).
+> **Note:** The generated files in output directory `target\` are similar to the ones in example [`Factorial`](#factorial).
 
 ### <span id="liste">`Liste` Example</span>
 
@@ -133,7 +169,7 @@ No errors, no warnings
     6     7     8     8     9    10    11    12
 </pre>
 
-The output directory `target\` contains 
+The output directory `target\` looks as follows : 
 <pre style="font-size:80%;">
 <b>&gt; <a href="">tree</a> /a /f target | <a href="">findstr</a> /v /b [A-Z]</b>
 |   Liste.dll
@@ -154,9 +190,50 @@ The output directory `target\` contains
         ListeTest.mod
 </pre>
 
+The generated project file `target\Liste.prj` contains the XDS compiler options and the source files (`mod\Liste.mod` in this case) :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="">type</a> target\Liste.prj</b>
+% debug ON
+-gendebug+
+-genhistory+
+-lineno+
+% write -gendll- to generate an .exe
+-gendll+
+-usedll+
+-dllexport+
+-implib-
+-cpu = 486
+-lookup = *.sym = sym;C:\opt\XDS-Modula-2\sym
+-m2
+% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
+% -m2addtypes
+-verbose
+-werr
+% disable warning 301 (parameter "xxx" is never used)
+-woff301+
+% disable warning 303 (procedure "xxx" declared but never used)
+-woff303+
+!module mod\Liste.mod
+</pre>
+
 ### <span id="pascal">`PascalTriangle` Example</span>
 
-The `PascalTriangle` code example contains source file [`PascalTriangle.mod`](./PascalTriangle/src/main/mod/PascalTriangle.mod). We generate the application using one of the build scripts [`build.bat`](./PascalTriangle/build.bat), [`build.sh`](./PascalTriangle/build.sh) or [`Makefile`](./PascalTriangle/Makefile).
+The project directory is organized as follows  :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
+|   <a href="./PascalTriangle/build.bat">build.bat</a>
+|   <a href="./PascalTriangle/build.sh">build.sh</a>
+|   <a href="./PascalTriangle/Makefile">Makefile</a>
+|
+\---src
+    \---main
+        \---mod
+                <a href="./PascalTriangle/src/main/mod/PascalTriangle.mod">PascalTriangle.mod</a>
+</pre>
+
+We generate the application using one of the build scripts [`build.bat`](./PascalTriangle/build.bat), [`build.sh`](./PascalTriangle/build.sh) or [`Makefile`](./PascalTriangle/Makefile).
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./PascalTriangle/build.bat">build</a> -verbose clean run</b>
@@ -210,11 +287,11 @@ Triangle height=7
     1   6  15  20  15   6   1
 </pre>
 
-> **Note:** The generated files in output directory `target\` as similar to the ones in example [`Factorial`](#factorial).
+> **Note:** The generated files in output directory `target\` are similar to the ones in example [`Factorial`](#factorial).
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/January 2024* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/February 2024* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- link refs -->

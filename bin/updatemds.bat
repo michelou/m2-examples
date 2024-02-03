@@ -10,14 +10,15 @@ set _DEBUG=0
 set _EXITCODE=0
 
 @rem files README.md, RESOURCES.md, etc.
-set _LAST_MODIFIED_OLD=michelou/)/December 2023
-set _LAST_MODIFIED_NEW=michelou/)/January 2024
+set _LAST_MODIFIED_OLD=michelou/)/January 2024
+set _LAST_MODIFIED_NEW=michelou/)/February 2024
 
-set _LAST_DOWNLOAD_OLD=(\*December 2023\*)
-set _LAST_DOWNLOAD_NEW=(*January 2024*)
+set _LAST_DOWNLOAD_OLD=(\*January 2024\*)
+set _LAST_DOWNLOAD_NEW=(*February 2024*)
 
-@rem https://superuser.com/questions/909127/findstr-dos-commands-multiple-string-argument
-set _MD_EXCLUDES=:\kafka
+@rem to be transformed into -not -path "./<dirname>/*"
+set _EXCLUDE_DIRS=bin docs docs_LOCAL gcc-13.2.0 gcc-13-20230219 ^
+    gcc-releases-gcc-13.2.0 m2j-master
 
 call :env
 if not %_EXITCODE%==0 goto end
@@ -58,6 +59,7 @@ if not exist "%GIT_HOME%\usr\bin\grep.exe" (
     set _EXITCODE=1
     goto :eof
 )
+set "_FIND_CMD=%GIT_HOME%\usr\bin\find.exe"
 set "_GREP_CMD=%GIT_HOME%\usr\bin\grep.exe"
 set "_SED_CMD=%GIT_HOME%\usr\bin\sed.exe"
 set "_UNIX2DOS_CMD=%GIT_HOME%\usr\bin\unix2dos.exe"
@@ -173,13 +175,23 @@ echo     %__BEG_O%run%__END%          replace old patterns with new ones
 goto :eof
 
 :run
+set __FIND_EXCLUDES=
+for %%i in (%_EXCLUDE_DIRS%) do (
+    set __FIND_EXCLUDES=!__FIND_EXCLUDES! -not -path "./%%i/*"
+)
 set __N=0
-for /f "delims=" %%f in ('dir /b /s "%_ROOT_DIR%\*.md" ^| findstr /v "%_MD_EXCLUDES%"') do (
+if %_DEBUG%==1 echo %_DEBUG_LABEL% "%_FIND_CMD%" . -type f -name "*.md" %__FIND_EXCLUDES% 1>&2
+for /f "delims=" %%f in ('%_FIND_CMD% . -type f -name "*.md" %__FIND_EXCLUDES%') do (
+    set __OLD_N=!__N!
     set "__INPUT_FILE=%%f"
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% "%_GREP_CMD%" -q "%_LAST_MODIFIED_OLD%" "!__INPUT_FILE!" 1>&2
+    if %_DEBUG%==1 (echo %_DEBUG_LABEL% "%_GREP_CMD%" -q "%_LAST_MODIFIED_OLD%" "!__INPUT_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Check file "!__INPUT_FILE!" 1>&2
+    )
     call "%_GREP_CMD%" -q "%_LAST_MODIFIED_OLD%" "!__INPUT_FILE!"
     if !ERRORLEVEL!==0 (
-        if %_DEBUG%==1 echo %_DEBUG_LABEL% "%_SED_CMD%" -i "s@%_LAST_MODIFIED_OLD%@%_LAST_MODIFIED_NEW%@g" "!__INPUT_FILE!" 1>&2
+        if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SED_CMD%" -i "s@%_LAST_MODIFIED_OLD%@%_LAST_MODIFIED_NEW%@g" "!__INPUT_FILE!" 1>&2
+        ) else if %_VERBOSE%==1 ( echo    Replace pattern "%_LAST_MODIFIED_OLD%" by "%_LAST_MODIFIED_NEW%" 1>&2
+        )
         call "%_SED_CMD%" -i "s@%_LAST_MODIFIED_OLD%@%_LAST_MODIFIED_NEW%@g" "!__INPUT_FILE!"
         call "%_UNIX2DOS_CMD%" -q "!__INPUT_FILE!"
         set /a __N+=1
