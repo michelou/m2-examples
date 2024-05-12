@@ -16,13 +16,14 @@
 This project depends on the following external software for the **Microsoft Windows** platform:
 
 - [ADW Modula-2 1.6][adwm2_downloads] ([*release notes*][adwm2_relnotes])
-- [Git 2.44][git_downloads] ([*release notes*][git_relnotes])
+- [Git 2.45][git_downloads] ([*release notes*][git_relnotes])
 - [MSYS2 2024][msys2_releases] ([*change log*][msys2_changelog])
 - [XDS Modula-2 2.60][xdsm2_downloads]
 
 Optionally one may also install the following software:
 
-- [Visual Studio Code 1.88][vscode_downloads] ([*release notes*][vscode_relnotes])
+- [ConEmu][conemu_downloads] ([*release notes*][conemu_relnotes])
+- [Visual Studio Code 1.89][vscode_downloads] ([*release notes*][vscode_relnotes])
 
 > **&#9755;** ***Installation policy***<br/>
 > When possible we install software from a [Zip archive][zip_archive] rather than via a [Windows installer][windows_installer]. In our case we defined **`C:\opt\`** as the installation directory for optional software tools (*in reference to* the [`/opt/`][unix_opt] directory on Unix).
@@ -31,6 +32,7 @@ For instance our development environment looks as follows (*May 2024*) <sup id="
 
 <pre style="font-size:80%;">
 C:\opt\ADW-Modula-2\    <i>(108 MB)</i>
+C:\opt\ConEmu\          <i>( 26 MB)</i>
 C:\opt\Git\             <i>(367 MB)</i>
 C:\opt\VSCode\          <i>(341 MB)</i>
 C:\opt\XDS-Modula-2\<sup id="anchor_02"><a href="#footnote_02">2</a></sup>   <i>( 29 MB)</i>
@@ -78,8 +80,8 @@ We execute command [**`setenv.bat`**](setenv.bat) once to setup our development 
    <pre style="font-size:80%;">
    <b>&gt; <a href="./setenv.bat">setenv</a></b>
    Tool versions:
-   m2amd64 1.6.879, xc v2.60, make 4.4.1,
-   git 2.45.0.windows.1, diff 3.10, bash 5.2.26(1)-release
+      m2amd64 1.6.879, xc v2.60, make 4.4.1,
+      git 2.45.0, diff 3.10, bash 5.2.26(1)-release
    &nbsp;
    <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/where" rel="external">where</a> git sh</b>
    C:\opt\Git\bin\git.exe
@@ -99,7 +101,9 @@ In our case we downloaded the following installation files (<a href="#proj_deps"
 </p>
 <pre style="font-size:80%;">
 <a href="https://www.modula2.org/adwm2/download.php" rel="external">ADWM2Setup.exe</a>                    <i>( 18 MB)</i>
+<a href="https://github.com/Maximus5/ConEmu/releases/tag/v23.07.24" rel="external">ConEmuPack.230724.7z</a>              <i>(  5 MB)</i>
 <a href="https://git-scm.com/download/win" rel="external">PortableGit-2.45.0-64-bit.7z.exe</a>  <i>( 41 MB)</i>
+<a href="https://code.visualstudio.com/Download#" rel="external">VSCode-win32-x64-1.89.1.zip</a>       <i>(131 MB)</i>
 <a href="https://github.com/excelsior-oss/xds-ide/releases">xds-ide-1.7.0-060713-1-win32.zip</a>  <i>(198 MB)</i>
 </pre>
 </dd></dl>
@@ -170,16 +174,18 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 
 <!-- link refs -->
 
-[ada_examples]: https://github.com/michelou/ada-examples
+[ada_examples]: https://github.com/michelou/ada-examples?tab=readme-ov-file#playing-with-ada-on-windows
 [adwm2_downloads]: https://www.modula2.org/adwm2/download.php
 [adwm2_relnotes]: https://www.modula2.org/adwm2/
-[akka_examples]: https://github.com/michelou/akka-examples
-[apache_maven_cli]: https://maven.apache.org/ref/3.8.7/maven-embedder/cli.html
+[akka_examples]: https://github.com/michelou/akka-examples?tab=readme-ov-file#playing-with-akka-on-windows
+[apache_maven_cli]: https://maven.apache.org/ref/3.9.6/maven-embedder/cli.html
 [bazel_changelog]: https://github.com/bazelbuild/bazel/blob/master/CHANGELOG.md
 [bazel_home]: https://www.bazel.build/
 [bazel_releases]: https://github.com/bazelbuild/bazel/releases
 [bazel_userguide]: https://bazel.build/build/style-guide
 [cobol_examples]: https://github.com/michelou/cobol-examples
+[conemu_downloads]: https://github.com/Maximus5/ConEmu/releases
+[conemu_relnotes]: https://conemu.github.io/blog/2023/07/24/Build-230724.html
 [cpp_examples]: https://github.com/michelou/cpp-examples
 [dart_examples]: https://github.com/michelou/dart-examples
 [deno_examples]: https://github.com/michelou/deno-examples
