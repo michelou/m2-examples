@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2018-2023 Stéphane Micheloud
+# Copyright (c) 2018-2024 Stéphane Micheloud
 #
 # Licensed under the MIT License.
 #
@@ -67,12 +67,14 @@ args() {
             ;;
         esac
     done
-    debug "Options    : VERBOSE=$VERBOSE"
+    if [[ -d "$SOURCE_DIR/main/mod-$TOOLSET" ]]; then
+        SOURCE_MOD_DIR="$SOURCE_DIR/main/mod-$TOOLSET"
+    fi
+    debug "Options    : TOOLSET=$TOOLSET VERBOSE=$VERBOSE"
     debug "Subcommands: CLEAN=$CLEAN COMPILE=$COMPILE HELP=$HELP RUN=$RUN"
     debug "Variables  : ADWM2_HOME=$ADWM2_HOME"
     debug "Variables  : GIT_HOME=$GIT_HOME"
     debug "Variables  : XDSM2_HOME=$XDSM2_HOME"
-    debug "Variables  : TOOLSET=$TOOLSET"
 }
 
 help() {
@@ -109,14 +111,15 @@ clean() {
 compile() {
     [[ -d "$TARGET_DEF_DIR" ]] || mkdir -p "$TARGET_DEF_DIR"
     [[ -d "$TARGET_MOD_DIR" ]] || mkdir -p "$TARGET_MOD_DIR"
+    [[ -d "$TARGET_SYM_DIR" ]] || mkdir -p "$TARGET_SYM_DIR"
 
     local is_required_def="$(action_required "$TARGET_FILE" "$SOURCE_DEF_DIR/" "*.def")"
 
     local is_required_mod="$(action_required "$TARGET_FILE" "$SOURCE_MOD_DIR/" "*.mod")"
-    [[ $is_required_def -eq 0 ]] && [[ $is_required_mod -eq 0 ]] && return 1
-    
+    [[ $is_required_def -eq 0 ]] && [[ $is_required_mod -eq 0 ]] && return
+
     compile_$TOOLSET $is_required_def
-    [[ $? -eq 0 ]] || ( EXITCODE=1 && return 0 )
+    [[ $? -eq 0 ]] || ( EXITCODE=1 && return )
 }
 
 action_required() {
@@ -140,7 +143,61 @@ action_required() {
 }
 
 compile_adw() {
-    warning "Not yet implemented"
+    if $DEBUG; then
+        debug "cp \"$(mixed_path $ADWM2_HOME1)/winamd64sym/*.sym\" \"$(mixed_path $TARGET_SYM_DIR)\""
+    fi
+    cp "$(mixed_path $ADWM2_HOME1)/winamd64sym/"*.sym "$(mixed_path $TARGET_SYM_DIR)"
+
+    if [[ -n "$(ls -A $SOURCE_DEF_DIR/*.def 2>/dev/null)" ]]; then
+        if $DEBUG; then
+            debug "cp \"$SOURCE_DEF_DIR*.def\" \"$TARGET_DEF_DIR\""
+        fi
+        cp "$(mixed_path $SOURCE_DEF_DIR)/"*.def "$(mixed_path $TARGET_DEF_DIR)"
+    fi
+    if $DEBUG; then
+        debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
+    fi
+    cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
+
+    # We must specify a relative path to the SYM directory
+    local m2c_opts=-sym:"$(win_path $TARGET_SYM_DIR)"
+
+    local n=0
+    for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
+        eval "$M2C_CMD" $m2c_opts "$(win_path $f)"
+        n=$((n + 1))
+    done
+    for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.mod" 2>/dev/null); do
+        if $DEBUG; then
+            debug "\"$M2C_CMD\" $m2c_opts \"$(win_path $f)\""
+        fi
+        eval "$M2C_CMD" $m2c_opts "$(win_path $f)"
+        n=$((n + 1))
+    done
+    local linker_opts_file="$(mixed_path $TARGET_DIR)/linker_opts.txt"
+    (
+        ## echo -EXETYPE:exe
+        echo "-MACHINE:X86_64"
+        echo "-SUBSYSTEM:WINDOWS"
+        echo "-MAP:$(win_path $TARGET_DIR)\\$APP_NAME"
+        echo "-OUT:$(win_path $TARGET_FILE)"
+    ) > "$linker_opts_file"
+    for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.obj" 2>/dev/null); do
+        local x="${f/$ROOT_DIR\///}"
+        echo "target\\mod\\Hello.obj" >> "$linker_opts_file"
+    done
+    (
+        echo "$(win_path $ADWM2_HOME1)\\rtl-win-amd64.lib"
+        echo "$(win_path $ADWM2_HOME1)\\win64api.lib"
+    ) >> "$linker_opts_file"
+    if $DEBUG; then
+        debug "\"$SBLINK_CMD\" @${linker_opts_file/$ROOT_DIR\///}"
+    fi
+    eval "\"$SBLINK_CMD\" @${linker_opts_file/$ROOT_DIR\///}"
+    if [[ $? -ne 0 ]]; then
+        error "Failed to execute ADW linker"
+        cleanup 1
+    fi
 }
 
 compile_xds() {
@@ -199,6 +256,16 @@ mixed_path() {
     fi
 }
 
+win_path() {
+    if [[ -x "$CYGPATH_CMD" ]]; then
+        $CYGPATH_CMD -aw $1 | sed 's|\\|\\\\|g'
+    elif $mingw || $msys; then
+        echo $1 | sed 's|/|\\\\|g'
+    else
+        echo $1
+    fi
+}
+
 run() {
     if [[ ! -f "$TARGET_FILE" ]]; then
         error "Program \"$TARGET_FILE\" not found"
@@ -220,13 +287,13 @@ EXITCODE=0
 
 ROOT_DIR="$(getHome)"
 
-SOURCE_DIR=$ROOT_DIR/src
-SOURCE_DEF_DIR=$SOURCE_DIR/main/def
-SOURCE_MOD_DIR=$SOURCE_DIR/main/mod
-TARGET_DIR=$ROOT_DIR/target
-TARGET_DEF_DIR=$TARGET_DIR/def
-TARGET_MOD_DIR=$TARGET_DIR/mod
-TARGET_SYM_DIR=$TARGET_DIR/sym
+SOURCE_DIR="$ROOT_DIR/src"
+SOURCE_DEF_DIR="$SOURCE_DIR/main/def"
+SOURCE_MOD_DIR="$SOURCE_DIR/main/mod"
+TARGET_DIR="$ROOT_DIR/target"
+TARGET_DEF_DIR="$TARGET_DIR/def"
+TARGET_MOD_DIR="$TARGET_DIR/mod"
+TARGET_SYM_DIR="$TARGET_DIR/sym"
 
 CLEAN=false
 COMPILE=false
@@ -260,12 +327,13 @@ if $cygwin || $mingw || $msys; then
     [[ -n "$GIT_HOME" ]] && GIT_HOME="$(mixed_path $GIT_HOME)"
     [[ -n "$XDSM2_HOME" ]] && XDSM2_HOME="$(mixed_path $XDSM2_HOME)"
 fi
-if [[ ! -x "$ADWM2_HOME/Unicode/m2amd64.exe" ]]; then
+ADWM2_HOME1="$ADWM2_HOME/ASCII"
+if [[ ! -x "$ADWM2_HOME1/m2amd64.exe" ]]; then
     error "ADW Modula-2 installation not found"
     cleanup 1
 fi
-M2C_CMD="$ADWM2_HOME/Unicode/m2amd64.exe"
-SBLINK_CMD="$ADWM2_HOME/Unicode/sblink.exe"
+M2C_CMD="$ADWM2_HOME1/m2amd64.exe"
+SBLINK_CMD="$ADWM2_HOME1/sblink.exe"
 
 if [[ ! -x "$XDSM2_HOME/bin/xc.exe" ]]; then
     error "XDS Modula-2 installation not found"

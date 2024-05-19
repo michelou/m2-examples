@@ -426,6 +426,10 @@ if %__VERBOSE%==1 (
         setlocal enabledelayedexpansion
         echo    !__LINE:%USERPROFILE%=%%USERPROFILE%%! 1>&2
     )
+    echo Environment variables: 1>&2
+    if defined ADWM2_HOME echo    "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    if defined GIT_HOME echo    "GIT_HOME=%GIT_HOME%" 1>&2
+    if defined XDSM2_HOME echo    "XDSM2_HOME=%XDSM2_HOME%" 1>&2
 )
 goto :eof
 

@@ -77,10 +77,6 @@ goto :eof
 :env_colors
 @rem ANSI colors in standard Windows 10 shell
 @rem see https://gist.github.com/mlocati/#file-win10colors-cmd
-set _RESET=[0m
-set _BOLD=[1m
-set _UNDERSCORE=[4m
-set _INVERSE=[7m
 
 @rem normal foreground colors
 set _NORMAL_FG_BLACK=[30m
@@ -118,6 +114,12 @@ set _STRONG_BG_RED=[101m
 set _STRONG_BG_GREEN=[102m
 set _STRONG_BG_YELLOW=[103m
 set _STRONG_BG_BLUE=[104m
+
+@rem we define _RESET in last position to avoid crazy console output with type command
+set _BOLD=[1m
+set _UNDERSCORE=[4m
+set _INVERSE=[7m
+set _RESET=[0m
 goto :eof
 
 @rem input parameter: %*
@@ -162,9 +164,8 @@ goto args_loop
 :args_done
 set _STDOUT_REDIRECT=1^>NUL
 if %_DEBUG%==1 set _STDOUT_REDIRECT=
-
-if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
-    set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
+if exist "%_SOURCE_DIR%\main\mod-%_TOOLSET%" (
+    set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod-%_TOOLSET%"
 )
 for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 
@@ -266,7 +267,7 @@ set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__DEF_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
@@ -280,7 +281,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
 :compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__MOD_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" %_STDOUT_REDIRECT%
