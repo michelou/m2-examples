@@ -6,7 +6,7 @@ $(error Variable XDSM2_HOME is not set)
 endif
 
 ifeq ($(OS),Windows_NT)
-M2C        = $(subst \,/,$(ADWM2_HOME))/Unicode/m2amd.exe
+M2C        = $(subst \,/,$(ADWM2_HOME))/Unicode/m2amd64.exe
 XC         = $(subst \,/,$(XDSM2_HOME))/bin/xc.exe
 LOCAL_REPO = $(subst \,/,$(USERPROFILE))/.m2/repository
 PSEP       = ;

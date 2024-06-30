@@ -399,15 +399,19 @@ if %ERRORLEVEL%==0 (
     )
     set __WHERE_ARGS=%__WHERE_ARGS% "%GIT_HOME%\bin:git.exe"
 )
-where /q "%GIT_HOME%\bin:bash.exe"
-if %ERRORLEVEL%==0 (
-    for /f "tokens=1-3,4,*" %%i in ('"%GIT_HOME%\bin\bash.exe" --version ^| findstr bash') do set "__VERSIONS_LINE2=%__VERSIONS_LINE2% bash %%l"
-    set __WHERE_ARGS=%__WHERE_ARGS% "%GIT_HOME%\bin:bash.exe"
-)
 where /q "%MSYS_HOME%\usr\bin:diff.exe"
 if %ERRORLEVEL%==0 (
    for /f "tokens=1-3,*" %%i in ('"%MSYS_HOME%\usr\bin\diff.exe" --version ^| findstr diff') do set "__VERSIONS_LINE2=%__VERSIONS_LINE2% diff %%l,"
     set __WHERE_ARGS=%__WHERE_ARGS% "%MSYS_HOME%\usr\bin:diff.exe"
+)
+where /q "%GIT_HOME%\bin:bash.exe"
+if %ERRORLEVEL%==0 (
+    for /f "tokens=1-3,4,*" %%i in ('"%GIT_HOME%\bin\bash.exe" --version ^| findstr bash') do (
+        set "__VERSION=%%l"
+        setlocal enabledelayedexpansion
+        set "__VERSIONS_LINE2=%__VERSIONS_LINE2% bash !__VERSION:-release=!"
+    )
+    set __WHERE_ARGS=%__WHERE_ARGS% "%GIT_HOME%\bin:bash.exe"
 )
 echo Tool versions:
 echo   %__VERSIONS_LINE1%

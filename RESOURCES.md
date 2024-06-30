@@ -1,4 +1,4 @@
-# <span id="top">Modula-2 Resources</span> <span style="size:25%;"><a href="README.md">↩</a></span>
+# <span id="top">Modula-2 Resources</span> <span style="font-size:90%;">[↩](README.md#top)</span>
 
 <table style="font-family:Helvetica,Arial;line-height:1.6;">
   <tr>
@@ -47,7 +47,7 @@
 - [XDS Modula-2/Oberon-2 programing system](https://github.com/excelsior-oss/xds)
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/May 2024* [**&#9650;**](#top)  <!-- February 2023 -->
+*[mics](https://lampwww.epfl.ch/~michelou/)/July 2024* [**&#9650;**](#top)  <!-- February 2023 -->
 
 <span id="bottom">&nbsp;</span>
 

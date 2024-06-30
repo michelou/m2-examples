@@ -4,12 +4,12 @@
   <tr>
   <td style="border:0;padding:0 10px 0 0;min-width:25%;"><a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1"><img src="./docs/images/pim4.png" width="120" alt="Modula-2 project"/></a></td>
   <td style="border:0;padding:0;vertical-align:text-top;">This repository gathers <a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1" rel="external">Modula-2</a> code examples coming from various websites and books.<br/>
-  It also includes several <a href="https://en.wikibooks.org/wiki/Windows_Batch_Scripting" rel="external">batch files</a> for experimenting with <a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1" rel="external">Modula-2</a> on a Windows machine.
+  It also includes several build scripts (<a href="https://en.wikibooks.org/wiki/Windows_Batch_Scripting" rel="external">batch files</a>) for experimenting with <a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1" rel="external">Modula-2</a> on a Windows machine.
   </td>
   </tr>
 </table>
 
-[Ada][ada_examples], [Akka][akka_examples], [C++][cpp_examples], [COBOL][cobol_examples],  [Dart][dart_examples], [Deno][deno_examples], [Docker][docker_examples], [Erlang][erlang_examples], [Flix][flix_examples], [Golang][golang_examples], [GraalVM][graalvm_examples], [Haskell][haskell_examples], [Kafka][kafka_examples], [Kotlin][kotlin_examples], [LLVM][llvm_examples], [Node.js][nodejs_examples], [Rust][rust_examples], [Scala 3][dotty_examples], [Spark][spark_examples], [Spring][spring_examples], [TruffleSqueak][trufflesqueak_examples] and [Wix Toolset][wix_examples] are other topics we are continuously monitoring.
+[Ada][ada_examples], [Akka][akka_examples], [C++][cpp_examples], [COBOL][cobol_examples],  [Dart][dart_examples], [Deno][deno_examples], [Docker][docker_examples], [Erlang][erlang_examples], [Flix][flix_examples], [Golang][golang_examples], [GraalVM][graalvm_examples], [Haskell][haskell_examples], [Kafka][kafka_examples], [Kotlin][kotlin_examples], [LLVM][llvm_examples], [Node.js][nodejs_examples], [Rust][rust_examples], [Scala 3][dotty_examples], [Spark][spark_examples], [Spring][spring_examples], [TruffleSqueak][trufflesqueak_examples], [Wix Toolset][wix_examples] and [Zig][zig_examples] are other topics we are continuously monitoring.
 
 ## <span id="proj_deps">Project dependencies</span>
 
@@ -17,18 +17,19 @@ This project depends on the following external software for the **Microsoft Wind
 
 - [ADW Modula-2 1.6][adwm2_downloads] ([*release notes*][adwm2_relnotes])
 - [Git 2.45][git_downloads] ([*release notes*][git_relnotes])
+- *(Hopefully soon: [GNU Modula-2][gm2_downloads])*
 - [MSYS2 2024][msys2_releases] ([*change log*][msys2_changelog])
 - [XDS Modula-2 2.60][xdsm2_downloads]
 
 Optionally one may also install the following software:
 
-- [ConEmu][conemu_downloads] ([*release notes*][conemu_relnotes])
-- [Visual Studio Code 1.89][vscode_downloads] ([*release notes*][vscode_relnotes])
+- [ConEmu 2023][conemu_downloads] ([*release notes*][conemu_relnotes])
+- [Visual Studio Code 1.90][vscode_downloads] ([*release notes*][vscode_relnotes])
 
 > **&#9755;** ***Installation policy***<br/>
 > When possible we install software from a [Zip archive][zip_archive] rather than via a [Windows installer][windows_installer]. In our case we defined **`C:\opt\`** as the installation directory for optional software tools (*in reference to* the [`/opt/`][unix_opt] directory on Unix).
 
-For instance our development environment looks as follows (*May 2024*) <sup id="anchor_01">[1](#footnote_01)</sup>:
+For instance our development environment looks as follows (*July 2024*) <sup id="anchor_01">[1](#footnote_01)</sup>:
 
 <pre style="font-size:80%;">
 C:\opt\ADW-Modula-2\    <i>(108 MB)</i>
@@ -79,9 +80,9 @@ We execute command [**`setenv.bat`**](setenv.bat) once to setup our development 
 
    <pre style="font-size:80%;">
    <b>&gt; <a href="./setenv.bat">setenv</a></b>
-   Tool versions:
+   Tool versions:2.45.2
       m2amd64 1.6.879, xc v2.60, make 4.4.1,
-      git 2.45.1, diff 3.10, bash 5.2.26(1)-release
+      git 2.45.2, diff 3.10, bash 5.2.26(1)
    &nbsp;
    <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/where" rel="external">where</a> git sh</b>
    C:\opt\Git\bin\git.exe
@@ -102,8 +103,8 @@ In our case we downloaded the following installation files (<a href="#proj_deps"
 <pre style="font-size:80%;">
 <a href="https://www.modula2.org/adwm2/download.php" rel="external">ADWM2Setup.exe</a>                    <i>( 18 MB)</i>
 <a href="https://github.com/Maximus5/ConEmu/releases/tag/v23.07.24" rel="external">ConEmuPack.230724.7z</a>              <i>(  5 MB)</i>
-<a href="https://git-scm.com/download/win" rel="external">PortableGit-2.45.1-64-bit.7z.exe</a>  <i>( 41 MB)</i>
-<a href="https://code.visualstudio.com/Download#" rel="external">VSCode-win32-x64-1.89.1.zip</a>       <i>(131 MB)</i>
+<a href="https://git-scm.com/download/win" rel="external">PortableGit-2.45.2-64-bit.7z.exe</a>  <i>( 41 MB)</i>
+<a href="https://code.visualstudio.com/Download#" rel="external">VSCode-win32-x64-1.90.2.zip</a>       <i>(131 MB)</i>
 <a href="https://github.com/excelsior-oss/xds-ide/releases">xds-ide-1.7.0-060713-1-win32.zip</a>  <i>(198 MB)</i>
 </pre>
 </dd></dl>
@@ -114,7 +115,7 @@ In our case we downloaded the following installation files (<a href="#proj_deps"
 The <a href="https://github.com/excelsior-oss/xds-2.60">XDS Modula-2 SDK 2.6</a> is included in the Zip archive <a href="https://github.com/excelsior-oss/xds-ide/releases" rel="external">Excelsior XDS Modula-2 IDE 1.7.0</a>. Concretely we simply extract the <code><b>xds-ide\sdks\XDS-x86\</b></code> subdirectory (thus ignoring the Eclipse IDE related stuff). In our case we created a directory <code><b>C:\opt\XDS-Modula-2\</b></code> :
 
 <pre style="font-size:80%;">
-<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a c:\opt\XDS-Modula-2 | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b +</b>
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a c:\opt\XDS-Modula-2 | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /b +</b>
 +---bin
 +---c
 +---def
@@ -125,7 +126,7 @@ The <a href="https://github.com/excelsior-oss/xds-2.60">XDS Modula-2 SDK 2.6</a>
 +---readme
 +---samples
 &nbsp;
-<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">dir</a> /b c:\opt\XDS-Modula-2\bin\*.exe</b>
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/dir">dir</a> /b c:\opt\XDS-Modula-2\bin\*.exe</b>
 h2d.exe        <i>(<a href="http://computer-programming-forum.com/26-programming-language/d41077d4e2e3f40d.htm">C headers to Modula-2 definition modules translator</a>)</i>
 his.exe        <i>(XDS History formatter)</i>
 xc.exe         <i>(XDS Compiler for Oberon-2/Modula-2)</i>
@@ -135,10 +136,10 @@ xds.exe        <i>(XDS Standalone IDE)</i>
 xd_demon.exe
 xd_srv.exe
 xlib.exe       <i>(XDS Library manager)</i>
-xlink.exe
-xm.exe
-xpdump.exe
-xprof.exe
+xlink.exe      <i>(XDS Link)</i>
+xm.exe         <i>(O2/M2 development system)</i>
+xpdump.exe     <i>(XDS Profiler)</i>
+xprof.exe      <i>(XDS Profiler)</i>
 xprofmem.exe
 xpview.exe     <i>(XDS Profile viewer)</i>
 xrc.exe        <i>(XDS Resource compiler)</i>
@@ -169,7 +170,7 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/May 2024* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/July 2024* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- link refs -->
@@ -196,8 +197,9 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 [git_downloads]: https://git-scm.com/download/win
 [git_cli]: https://git-scm.com/docs/git
 [git_releases]: https://git-scm.com/download/win
-[git_relnotes]: https://raw.githubusercontent.com/git/git/master/Documentation/RelNotes/2.45.1.txt
+[git_relnotes]: https://raw.githubusercontent.com/git/git/master/Documentation/RelNotes/2.45.2.txt
 [github_markdown]: https://github.github.com/gfm/
+[gm2_downloads]: https://gcc.gnu.org/onlinedocs/gcc-13.1.0/gm2/Overview.html
 [golang_examples]: https://github.com/michelou/golang-examples#top
 [graalvm_examples]: https://github.com/michelou/graalvm-examples#top
 [haskell_examples]: https://github.com/michelou/haskell-examples#top
@@ -235,4 +237,5 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 [xdsm2_downloads]: https://github.com/excelsior-oss/xds-2.60
 -->
 [xdsm2_downloads]: https://github.com/excelsior-oss/xds-ide/releases
+[zig_examples]: https://github.com/michelou/zig-examples#top
 [zip_archive]: https://www.howtogeek.com/178146/htg-explains-everything-you-need-to-know-about-zipped-files/
