@@ -63,11 +63,25 @@ $(TARGET): $(DEFS) $(MODS)
 	[ -d "$(TARGET_SYM_DIR)" ] || "$(MKDIR)" -p "$(TARGET_SYM_DIR)"
 	@$(CP) $(subst \,/,$(ADWM2_HOME))/Unicode/winamd64sym/*.sym "$(TARGET_SYM_DIR)"
 	$(CP) ../lib/adw/*.sym "$(TARGET_SYM_DIR)"
-	$(eval M2C_OPTS := -sym:$(shell cygpath -w L:\examples\Factorial\$(TARGET_SYM_DIR)))
+	$(eval ABS_TARGET_SYM_DIR := $(shell realpath $(TARGET_SYM_DIR)))
+	$(eval M2C_OPTS := "-sym:$(shell cygpath -w $(ABS_TARGET_SYM_DIR))")
 	##for f in $(TARGET_MOD_DIR)/*.mod; do \
 	##    @$(ECHO) $$f \
 	"$(M2C)" $(M2C_OPTS) "$(shell cygpath -w $(TARGET_MOD_DIR)/Factorial.mod)"
 	##done
+	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
+	$(eval LINKE_OPTS_FILE := $(shell cygpath -m $(ABS_TARGET_DIR))/linker_opts.txt)
+	##@$(ECHO) "-EXETYPE:exe"
+	@$(ECHO) "-MACHINE:X86_64" > "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "-SUBSYSTEM:CONSOLE" >> "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "-MAP:$(TARGET_DIR)\$(APP_NAME)" >> "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "-OUT:$(TARGET_FILE) >> "$(LINKER_OPTS_FILE)"
+	##for $f in $(TARGET_MOD_DIR)/*.obj; do \
+	    echo "$(TARGET_MOD_DIR)\$f" >> "$(LINKER_OPTS_FILE)"
+	##done
+	@$(ECHO) "$(ADWM2_HOME)\rtl-win-amd64.lib" >> "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "$(ADWM2_HOME)\win64api.lib" >> "$(LINKER_OPTS_FILE)"
+	"$(SBLINK)" "@$(LINKER_OPTS_FILE)"
 
 else ifeq ($(TOOLSET),gm2)
 $(TARGET): $(DEFS) $(MODS)
