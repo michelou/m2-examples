@@ -80,7 +80,7 @@ We execute command [**`setenv.bat`**](setenv.bat) once to setup our development 
 
    <pre style="font-size:80%;">
    <b>&gt; <a href="./setenv.bat">setenv</a></b>
-   Tool versions:2.45.2
+   Tool versions:
       m2amd64 1.6.879, xc v2.60, make 4.4.1,
       git 2.45.2, diff 3.10, bash 5.2.26(1)
    &nbsp;
