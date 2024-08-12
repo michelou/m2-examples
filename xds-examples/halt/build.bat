@@ -72,6 +72,12 @@ if not exist "%XDSM2_HOME%\bin\xc.exe" (
     goto :eof
 )
 set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
+
+@rem use newer PowerShell version if available
+where /q pwsh.exe
+if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
+) else ( set _PWSH_CMD=powershell.exe
+)
 goto :eof
 
 :env_colors
@@ -160,8 +166,8 @@ if "%__ARG:~0,1%"=="-" (
 shift
 goto args_loop
 :args_done
-set _STDERR_REDIRECT=1^>NUL
-if %_DEBUG%==1 set _STDERR_REDIRECT=
+set _STDOUT_REDIRECT=1^>NUL
+if %_DEBUG%==1 set _STDOUT_REDIRECT=
 
 if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
     set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
@@ -314,18 +320,26 @@ goto :eof
 
 :compile_xds
 if exist "%_SOURCE_DEF_DIR%\*.def" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>&2
-    xcopy /i "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
+    xcopy /i "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>&2
-xcopy /i "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>NUL
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+xcopy /i "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 
 set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
 ) else if %_VERBOSE%==1 ( echo Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
 )
 (
+    if %_DEBUG%==1 (
+        echo %% debug ON
+        echo -gendebug+
+        echo -genhistory+
+        echo -lineno+
+    )
+    echo -cpu = 486
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
+    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
     echo -m2
     echo -verbose
     echo -werr
@@ -356,32 +370,42 @@ if not %ERRORLEVEL%==0 (
 popd
 goto :eof
 
-@rem input parameter: 1=target file 2=path (wildcards accepted)
+@rem input parameter: 1=target file 2,3,..=path (wildcards accepted)
 @rem output parameter: _ACTION_REQUIRED
 :action_required
 set "__TARGET_FILE=%~1"
-set __PATH=%~2
 
+set __PATH_ARRAY=
+set __PATH_ARRAY1=
+:action_path
+shift
+set __PATH=%~1
+if not defined __PATH goto action_next
+set __PATH_ARRAY=%__PATH_ARRAY%,'%__PATH%'
+set __PATH_ARRAY1=%__PATH_ARRAY1%,'!__PATH:%_ROOT_DIR%=!'
+goto action_path
+
+:action_next
 set __TARGET_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
      set __TARGET_TIMESTAMP=%%i
 )
 set __SOURCE_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -recurse -path '%__PATH%' -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -recurse -path %__PATH_ARRAY:~1% -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
     set __SOURCE_TIMESTAMP=%%i
 )
 call :newer %__SOURCE_TIMESTAMP% %__TARGET_TIMESTAMP%
 set _ACTION_REQUIRED=%_NEWER%
 if %_DEBUG%==1 (
-    echo %_DEBUG_LABEL% %__TARGET_TIMESTAMP% Target : "%__TARGET_FILE%" 1>&2
-    echo %_DEBUG_LABEL% %__SOURCE_TIMESTAMP% Sources: "%__PATH%" 1>&2
+    echo %_DEBUG_LABEL% %__TARGET_TIMESTAMP% Target : '%__TARGET_FILE%' 1>&2
+    echo %_DEBUG_LABEL% %__SOURCE_TIMESTAMP% Sources: %__PATH_ARRAY:~1% 1>&2
     echo %_DEBUG_LABEL% _ACTION_REQUIRED=%_ACTION_REQUIRED% 1>&2
 ) else if %_VERBOSE%==1 if %_ACTION_REQUIRED%==0 if %__SOURCE_TIMESTAMP% gtr 0 (
-    echo No action required ^("!__PATH:%_ROOT_DIR%=!"^) 1>&2
+    echo No action required ^(%__PATH_ARRAY1:~1%^) 1>&2
 )
 goto :eof
 
-@rem input parameters: %1=file timestamp 1, %2=file timestamp 2
+@rem input parameters: %1=source timestamp, %2=target timestamp
 @rem output parameter: _NEWER
 :newer
 set __TIMESTAMP1=%~1

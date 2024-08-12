@@ -1,4 +1,4 @@
-# <span id="top">XDS Modula-2 examples</span> <span style="size:30%;"><a href="../README.md">⬆</a></span>
+# <span id="top">XDS Modula-2 examples</span> <span style="font-size:90%;">[⬆](../README.md#top)</span>
 
 <table style="font-family:Helvetica,Arial;line-height:1.6;">
   <tr>
@@ -12,6 +12,19 @@
 </table>
 
 ### <span id="exp">`exp` Example</span>
+
+This project has the following directory structure :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="">tree</a> /f /a . | <a href="">findstr</a> /v /b [A-Z]</b>
+|   <a href="./exp/build.bat">build.bat</a>
+|   <a href="./exp/build.sh">build.sh</a>
+\---<b>src</b>
+    \---<b>mod</b>
+            <a href="./exp/src/mod/exp.mod">exp.mod</a>
+</pre>
+
+Command [`build.bat`](./exp/build.bat) generates and executes the Modula-2 program :
 
 <pre style="font-size:80%;border:1px solid #cccccc;">
 <b>&gt; <a href="./build.bat">build</a> -verbose clean run</b>
@@ -46,7 +59,7 @@ No errors, no warnings
  1024
  </pre>
 
-### <span id="queens">`queens` Example</span>
+### <span id="queens">`queens` Example</span> [**&#x25B4;**](#top)
 
 <pre style="font-size:80%;border:1px solid #cccccc;">
 <b>&gt; <a href="./queens/build.bat">build</a> -verbose clean run</b>
@@ -71,17 +84,14 @@ There are 92 solutions
 <pre style="font-size:80%;border:1px solid #cccccc;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /v /b [a-z]</b>
 |   <a href="./queens/build.bat">build.bat</a>
-|
-+---src
-|   \---mod
++---<b>src</b>
+|   \---<b>mod</b>
 |           <a href="./queens/src/mod/queens.mod">queens.mod</a>
-|
-\---target
+\---<b>target</b>
     |   queens.exe
     |   queens.obj
     |   queens.prj
     |   tmp.lnk
-    |
     \---mod
             queens.mod
 &nbsp;
@@ -95,7 +105,7 @@ There are 92 solutions
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/July 2024* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/August 2024* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- link refs -->

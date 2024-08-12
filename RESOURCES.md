@@ -14,11 +14,13 @@
 
 ## <span id="blogs">Blogs</span>
 
-- [Working in MODULA-2](https://galfar.vevb.net/wp/2009/working-in-modula-2/) by Marek Mauder, April 2009.
+- [Modula, zum Zweiten: Modula-2 im Überblick][blog_hanna] by Tam Hanna, November 2017.
+- [Working in MODULA-2][blog_mauder] by Marek Mauder, April 2009.
 
 ## <span id="news">News</span>
 
 - [Free Modula-2 Pages](https://freepages.modula2.org/).
+- [GNU] &ndash; [gm2 Archives](https://lists.gnu.org/archive/html/gm2/).
 
 ## <span id="papers">Papers</span>
 
@@ -47,13 +49,16 @@
 - [XDS Modula-2/Oberon-2 programing system](https://github.com/excelsior-oss/xds)
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/July 2024* [**&#9650;**](#top)  <!-- February 2023 -->
+*[mics](https://lampwww.epfl.ch/~michelou/)/August 2024* [**&#9650;**](#top)  <!-- February 2023 -->
 
 <span id="bottom">&nbsp;</span>
 
 <!-- href links -->
 
 [article_rogers]: https://www.atarimagazines.com/startv4n2/modula2.html
+[blog_hanna]: https://entwickler.de/programmierung/modula-zum-zweiten-modula-2-im-uberblick
+[blog_mauder]: https://galfar.vevb.net/wp/2009/working-in-modula-2/
+[gnu]: https://www.gnu.org/home.html
 [paper_dodrill]: http://parallel.vub.ac.be/education/modula2/documentation/modula-2_tutor_coronado_enterprises.html
 [teaching_innsbruck]: http://cl-informatik.uibk.ac.at/
 [teaching_moosbrugger]: http://cl-informatik.uibk.ac.at/teaching/ws12/bob/schedule.php

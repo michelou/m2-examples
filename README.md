@@ -29,7 +29,7 @@ Optionally one may also install the following software:
 > **&#9755;** ***Installation policy***<br/>
 > When possible we install software from a [Zip archive][zip_archive] rather than via a [Windows installer][windows_installer]. In our case we defined **`C:\opt\`** as the installation directory for optional software tools (*in reference to* the [`/opt/`][unix_opt] directory on Unix).
 
-For instance our development environment looks as follows (*July 2024*) <sup id="anchor_01">[1](#footnote_01)</sup>:
+For instance our development environment looks as follows (*August 2024*) <sup id="anchor_01">[1](#footnote_01)</sup>:
 
 <pre style="font-size:80%;">
 C:\opt\ADW-Modula-2\    <i>(108 MB)</i>
@@ -49,7 +49,8 @@ This project is organized as follows:
 adw-examples\{<a href="adw-examples/README.md">README.md</a>}
 docs\
 examples\{<a href="examples/README.md">README.md</a>, <a href="./examples/Factorial/">Factorial</a>, <a href="./examples/Hello/">Hello</a>, <a href="./examples/PascalTriangle/">PascalTriangle</a>, ..}
-xds-examples\{<a href="xds-examples/README.md">README.md</a>}
+tutor-examples\{<a href="./tutor-examples/README.md">README.md</a>, <a href="./tutor-examples/Areas/">Areas</a>, <a href="./tutor-examples/Arrays/">Arrays</a>, ..}
+xds-examples\{<a href="xds-examples/README.md">README.md</a>. <a href="./xds-examples/exp/">exp</a>, <a href="./xds-examples/queens/">queens</a>, ..}
 README.md
 <a href="RESOURCES.md">RESOURCES.md</a>
 <a href="setenv.bat">setenv.bat</a>
@@ -59,6 +60,8 @@ where
 
 - directory [**`docs\`**](docs/) contains [Modula-2][pim4] related papers/articles (see file [**`docs\README.md`**](docs/README.md)).
 - directory [**`examples\`**](examples/) contains [Modula-2][pim4] examples grabbed from various websites (see file [**`examples\README.md`**](examples/README.md)).
+- directory [**`tutor-examples\`**](examples/) contains [Modula-2][pim4] examples from the online [Modula-2 Tutor](https://www.modula2.org/tutor/).
+- directory [**`xds-examples\`**](xds-examples/) contains [Modula-2][pim4] examples from the XDS Modula-2 distribution.
 - file [**`README.md`**](README.md) is the [Markdown][github_markdown] document for this page.
 - file [**`RESOURCES.md`**](RESOURCES.md) is the [Markdown][github_markdown] document presenting external resources.
 - file [**`setenv.bat`**](setenv.bat) is the batch command for setting up our environment.
@@ -170,7 +173,7 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/July 2024* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/August 2024* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- link refs -->

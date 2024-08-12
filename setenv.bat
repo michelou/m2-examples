@@ -170,7 +170,8 @@ for /f "tokens=1,2,*" %%f in ('subst') do (
     set "__SUBST_DRIVE=%%f"
     set "__SUBST_DRIVE=!__SUBST_DRIVE:~0,2!"
     set "__SUBST_PATH=%%h"
-    if "!__SUBST_DRiVE!"=="!__GIVEN_PATH:~0,2!" (
+    @rem Windows local file systems are not case sensitive (by default)
+    if /i "!__SUBST_DRIVE!"=="!__GIVEN_PATH:~0,2!" (
         set _DRIVE_NAME=!__SUBST_DRIVE:~0,2!
         if %_DEBUG%==1 ( echo %_DEBUG_LABEL% Select drive !_DRIVE_NAME! for which a substitution already exists 1>&2
         ) else if %_VERBOSE%==1 ( echo Select drive !_DRIVE_NAME! for which a substitution already exists 1>&2
@@ -349,7 +350,7 @@ if defined __GIT_CMD (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% Using path of Git executable found in PATH 1>&2
 ) else if defined GIT_HOME (
     set "_GIT_HOME=%GIT_HOME%"
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% Using environment variable GIT_HOME
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% Using environment variable GIT_HOME 1>&2
 ) else (
     set __PATH=C:\opt
     if exist "!__PATH!\Git\" ( set "_GIT_HOME=!__PATH!\Git"
@@ -373,7 +374,7 @@ set "_GIT_PATH=;%_GIT_HOME%\bin;%_GIT_HOME%\mingw64\bin;%_GIT_HOME%\usr\bin"
 goto :eof
 
 :print_env
-set __VERBOSE=%1
+set __VERBOSE=%~1
 set __VERSIONS_LINE1=
 set __VERSIONS_LINE2=
 set __WHERE_ARGS=
@@ -430,10 +431,6 @@ if %__VERBOSE%==1 (
         setlocal enabledelayedexpansion
         echo    !__LINE:%USERPROFILE%=%%USERPROFILE%%! 1>&2
     )
-    echo Environment variables: 1>&2
-    if defined ADWM2_HOME echo    "ADWM2_HOME=%ADWM2_HOME%" 1>&2
-    if defined GIT_HOME echo    "GIT_HOME=%GIT_HOME%" 1>&2
-    if defined XDSM2_HOME echo    "XDSM2_HOME=%XDSM2_HOME%" 1>&2
 )
 goto :eof
 
@@ -453,6 +450,11 @@ endlocal & (
         if not "%CD:~0,2%"=="%_DRIVE_NAME%" (
             if %_DEBUG%==1 echo %_DEBUG_LABEL% cd /d %_DRIVE_NAME% 1>&2
             cd /d %_DRIVE_NAME%
+        )
+        if %_BASH%==1 (
+            @rem see https://conemu.github.io/en/GitForWindows.html
+            if %_DEBUG%==1 echo %_DEBUG_LABEL% %_GIT_HOME%\usr\bin\bash.exe --login 1>&2
+            cmd.exe /c "%_GIT_HOME%\usr\bin\bash.exe --login"
         )
     )
     if %_DEBUG%==1 echo %_DEBUG_LABEL% _EXITCODE=%_EXITCODE% 1>&2

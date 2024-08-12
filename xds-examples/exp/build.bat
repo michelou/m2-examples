@@ -72,15 +72,17 @@ if not exist "%XDSM2_HOME%\bin\xc.exe" (
     goto :eof
 )
 set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
+
+@rem use newer PowerShell version if available
+where /q pwsh.exe
+if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
+) else ( set _PWSH_CMD=powershell.exe
+)
 goto :eof
 
 :env_colors
 @rem ANSI colors in standard Windows 10 shell
 @rem see https://gist.github.com/mlocati/#file-win10colors-cmd
-set _RESET=[0m
-set _BOLD=[1m
-set _UNDERSCORE=[4m
-set _INVERSE=[7m
 
 @rem normal foreground colors
 set _NORMAL_FG_BLACK=[30m
@@ -118,6 +120,12 @@ set _STRONG_BG_RED=[101m
 set _STRONG_BG_GREEN=[102m
 set _STRONG_BG_YELLOW=[103m
 set _STRONG_BG_BLUE=[104m
+
+@rem we define _RESET in last position to avoid crazy console output with type command
+set _BOLD=[1m
+set _UNDERSCORE=[4m
+set _INVERSE=[7m
+set _RESET=[0m
 goto :eof
 
 @rem input parameter: %*
@@ -136,6 +144,7 @@ if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
     ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
@@ -160,8 +169,8 @@ if "%__ARG:~0,1%"=="-" (
 shift
 goto args_loop
 :args_done
-set _STDERR_REDIRECT=1^>NUL
-if %_DEBUG%==1 set _STDERR_REDIRECT=
+set _STDOUT_REDIRECT=1^>NUL
+if %_DEBUG%==1 set _STDOUT_REDIRECT=
 
 if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
     set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
@@ -170,6 +179,9 @@ if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Variables  : _APP_NAME=%_APP_NAME% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
+    echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
 goto :eof
 
@@ -190,13 +202,14 @@ echo.
 echo   %__BEG_P%Options:%__END%
 echo     %__BEG_O%-adw%__END%         select ADW Modula-2 toolset
 echo     %__BEG_O%-debug%__END%       print commands executed by this script
+echo     %__BEG_O%-gm2%__END%         select GNU Modula-2 toolset
 echo     %__BEG_O%-verbose%__END%     print progress messages
 echo     %__BEG_O%-xds%__END%         select XDS Modula-2 toolset ^(default^)
 echo.
 echo   %__BEG_P%Subcommands:%__END%
 echo     %__BEG_O%clean%__END%        delete generated object files
 echo     %__BEG_O%compile%__END%      compile Modula-2 source files
-echo     %__BEG_O%run%__END%          execute main class "%__BEG_O%%_APP_NAME%%__END%"
+echo     %__BEG_O%run%__END%          execute main program "%__BEG_O%%_APP_NAME%%__END%"
 goto :eof
 
 :clean
@@ -234,21 +247,21 @@ goto :eof
 :compile_adw
 set __ACTION_DEF=%~1
 
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%" 1>&2
-xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%" 1>NUL
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 if exist "%_LIB_DIR%\*.sym" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
-    copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>NUL
+    copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>&2
-xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>NUL
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 if exist "%_LIB_DIR%\*.obj" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
-    copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>NUL
+    copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 )
 @rem We must specify a relative path to the SYM directory
 set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
@@ -363,11 +376,11 @@ set "__TARGET_FILE=%~1"
 set __PATH=%~2
 
 set __TARGET_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
      set __TARGET_TIMESTAMP=%%i
 )
 set __SOURCE_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -recurse -path '%__PATH%' -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -recurse -path '%__PATH%' -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
     set __SOURCE_TIMESTAMP=%%i
 )
 call :newer %__SOURCE_TIMESTAMP% %__TARGET_TIMESTAMP%

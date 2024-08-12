@@ -65,15 +65,17 @@ if not exist "%_ADWM2_HOME%\sblink.exe" (
     goto :eof
 )
 set "_SBLINK_CMD=%_ADWM2_HOME%\sblink.exe"
+
+@rem use newer PowerShell version if available
+where /q pwsh.exe
+if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
+) else ( set _PWSH_CMD=powershell.exe
+)
 goto :eof
 
 :env_colors
 @rem ANSI colors in standard Windows 10 shell
 @rem see https://gist.github.com/mlocati/#file-win10colors-cmd
-set _RESET=[0m
-set _BOLD=[1m
-set _UNDERSCORE=[4m
-set _INVERSE=[7m
 
 @rem normal foreground colors
 set _NORMAL_FG_BLACK=[30m
@@ -111,6 +113,12 @@ set _STRONG_BG_RED=[101m
 set _STRONG_BG_GREEN=[102m
 set _STRONG_BG_YELLOW=[103m
 set _STRONG_BG_BLUE=[104m
+
+@rem we define _RESET in last position to avoid crazy console output with type command
+set _BOLD=[1m
+set _UNDERSCORE=[4m
+set _INVERSE=[7m
+set _RESET=[0m
 goto :eof
 
 @rem input parameter: %*
@@ -164,6 +172,9 @@ for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
+    echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
 goto :eof
 
@@ -230,8 +241,8 @@ goto :eof
 :compile_adw
 set __ACTION_DEF=%~1
 
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%" 1>&2
-xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%" 1>NUL
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to copy ADW Modula-2 symbol files 1>&2
     set _EXITCODE=1
@@ -239,15 +250,15 @@ if not %ERRORLEVEL%==0 (
 )
 if exist "%_LIB_DIR%\*.sym" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
-    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>NUL
+    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_MOD_DIR%\*.mod" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 ) else (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
@@ -260,7 +271,7 @@ if %__ACTION_DEF%==0 goto compile_adw_main
 @rem definition modules
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__DEF_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" %_STDOUT_REDIRECT%
@@ -274,7 +285,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
 @rem implementation modules (without program module)
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" ^| findstr /v tstack.mod 2^>NUL') do (
     set "__MOD_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__MOD_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" %_STDOUT_REDIRECT%
@@ -288,7 +299,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" ^| findstr /v tsta
 :compile_adw_main
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\tstack.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__MOD_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" %_STDOUT_REDIRECT%
@@ -354,11 +365,11 @@ goto action_path
 
 :action_next
 set __TARGET_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
      set __TARGET_TIMESTAMP=%%i
 )
 set __SOURCE_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -recurse -path %__PATH_ARRAY:~1% -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -recurse -path %__PATH_ARRAY:~1% -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
     set __SOURCE_TIMESTAMP=%%i
 )
 call :newer %__SOURCE_TIMESTAMP% %__TARGET_TIMESTAMP%

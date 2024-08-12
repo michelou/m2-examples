@@ -30,7 +30,7 @@ C:\opt\ADW-Modula-2\ASCII\win64api.lib
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/July 2024* [**&#9650;**](#top)  <!-- February 2023 -->
+*[mics](https://lampwww.epfl.ch/~michelou/)/August 2024* [**&#9650;**](#top)  <!-- February 2023 -->
 
 <span id="bottom">&nbsp;</span>
 

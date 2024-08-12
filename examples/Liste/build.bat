@@ -40,6 +40,7 @@ set "_SOURCE_DIR=%_ROOT_DIR%src"
 set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\main\def"
 set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod"
 set "_SOURCE_TEST_MOD_DIR=%_SOURCE_DIR%\test\mod"
+
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
@@ -77,6 +78,12 @@ if not exist "%XDSM2_HOME%\bin\xc.exe" (
 set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 set "_HIS_CMD=%XDSM2_HOME%\bin\his.exe"
 set "_XLIB_CMD=%XDSM2_HOME%\bin\xlib.exe"
+
+@rem use newer PowerShell version if available
+where /q pwsh.exe
+if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
+) else ( set _PWSH_CMD=powershell.exe
+)
 goto :eof
 
 :env_colors
@@ -171,10 +178,10 @@ goto args_loop
 set _STDOUT_REDIRECT=1^>NUL
 if %_DEBUG%==1 set _STDOUT_REDIRECT=
 
-if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
-    set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
+if exist "%_SOURCE_DIR%\main\mod-%_TOOLSET%" (
+    set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod-%_TOOLSET%"
 )
-for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
+for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
@@ -249,23 +256,31 @@ goto :eof
 :compile_adw
 set __ACTION_DEF=%~1
 
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%" 1>&2
-xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%" 1>NUL
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to copy ADW Modula-2 symbol files 1>&2
     set _EXITCODE=1
     goto :eof
 )
+if exist "%_LIB_DIR%\*.sym" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+)
 if exist "%_SOURCE_DEF_DIR%\*.def" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_MOD_DIR%\*.mod" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 ) else (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
+)
+if exist "%_LIB_DIR%\*.obj" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
+    copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 )
 @rem We must specify a relative path to the SYM directory
 set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
@@ -275,11 +290,11 @@ if %__ACTION_DEF%==0 goto compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_SYM_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_SYM_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
@@ -293,11 +308,11 @@ if exist "%_TARGET_DEF_DIR%\*.sym" (
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
-    call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!"
+    call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" %_STDOUT_REDIRECT%
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
@@ -341,14 +356,14 @@ goto :eof
 set __ACTION_DEF=%~1
 
 if exist "%_SOURCE_DEF_DIR%\*.def" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_MOD_DIR%\*.mod" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 ) else (
-    echo %_WARNING_LABEL% No Modula-2 implementtion module found 1>&2
+    echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
 if %__ACTION_DEF%==1 (
@@ -389,6 +404,7 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -implib-
     echo -cpu = 486
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
+    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
     echo -m2
     echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
     echo %% -m2addtypes
@@ -437,8 +453,8 @@ if not %ERRORLEVEL%==0 (
 )
 popd
 if exist "%_SOURCE_TEST_MOD_DIR%\*.mod" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%\" %_STDOUT_REDIRECT%
 
     call :compile_xds_test
     if not !_EXITCODE!==0 goto :eof
@@ -456,6 +472,7 @@ set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%Test.prj"
     )
     echo -cpu = 486
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
+    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
     echo -m2
     echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
     echo %% -m2addtypes
@@ -512,11 +529,11 @@ goto action_path
 
 :action_next
 set __TARGET_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
      set __TARGET_TIMESTAMP=%%i
 )
 set __SOURCE_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -recurse -path %__PATH_ARRAY:~1% -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -recurse -path %__PATH_ARRAY:~1% -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
     set __SOURCE_TIMESTAMP=%%i
 )
 call :newer %__SOURCE_TIMESTAMP% %__TARGET_TIMESTAMP%
@@ -580,13 +597,13 @@ if not %ERRORLEVEL%==0 (
     set _EXITCODE=1
     goto :eof
 )
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%" 1>&2
-) else if %_VERBOSE%==1 ( echo Copy library files to "%_LIB_DIR%" 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%\" 1>&2
+) else if %_VERBOSE%==1 ( echo Copy library files to "%_LIB_DIR%\" 1>&2
 )
 @rem copy only if source time is newer than destination time.
-xcopy /d /i /q /y "%_TARGET_DIR%\*.dll" "%_LIB_DIR%" 1>NUL
-xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%" 1>NUL
-xcopy /d /i /q /y "%_TARGET_SYM_DIR%\*.sym" "%_LIB_DIR%" 1>NUL
+xcopy /d /i /q /y "%_TARGET_DIR%\*.dll" "%_LIB_DIR%\" 1>NUL
+xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%\" 1>NUL
+xcopy /d /i /q /y "%_TARGET_SYM_DIR%\*.sym" "%_LIB_DIR%\" 1>NUL
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to copy library files to "%_LIB_DIR%" 1>&2
     set _EXITCODE=1

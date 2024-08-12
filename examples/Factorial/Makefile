@@ -16,6 +16,8 @@ SOURCE_MOD_ADW_DIR = src/main/mod-adw
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
+
+TARGET_BIN_DIR = $(TARGET_DIR)/bin
 TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
 ##############################################################################
@@ -29,31 +31,9 @@ TARGET = $(TARGET_DIR)/$(APP_NAME)$(TARGET_EXT)
 
 all: build
 
-build: $(TARGET)
+build: build_$(TOOLSET)
 
-ifeq ($(TOOLSET),xds)
-$(TARGET): $(DEFS) $(MODS)
-	if [ -d "$(SOURCE_DEF_DIR)" ]; then \
-	    [ -d "$(TARGET_DEF_DIR)" ] || "$(MKDIR)" -p "$(TARGET_DEF_DIR)"; \
-	    "$(CP)" "$(SOURCE_DEF_DIR)"/*.def "$(TARGET_DEF_DIR)"; \
-	fi
-	[ -d "$(TARGET_MOD_DIR)" ] || "$(MKDIR)" -p "$(TARGET_MOD_DIR)"
-	@$(CP) $(SOURCE_MOD_DIR)/*.mod "$(TARGET_MOD_DIR)"
-	@# we compute the absolute path for PRJ_FILE since we use TARGET_DIR as current directory.
-	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
-	$(eval PRJ_FILE := $(shell cygpath -m $(ABS_TARGET_DIR))/$(APP_NAME).prj)
-	@$(ECHO) "-cpu = 486" > "$(PRJ_FILE)"
-	@$(ECHO) "-lookup = *.sym = sym;$(XDSM2_HOME)\sym" >> "$(PRJ_FILE)"
-	@$(ECHO) "-m2" >> "$(PRJ_FILE)"
-	@$(ECHO) "-verbose" >> "$(PRJ_FILE)"
-	@$(ECHO) "-werr" >> "$(PRJ_FILE)"
-	for f in $(TARGET_MOD_DIR)/*.mod; do \
-	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
-	done
-	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
-
-else ifeq ($(TOOLSET),adw)
-$(TARGET): $(DEFS) $(MODS)
+build_adw: $(DEFS) $(MODS)
 	if [ -d "$(SOURCE_DEF_DIR)" ]; then \
 	    [ -d "$(TARGET_DEF_DIR)" ] || "$(MKDIR)" -p "$(TARGET_DEF_DIR)"; \
 	    "$(CP)" "$(SOURCE_DEF_DIR)"/*.def "$(TARGET_DEF_DIR)"; \
@@ -83,14 +63,30 @@ $(TARGET): $(DEFS) $(MODS)
 	@$(ECHO) "$(ADWM2_HOME)\win64api.lib" >> "$(LINKER_OPTS_FILE)"
 	"$(SBLINK)" "@$(LINKER_OPTS_FILE)"
 
-else ifeq ($(TOOLSET),gm2)
-$(TARGET): $(DEFS) $(MODS)
-	@$(ECHO) "GNU Modula-2: Not yet implemented"
-
-else
-$(TARGET): $(DEFS) $(MODS)
-	@$(ECHO) "Unknown value for TOOLSET environment variable"
-endif
+build_xds: $(DEFS) $(MODS)
+	if [ -d "$(SOURCE_DEF_DIR)" ]; then \
+	    [ -d "$(TARGET_DEF_DIR)" ] || "$(MKDIR)" -p "$(TARGET_DEF_DIR)"; \
+	    "$(CP)" "$(SOURCE_DEF_DIR)"/*.def "$(TARGET_DEF_DIR)"; \
+	fi
+	[ -d "$(TARGET_MOD_DIR)" ] || "$(MKDIR)" -p "$(TARGET_MOD_DIR)"
+	@$(CP) $(SOURCE_MOD_DIR)/*.mod "$(TARGET_MOD_DIR)"
+	@# we compute the absolute path for PRJ_FILE since we use TARGET_DIR as current directory.
+	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
+	$(eval PRJ_FILE := $(shell cygpath -m $(ABS_TARGET_DIR))/$(APP_NAME).prj)
+	@$(ECHO) "-cpu = 486" > "$(PRJ_FILE)"
+	@$(ECHO) "-lookup = *.sym = sym;$(XDSM2_HOME)\sym" >> "$(PRJ_FILE)"
+	@$(ECHO) "-lookup = *.dll|*.lib = bin;$(XDSM2_HOME)\bin" >> "$(PRJ_FILE)"
+	@$(ECHO) "-m2" >> "$(PRJ_FILE)"
+	@$(ECHO) "-verbose" >> "$(PRJ_FILE)"
+	@$(ECHO) "-werr" >> "$(PRJ_FILE)"
+	for f in $(TARGET_MOD_DIR)/*.mod; do \
+	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
+	done
+	for f in $(TARGET_BIN_DIR)/*.lib; do \
+	    [ -f "$$f" ] || continue; \
+	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
+	done
+	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
 
 clean:
 	"$(RM)" -rf "$(TARGET_DIR)"

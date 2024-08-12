@@ -160,8 +160,8 @@ if "%__ARG:~0,1%"=="-" (
 shift
 goto args_loop
 :args_done
-set _STDERR_REDIRECT=1^>NUL
-if %_DEBUG%==1 set _STDERR_REDIRECT=
+set _STDOUT_REDIRECT=1^>NUL
+if %_DEBUG%==1 set _STDOUT_REDIRECT=
 
 if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
     set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
@@ -234,21 +234,21 @@ goto :eof
 :compile_adw
 set __ACTION_DEF=%~1
 
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%" 1>&2
-xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%" 1>NUL
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 if exist "%_LIB_DIR%\*.sym" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
-    copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>NUL
+    copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>&2
-    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>&2
-xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>NUL
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 if exist "%_LIB_DIR%\*.obj" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
-    copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>NUL
+    copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 )
 @rem We must specify a relative path to the SYM directory
 set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
@@ -257,7 +257,7 @@ set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__DEF_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
@@ -271,7 +271,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
 :compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__MOD_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!"
