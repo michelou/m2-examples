@@ -44,6 +44,8 @@ set "_SOURCE_TEST_MOD_DIR=%_SOURCE_DIR%\test\mod"
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
+@rem library dependencies
+set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 set "_TARGET_TEST_DIR=%_TARGET_DIR%\test"
 
@@ -296,8 +298,8 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set /a __N+=1
 )
 if exist "%_TARGET_DEF_DIR%\*.sym" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_TARGET_SYM_DIR%" 1>&2
-    xcopy /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_TARGET_SYM_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 :compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
@@ -321,8 +323,8 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -MAP:%_TARGET_DIR%\%_APP_NAME%
     echo -OUT:%_TARGET_FILE%
 ) > "%__LINKER_OPTS_FILE%"
-for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
-    echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
+    echo %%f >> "%__LINKER_OPTS_FILE%"
 )
 (
     echo %_ADWM2_HOME%\rtl-win-amd64.lib
@@ -399,7 +401,7 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -implib-
     echo -cpu = 486
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
-    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
+    echo -lookup = %XDSM2_HOME%\bin
     echo -m2
     echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
     echo %% -m2addtypes
@@ -413,7 +415,7 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
 set __N=0
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE:%_TARGET_DIR%\=!
+    echo ^^!module !__MOD_FILE!
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
 if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
@@ -434,7 +436,6 @@ if not %ERRORLEVEL%==0 (
 )
 set __XLIB_OPTS=/nologo /new "%_APP_NAME%" +%_APP_NAME%
 
-if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XLIB_CMD%" %__XLIB_OPTS% 1>&2
 ) else if %_VERBOSE%==1 ( echo Create library file into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
 )

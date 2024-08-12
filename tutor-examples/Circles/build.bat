@@ -37,15 +37,21 @@ set _ERROR_LABEL=%_STRONG_FG_RED%Error%_RESET%:
 set _WARNING_LABEL=%_STRONG_FG_YELLOW%Warning%_RESET%:
 
 set "_SOURCE_DIR=%_ROOT_DIR%src"
-set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\def"
-set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod"
+set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\main\def"
+set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod"
+set "_SOURCE_TEST_DIR=%_SOURCE_DIR%\test\mod"
+
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
+set "_TARGET_TEST_DIR=%_TARGET_DIR%\test"
+
+set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
 for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.lib"
+set "_TARGET_TEST_FILE=%_TARGET_DIR%\%_APP_NAME%Test.exe"
 
 @rem 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
@@ -160,6 +166,7 @@ if "%__ARG:~0,1%"=="-" (
     ) else if "%__ARG%"=="compile" ( set _COMMANDS=!_COMMANDS! compile
     ) else if "%__ARG%"=="help" ( set _COMMANDS=help
     ) else if "%__ARG%"=="run" ( set _COMMANDS=!_COMMANDS! compile run
+    ) else if "%__ARG%"=="test" ( set _COMMANDS=!_COMMANDS! compile test
     ) else (
         echo %_ERROR_LABEL% Unknown subcommand "%__ARG%" 1>&2
         set _EXITCODE=1
@@ -176,7 +183,7 @@ if %_DEBUG%==1 set _STDOUT_REDIRECT=
 if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
     set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
 )
-for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
+for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
@@ -494,13 +501,13 @@ call "%_XLIB_CMD%" %__XLIB_OPTS%
 @rem    set _EXITCODE=1
 @rem    goto :eof
 @rem )
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%" 1>&2
-) else if %_VERBOSE%==1 ( echo Copy library files to "%_LIB_DIR%" 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%\" 1>&2
+) else if %_VERBOSE%==1 ( echo Copy library files to "%_LIB_DIR%\" 1>&2
 )
 @rem copy only if source time is newer than destination time.
-@rem xcopy /d /i /q /y "%_TARGET_DIR%\*.dll" "%_LIB_DIR%" 1>NUL
-xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%" 1>NUL
-xcopy /d /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_LIB_DIR%" 1>NUL
+@rem xcopy /d /i /q /y "%_TARGET_DIR%\*.dll" "%_LIB_DIR%\" %_STDOUT_REDIRECT%
+xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%\" %_STDOUT_REDIRECT%
+xcopy /d /i /q /y "%_TARGET_SYM_DIR%\*.sym" "%_LIB_DIR%\" %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to copy library files to "%_LIB_DIR%" 1>&2
     set _EXITCODE=1
@@ -510,6 +517,103 @@ if not %ERRORLEVEL%==0 (
     )
     goto :eof
 )
+goto :eof
+
+:test_compile
+call :action_required "%_TARGET_TEST_FILE%" "%_SOURCE_TEST_DIR%\*.mod"
+if %_ACTION_REQUIRED%==0 goto :eof
+
+call :test_compile_%_TOOLSET%
+if not %_EXITCODE%==0 goto :eof
+
+goto :eof
+
+:test_compile_xds
+if exist "%_LIB_DIR%\*.dll" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.lib" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.lib" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.lib" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.sym" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_SOURCE_TEST_DIR%\*.mod" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_TEST_DIR%\*.mod" "%_TARGET_TEST_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_TEST_DIR%\*.mod" "%_TARGET_TEST_DIR%\" %_STDOUT_REDIRECT%
+)
+set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%Test.prj"
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
+) else if %_VERBOSE%==1 ( echo Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
+)
+(
+    if %_DEBUG%==1 (
+        echo %% debug ON
+        echo -gendebug+
+        echo -genhistory+
+        echo -lineno+
+    )
+    echo -cpu = 486
+    echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
+    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
+    echo -m2
+    echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
+    echo %% -m2addtypes
+    echo -verbose
+    echo -werr
+    echo %% disable warning 301 ^(parameter "xxx" is never used^)
+    echo -woff301+
+    echo %% disable warning 303 ^(procedure "xxx" declared but never used^)
+    echo -woff303+
+) > "%__PRJ_FILE%"
+set __N=0
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_TEST_DIR%\*.mod" 2^>NUL') do (
+    set "__MOD_FILE=%%f"
+    echo ^^!module !__MOD_FILE!
+    set /a __N+=1
+) >> "%__PRJ_FILE%"
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    set "__LIB_FILE=%%f"
+    echo ^^!module !__LIB_FILE!
+) >> "%__PRJ_FILE%"
+if %__N%==0 (
+    echo %_WARNING_LABEL% No Modula-2 test source file found 1>&2
+    goto :eof
+) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 test module
+) else ( set __N_FILES=%__N% Modula-2 test modules
+)
+pushd "%_TARGET_DIR%"
+if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
+
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2
+) else if %_VERBOSE%==1 ( echo Compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
+)
+call "%_XC_CMD%" =p "%__PRJ_FILE%"
+if not %ERRORLEVEL%==0 (
+    popd
+    echo %_ERROR_LABEL% Failed to compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+popd
+goto :eof
+
+:test
+call :test_compile
+if not %_EXITCODE%==0 goto :eof
+
+if not exist "%_TARGET_TEST_FILE%" (
+    echo %_ERROR_LABEL% Test program "!_TARGET_TEST_FILE:%_ROOT_DIR%=!" not found 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_TARGET_TEST_FILE%" 1>&2
+) else if %_VERBOSE%==1 ( echo Execute test program "!_TARGET_TEST_FILE:%_ROOT_DIR%=!" 1>&2
+)
+"%_TARGET_TEST_FILE%"
 goto :eof
 
 @rem #########################################################################

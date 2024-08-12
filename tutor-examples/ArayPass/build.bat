@@ -409,7 +409,10 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
     set "__LIB_FILE=%%f"
     echo ^^!module !__LIB_FILE!
 ) >> "%__PRJ_FILE%"
-if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
+if %__N%==0 (
+    echo %_WARNING_LABEL% No Modula-2 test source file found 1>&2
+    goto :eof
+) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
 ) else ( set __N_FILES=%__N% Modula-2 implementation modules
 )
 pushd "%_TARGET_DIR%"

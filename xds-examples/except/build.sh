@@ -49,7 +49,6 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=true ;;
-        -gm2)      TOOLSET=gm2 ;;
         -help)     HELP=true ;;
         -verbose)  VERBOSE=true ;;
         -xds)      TOOLSET=xds ;;
@@ -85,7 +84,6 @@ Usage: $BASENAME { <option> | <subcommand> }
   Options:
     -adw         select ADW Modula-2 toolset
     -debug       print commands executed by this script
-    -gm2         select GNU Modula-2 toolset
     -verbose     print progress messages
     -xds         select XDS Modula-2 toolset
 
@@ -202,10 +200,6 @@ compile_adw() {
     fi
 }
 
-compile_gm2() {
-    echo "Not yet implemented"
-}
-
 compile_xds() {
     if [[ -n "$(ls -A $SOURCE_DEF_DIR/*.def 2>/dev/null)" ]]; then
         if $DEBUG; then
@@ -221,16 +215,10 @@ compile_xds() {
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
     $DEBUG && debug "# Create XDS project file \"$prj_file\""
     (
-        echo "-cpu = 486" && \
         echo "-lookup = *.sym = sym;$(mixed_path $XDSM2_HOME)/sym" && \
-        echo "-lookup = *.dll|*.lib = bin;$(mixed_path $XDSM2_HOME)/bin" && \
         echo "-m2" && \
         echo "-verbose" && \
-        echo "-werr" && \
-        echo "% disable warning 301 (parameter \"xxx\" is never used)" && \
-        echo "-woff301+" && \
-        echo "% disable warning 303 (procedure \"xxx\" declared but never used)" && \
-        echo "-woff303+"
+        echo "-werr"
     ) > "$prj_file"
     local n=0
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.mod" 2>/dev/null); do
@@ -300,9 +288,8 @@ EXITCODE=0
 ROOT_DIR="$(getHome)"
 
 SOURCE_DIR="$ROOT_DIR/src"
-SOURCE_DEF_DIR="$SOURCE_DIR/main/def"
-SOURCE_MOD_DIR="$SOURCE_DIR/main/mod"
-
+SOURCE_DEF_DIR="$SOURCE_DIR/def"
+SOURCE_MOD_DIR="$SOURCE_DIR/mod"
 TARGET_DIR="$ROOT_DIR/target"
 TARGET_DEF_DIR="$TARGET_DIR/def"
 TARGET_MOD_DIR="$TARGET_DIR/mod"

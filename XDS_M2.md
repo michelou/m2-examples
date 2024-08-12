@@ -86,11 +86,11 @@ The project directory for the **`Terminal2`** library looks as follows  :
 <b>&gt; <a href="https://learn.microsoft.com/fr-fr/windows-server/administration/windows-commands/cd">cd</a></b>
 F:\examples\Terminal2
 &nbsp;
-<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /f /a . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /f /a . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /v /b [A-Z]</b>
 |   <a href="./examples/Terminal2/build.bat">build.bat</a>
 |   <a href="./examples/Terminal2/build.sh">build.sh</a>
 |   <a href="./examples/Terminal2/Makefile">Makefile</a>
-\---src
+\---<b>src</b>
     +---main
     |   +---def
     |   |       <a href="./examples/Terminal2/src/main/def/Terminal2.def">Terminal2.def</a>
@@ -98,8 +98,8 @@ F:\examples\Terminal2
     |   |       <a href="./examples/Terminal2/src/main/mod/Terminal2.mod">Terminal2.mod</a>
     |   \---mod-adw
     |           <a href="./examples/Terminal2/src/main/mod-adw/Terminal2.mod">Terminal2.mod</a>
-    \---test
-        \---mod
+    \---<b>test</b>
+        \---<b>mod</b>
                 <a href="./examples/Terminal2/src/test/mod/Terminal2Test.mod">Terminal2Test.mod</a>
 </pre>
 
@@ -115,9 +115,9 @@ Let's again have a closer look at the build directory **`target`** :
   |   Terminal2Test.obj
   |   Terminal2Test.prj
   |   tmp.lnk
-  +---def
+  +---<b>def</b>
   |       Terminal2.def
-  +---mod
+  +---<b>mod</b>
   |       Terminal2.mod
   +---sym
   |       Terminal2.sym
@@ -136,6 +136,7 @@ Let's again have a closer look at the build directory **`target`** :
     -implib-
     -cpu = 486
     -lookup = *.sym = sym;C:\opt\XDS-Modula-2\sym
+    -lookup = *.dll|*.lib = bin;C:\opt\XDS-Modula-2\bin
     -m2
     <span style="color:green;">% main module of the program</span>
     !module mod\Terminal2.mod
@@ -143,12 +144,13 @@ Let's again have a closer look at the build directory **`target`** :
 
 Finally we support 3 ways to build a Modula-2 library, namely with a batch file (**`build.bat`**), a shell script (**`build.sh`**) or a GNU make file (**`Makefile`**). For instance :
 <pre style="font-size:80%;">
-<b>&gt; build</b>
+<b>&gt; <a href="./examples/Terminal2/build.bat">build</a></b>
 Usage: build { &lt;option&gt; | &lt;subcommand&gt; }
 &nbsp;
   Options:
     -adw         select ADW Modula-2 toolset
     -debug       print commands executed by this script
+    -gm2         select GNU Modula-2 toolset
     -verbose     print progress messages
     -xds         select XDS Modula-2 toolset (default)
 &nbsp;
