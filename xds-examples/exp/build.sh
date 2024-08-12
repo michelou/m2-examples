@@ -84,6 +84,7 @@ Usage: $BASENAME { <option> | <subcommand> }
   Options:
     -adw         select ADW Modula-2 toolset
     -debug       print commands executed by this script
+    -gm2         select GNU Modula-2 toolset
     -verbose     print progress messages
     -xds         select XDS Modula-2 toolset
 
@@ -215,6 +216,7 @@ compile_xds() {
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
     $DEBUG && debug "# Create XDS project file \"$prj_file\""
     (
+        echo "-cpu = 486" && \
         echo "-lookup = *.sym = sym;$(mixed_path $XDSM2_HOME)/sym" && \
         echo "-m2" && \
         echo "-verbose" && \

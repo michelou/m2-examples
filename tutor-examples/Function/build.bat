@@ -334,7 +334,7 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_SBLINK_CMD% @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
-call "%_SBLINK_CMD%" @!__LINKER_OPTS_FILE:%_ROOT_DIR%=!
+call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2
     if %_DEBUG%==1 ( if exist "%_ROOT_DIR%linker.err" type "%_ROOT_DIR%linker.err"

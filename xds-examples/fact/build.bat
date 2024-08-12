@@ -41,6 +41,7 @@ for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib"
 set "_SOURCE_DIR=%_ROOT_DIR%src"
 set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\def"
 set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod"
+
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
@@ -49,22 +50,24 @@ set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
+@rem 2 choices: ASCII, Unicode
+set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
 @rem m2e.exe = ADW Modula-2 IDE
 @rem sbd.exe = ADW Modula-2 Debugger
 @rem sblink.exe = ADW Modula-2 Linker
-if not exist "%ADWM2_HOME%\Unicode\m2amd64.exe" (
+if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
     goto :eof
 )
-set "_M2C_CMD=%ADWM2_HOME%\Unicode\m2amd64.exe"
+set "_M2C_CMD=%_ADWM2_HOME%\m2amd64.exe"
 
-if not exist "%ADWM2_HOME%\Unicode\sblink.exe" (
+if not exist "%_ADWM2_HOME%\sblink.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
     goto :eof
 )
-set "_SBLINK_CMD=%ADWM2_HOME%\Unicode\sblink.exe"
+set "_SBLINK_CMD=%_ADWM2_HOME%\sblink.exe"
 
 if not exist "%XDSM2_HOME%\bin\xc.exe" (
     echo %_ERROR_LABEL% XDS Modula-2 installation not found 1>&2
@@ -72,15 +75,17 @@ if not exist "%XDSM2_HOME%\bin\xc.exe" (
     goto :eof
 )
 set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
+
+@rem use newer PowerShell version if available
+where /q pwsh.exe
+if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
+) else ( set _PWSH_CMD=powershell.exe
+)
 goto :eof
 
 :env_colors
 @rem ANSI colors in standard Windows 10 shell
 @rem see https://gist.github.com/mlocati/#file-win10colors-cmd
-set _RESET=[0m
-set _BOLD=[1m
-set _UNDERSCORE=[4m
-set _INVERSE=[7m
 
 @rem normal foreground colors
 set _NORMAL_FG_BLACK=[30m
@@ -118,6 +123,12 @@ set _STRONG_BG_RED=[101m
 set _STRONG_BG_GREEN=[102m
 set _STRONG_BG_YELLOW=[103m
 set _STRONG_BG_BLUE=[104m
+
+@rem we define _RESET in last position to avoid crazy console output with type command
+set _BOLD=[1m
+set _UNDERSCORE=[4m
+set _INVERSE=[7m
+set _RESET=[0m
 goto :eof
 
 @rem input parameter: %*
@@ -170,6 +181,9 @@ if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Variables  : _APP_NAME=%_APP_NAME% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
+    echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%"
 )
 goto :eof
 
@@ -190,6 +204,7 @@ echo.
 echo   %__BEG_P%Options:%__END%
 echo     %__BEG_O%-adw%__END%         select ADW Modula-2 toolset
 echo     %__BEG_O%-debug%__END%       print commands executed by this script
+echo     %__BEG_O%-gm2%__END%         select GNU Modula-2 toolset
 echo     %__BEG_O%-verbose%__END%     print progress messages
 echo     %__BEG_O%-xds%__END%         select XDS Modula-2 toolset ^(default^)
 echo.
@@ -234,8 +249,8 @@ goto :eof
 :compile_adw
 set __ACTION_DEF=%~1
 
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
-xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 if exist "%_LIB_DIR%\*.sym" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
     copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
@@ -272,11 +287,11 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!"
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
@@ -298,7 +313,7 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo %ADWM2_HOME%\Unicode\win64api.lib
 ) >> "%__LINKER_OPTS_FILE%"
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_SBLINK_CMD% @%__LINKER_OPTS_FILE% 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
 call "%_SBLINK_CMD%" @!__LINKER_OPTS_FILE:%_ROOT_DIR%=!
@@ -314,11 +329,11 @@ goto :eof
 
 :compile_xds
 if exist "%_SOURCE_DEF_DIR%\*.def" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>&2
-    xcopy /i "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%" 1>NUL
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
+    xcopy /i "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>&2
-xcopy /i "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%" 1>NUL
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+xcopy /i "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 
 set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
@@ -363,11 +378,11 @@ set "__TARGET_FILE=%~1"
 set __PATH=%~2
 
 set __TARGET_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
      set __TARGET_TIMESTAMP=%%i
 )
 set __SOURCE_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -recurse -path '%__PATH%' -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -recurse -path '%__PATH%' -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
     set __SOURCE_TIMESTAMP=%%i
 )
 call :newer %__SOURCE_TIMESTAMP% %__TARGET_TIMESTAMP%

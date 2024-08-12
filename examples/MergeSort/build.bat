@@ -219,6 +219,8 @@ goto :eof
 
 :clean
 call :rmdir "%_TARGET_DIR%"
+if exist "%_ROOT_DIR%%_APP_NAME%.err" del "%_ROOT_DIR%%_APP_NAME%.err"
+if exist "%_ROOT_DIR%errinfo.$$$" del "%_ROOT_DIR%errinfo.$$$"
 goto :eof
 
 @rem input parameter: %1=directory path
@@ -256,19 +258,29 @@ set __ACTION_DEF=%~1
 
 if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
 xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+if %ERRORLEVEL%==0 (
+    echo %_ERROR_LABEL% Failed to copy XDS symbol files 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
 if exist "%_LIB_DIR%\*.sym" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
-    copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.obj" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
     xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
-xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
-if exist "%_LIB_DIR%\*.obj" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
-    copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
+if exist "%_SOURCE_MOD_DIR%\*.mod" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
+) else (
+    echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
+    goto :eof
 )
 @rem We must specify a relative path to the SYM directory
 set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
@@ -321,7 +333,7 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
-call "%_SBLINK_CMD%" @!__LINKER_OPTS_FILE:%_ROOT_DIR%=! %_STDOUT_REDIRECT%
+call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2
     if %_DEBUG%==1 ( if exist "%_ROOT_DIR%linker.err" type "%_ROOT_DIR%linker.err"
@@ -400,18 +412,18 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
 set __N=0
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE:%_TARGET_DIR%\=!
+    echo ^^!module !__MOD_FILE!
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
     set "__LIB_FILE=%%f"
-    echo ^^!module !__LIB_FILE:%_TARGET_DIR%\=!
+    echo ^^!module !__LIB_FILE!
 ) >> "%__PRJ_FILE%"
 if %__N%==0 (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
-) else if %__N%==1 ( set __N_FILES=%__% Modula-2 implementation module
-) else ( set __N_FILES=%__% Modula-2 implementation modules
+) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
+) else ( set __N_FILES=%__N% Modula-2 implementation modules
 )
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2

@@ -303,11 +303,11 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!"
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
@@ -322,11 +322,11 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -OUT:%_TARGET_FILE%
     echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
-for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
-    echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
+    echo %%f >> "%__LINKER_OPTS_FILE%"
 )
-for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
-    echo !_TARGET_BIN_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
+    echo %%f >> "%__LINKER_OPTS_FILE%"
 )
 (
     echo %_ADWM2_HOME%\rtl-win-amd64.lib

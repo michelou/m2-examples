@@ -36,7 +36,7 @@ set _DEBUG_LABEL=%_NORMAL_BG_CYAN%[%_BASENAME%]%_RESET%
 set _ERROR_LABEL=%_STRONG_FG_RED%Error%_RESET%:
 set _WARNING_LABEL=%_STRONG_FG_YELLOW%Warning%_RESET%:
 
-for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib"
+for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib"
 
 set "_SOURCE_DIR=%_ROOT_DIR%src"
 set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\def"
@@ -49,22 +49,24 @@ set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
+@rem 2 choices: ASCII, Unicode
+set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
 @rem m2e.exe = ADW Modula-2 IDE
 @rem sbd.exe = ADW Modula-2 Debugger
 @rem sblink.exe = ADW Modula-2 Linker
-if not exist "%ADWM2_HOME%\Unicode\m2amd64.exe" (
+if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
     goto :eof
 )
-set "_M2C_CMD=%ADWM2_HOME%\Unicode\m2amd64.exe"
+set "_M2C_CMD=%_ADWM2_HOME%\m2amd64.exe"
 
-if not exist "%ADWM2_HOME%\Unicode\sblink.exe" (
+if not exist "%_ADWM2_HOME%\sblink.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
     goto :eof
 )
-set "_SBLINK_CMD=%ADWM2_HOME%\Unicode\sblink.exe"
+set "_SBLINK_CMD=%_ADWM2_HOME%\sblink.exe"
 
 if not exist "%XDSM2_HOME%\bin\xc.exe" (
     echo %_ERROR_LABEL% XDS Modula-2 installation not found 1>&2
@@ -247,8 +249,8 @@ goto :eof
 :compile_adw
 set __ACTION_DEF=%~1
 
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
-xcopy /i /q /y "%ADWM2_HOME%\Unicode\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 if exist "%_LIB_DIR%\*.sym" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
     copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
@@ -285,11 +287,11 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!"
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
@@ -338,10 +340,24 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
 ) else if %_VERBOSE%==1 ( echo Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
 )
 (
+    if %_DEBUG%==1 (
+        echo %% debug ON
+        echo -gendebug+
+        echo -genhistory+
+        echo -lineno+
+    )
+    echo -cpu = 486
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
+    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
     echo -m2
+    echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
+    echo %% -m2addtypes
     echo -verbose
     echo -werr
+    echo %% disable warning 301 ^(parameter "xxx" is never used^)
+    echo -woff301+
+    echo %% disable warning 303 ^(procedure "xxx" declared but never used^)
+    echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
@@ -376,11 +392,11 @@ set "__TARGET_FILE=%~1"
 set __PATH=%~2
 
 set __TARGET_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -path '%__TARGET_FILE%' -ea Stop | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
      set __TARGET_TIMESTAMP=%%i
 )
 set __SOURCE_TIMESTAMP=00000000000000
-for /f "usebackq" %%i in (`powershell -c "gci -recurse -path '%__PATH%' -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
+for /f "usebackq" %%i in (`call "%_PWSH_CMD%" -c "gci -recurse -path '%__PATH%' -ea Stop | sort LastWriteTime | select -last 1 -expandProperty LastWriteTime | Get-Date -uformat %%Y%%m%%d%%H%%M%%S" 2^>NUL`) do (
     set __SOURCE_TIMESTAMP=%%i
 )
 call :newer %__SOURCE_TIMESTAMP% %__TARGET_TIMESTAMP%

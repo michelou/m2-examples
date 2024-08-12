@@ -39,6 +39,7 @@ set _WARNING_LABEL=%_STRONG_FG_YELLOW%Warning%_RESET%:
 set "_SOURCE_DIR=%_ROOT_DIR%src"
 set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\main\def"
 set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod"
+
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
@@ -46,11 +47,11 @@ set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
 set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
 @rem 2 choices: ASCII, Unicode
-set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
+set "_ADWM2_HOME=%ADWM2_HOME%\Unicode"
 @rem m2e.exe = ADW Modula-2 IDE
 @rem sbd.exe = ADW Modula-2 Debugger
 @rem sblink.exe = ADW Modula-2 Linker
@@ -68,11 +69,12 @@ if not exist "%_ADWM2_HOME%\sblink.exe" (
 )
 set "_SBLINK_CMD=%_ADWM2_HOME%\sblink.exe"
 
-if not exist "%_ADWM2_HOME%\sblink.exe" (
-    echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
+if not exist "%XDSM2_HOME%\bin\xc.exe" (
+    echo %_ERROR_LABEL% XDS Modula-2 installation not found 1>&2
     set _EXITCODE=1
     goto :eof
 )
+set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 @rem use newer PowerShell version if available
 where /q pwsh.exe
 if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
@@ -144,9 +146,10 @@ if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
-    @rem ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
+    ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
     ) else (
         echo %_ERROR_LABEL% Unknown option "%__ARG%" 1>&2
         set _EXITCODE=1
@@ -174,6 +177,8 @@ if %_DEBUG%==1 set _STDOUT_REDIRECT=
 if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
     set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
 )
+for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
+
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
@@ -211,6 +216,8 @@ goto :eof
 
 :clean
 call :rmdir "%_TARGET_DIR%"
+if exist "%_ROOT_DIR%%_APP_NAME%.err" del "%_ROOT_DIR%%_APP_NAME%.err"
+if exist "%_ROOT_DIR%errinfo.$$$" del "%_ROOT_DIR%errinfo.$$$"
 goto :eof
 
 @rem input parameter: %1=directory path
@@ -229,6 +236,8 @@ if not %ERRORLEVEL%==0 (
 goto :eof
 
 :compile
+if not exist "%_TARGET_DIR%" mkdir "%_TARGET_DIR%"
+
 call :action_required "%_TARGET_FILE%" "%_SOURCE_DEF_DIR%\*.def"
 set __ACTION_DEF=%_ACTION_REQUIRED%
 
@@ -244,9 +253,16 @@ goto :eof
 :compile_adw
 set __ACTION_DEF=%~1
 
-if exist "%_ADWM2_HOME%\winamd64sym\*.sym" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
-    xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+if not %ERRORLEVEL%==0 (
+    echo %_ERROR_LABEL% Failed to copy ADW Modula-2 symbol files 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+if exist "%_LIB_DIR%\*.sym" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
@@ -260,7 +276,7 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     goto :eof
 )
 @rem We must specify a relative path to the SYM directory
-set __M2C_OPTS=-nowarn -sym:!_TARGET_SYM_DIR:%_ROOT_DIR%=!,!_TARGET_DEF_DIR:%_ROOT_DIR%=!
+set __M2C_OPTS=-nowarn -sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%=!,!_TARGET_DEF_DIR:%_ROOT_DIR%=!"
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_main
@@ -270,7 +286,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
     )
-    call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
+    call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" %_STDOUT_REDIRECT%
     if not !ERRORLEVEL!==0 (
         echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
@@ -298,7 +314,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\Clock.mod" 2^>NUL') do (
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
-    call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!"
+    call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" %_STDOUT_REDIRECT%
     if not !ERRORLEVEL!==0 (
         echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
@@ -325,10 +341,10 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
     echo %_ADWM2_HOME%\win64api.lib
 ) >> "%__LINKER_OPTS_FILE%"
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_SBLINK_CMD% @%__LINKER_OPTS_FILE% 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
-call "%_SBLINK_CMD%" @!__LINKER_OPTS_FILE:%_ROOT_DIR%=!
+call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2
     if %_DEBUG%==1 ( if exist "%_ROOT_DIR%linker.err" type "%_ROOT_DIR%linker.err"
@@ -406,6 +422,9 @@ if not exist "%_TARGET_FILE%" (
     echo %_ERROR_LABEL% Program "!_TARGET_FILE:%_ROOT_DIR%=!" not found 1>&2
     set _EXITCODE=1
     goto :eof
+)
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_TARGET_FILE%" 1>&2
+) else if %_VERBOSE%==1 ( echo Execute program "!_TARGET_FILE:%_ROOT_DIR%=!" 1>&2
 )
 "%_TARGET_FILE%"
 if not %ERRORLEVEL%==0 (
