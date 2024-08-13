@@ -49,6 +49,7 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=true ;;
+        -gm2)      TOOLSET=gm2 ;;
         -help)     HELP=true ;;
         -verbose)  VERBOSE=true ;;
         -xds)      TOOLSET=xds ;;
@@ -68,7 +69,7 @@ args() {
         esac
     done
     if [[ -d "$SOURCE_DIR/main/mod-$TOOLSET" ]]; then
-        SOURCE_MOD_DIR="$(mixed_path SOURCE_DIR/main/mod-$TOOLSET)"
+        SOURCE_MOD_DIR="$(mixed_path $SOURCE_DIR/main/mod-$TOOLSET)"
     fi
     LIB_DIR="$(mixed_path $(dirname $ROOT_DIR)/lib/$TOOLSET)"
 
@@ -87,6 +88,7 @@ Usage: $BASENAME { <option> | <subcommand> }
   Options:
     -adw         select ADW Modula-2 toolset
     -debug       print commands executed by this script
+    -gm2         select GNU Modula-2 toolset
     -verbose     print progress messages
     -xds         select XDS Modula-2 toolset
 
@@ -228,7 +230,7 @@ compile_adw() {
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.obj" 2>/dev/null); do
         echo "${TARGET_MOD_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
-    for f in $(find "$TARGET_BIN_DIR)/" -type f -name "*.obj" 2>/dev/null); do
+    for f in $(find "$TARGET_BIN_DIR/" -type f -name "*.obj" 2>/dev/null); do
         echo "${TARGET_BIN_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
     (

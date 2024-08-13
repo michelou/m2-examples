@@ -37,8 +37,8 @@ set _ERROR_LABEL=%_STRONG_FG_RED%Error%_RESET%:
 set _WARNING_LABEL=%_STRONG_FG_YELLOW%Warning%_RESET%:
 
 set "_SOURCE_DIR=%_ROOT_DIR%src"
-set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\def"
-set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod"
+set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\main\def"
+set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod"
 
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
@@ -47,14 +47,12 @@ set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
 set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
 @rem 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -176,10 +174,10 @@ goto args_loop
 set _STDOUT_REDIRECT=1^>NUL
 if %_DEBUG%==1 set _STDOUT_REDIRECT=
 
-if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
-    set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
+if exist "%_SOURCE_DIR%\main\mod-%_TOOLSET%" (
+    set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod-%_TOOLSET%"
 )
-for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
+for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
@@ -408,6 +406,8 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -woff301+
     echo %% disable warning 303 ^(procedure "xxx" declared but never used^)
     echo -woff303+
+    echo %% disable warning 306 ^(import of "xxx.yyy" is never used^)
+    echo -woff306+
 ) > "%__PRJ_FILE%"
 set __N=0
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (

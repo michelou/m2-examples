@@ -5,21 +5,24 @@
 ##
 ##############################################################################
 
+DEBUG ?= false
+
 TOOLSET ?= xds
 
 include ../Makefile.inc
 
-ADWM2_HOME2 = $(subst \,/,$(ADWM2_HOME))/ascii
+ADWM2_SYM_DIR = $(subst \,/,$(ADWM2_HOME))/ascii/winamd64sym
 
 LIB_DIR = ../lib/$(TOOLSET)
 
 SOURCE_DIR = src
 SOURCE_DEF_DIR = src/main/def
 SOURCE_MOD_DIR = src/main/mod
+
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
-
+## library dependencies
 TARGET_BIN_DIR = $(TARGET_DIR)/bin
 TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
@@ -54,7 +57,7 @@ build_adw: $(DEFS) $(MODS)
 	[ -d "$(TARGET_BIN_DIR)" ] || "$(MKDIR)" -p "$(TARGET_BIN_DIR)"
 	@$(CP) $(LIB_DIR)/*.obj "$(TARGET_BIN_DIR)"
 	[ -d "$(TARGET_SYM_DIR)" ] || "$(MKDIR)" -p "$(TARGET_SYM_DIR)"
-	@$(CP) $(ADWM2_HOME2)/winamd64sym/*.sym "$(TARGET_SYM_DIR)"
+	@$(CP) $(ADWM2_SYM_DIR)/*.sym "$(TARGET_SYM_DIR)"
 	@$(CP) $(LIB_DIR)/*.sym "$(TARGET_SYM_DIR)"
 
 	@$(ECHO) "-MACHINE:X86_64" > "$(LINKER_OPTS_FILE)"
@@ -84,15 +87,26 @@ build_xds: $(DEFS) $(MODS)
 	@# we compute the absolute path for PRJ_FILE since we use TARGET_DIR as current directory.
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	$(eval PRJ_FILE := $(ABS_TARGET_DIR)/$(APP_NAME).prj)
-	@$(ECHO) "-cpu = 486" > "$(PRJ_FILE)"
+	@$(ECHO) "%% generated on $(shell date '+%F %T')" > "$(PRJ_FILE)"
+	if $(DEBUG); then \
+	    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-lineno+" >> "$(PRJ_FILE)"; \
+	fi
+	@$(ECHO) "-cpu = 486" >> "$(PRJ_FILE)"
 	@$(ECHO) "-lookup = *.sym = sym;$(XDSM2_HOME)\sym" >> "$(PRJ_FILE)"
+	@$(ECHO) "-lookup = *.dll|*.lib = bin;$(XDSM2_HOME)\bin" >> "$(PRJ_FILE)"
 	@$(ECHO) "-m2" >> "$(PRJ_FILE)"
 	@$(ECHO) "-verbose" >> "$(PRJ_FILE)"
 	@$(ECHO) "-werr" >> "$(PRJ_FILE)"
 	for f in $(TARGET_MOD_DIR)/*.mod; do \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
-	@$(ECHO) "!module bin/Terminal2.lib" >> "$(PRJ_FILE)"
+	for f in $(TARGET_BIN_DIR)/*.lib; do \
+	    [ -f "$$f" ] || continue; \
+	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
+	done
 	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
 
 clean:

@@ -5,18 +5,25 @@
 ##
 ##############################################################################
 
+DEBUG ?= false
+
 TOOLSET ?= xds
 
 include ../Makefile.inc
+
+ADWM2_SYM_DIR = $(subst \,/,$(ADWM2_HOME))/ascii/winamd64sym
+
+LIB_DIR = ../lib/$(TOOLSET)
 
 SOURCE_DIR = src
 SOURCE_DEF_DIR = src/main/def
 SOURCE_MOD_DIR = src/main/mod
 SOURCE_MOD_ADW_DIR = src/main/mod-adw
+
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
-
+## library dependencies
 TARGET_BIN_DIR = $(TARGET_DIR)/bin
 TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
@@ -28,6 +35,9 @@ MODS = $(shell $(FIND) "$(SOURCE_MOD_DIR)" -type f -name "*.mod")
 
 APP_NAME = Factorial
 TARGET = $(TARGET_DIR)/$(APP_NAME)$(TARGET_EXT)
+
+M2C_OPTS =
+LINKER_OPTS_FILE = $(TARGET_DIR)/linker_opts.txt
 
 all: build
 
@@ -57,7 +67,7 @@ build_adw: $(DEFS) $(MODS)
 	@$(ECHO) "-MAP:$(TARGET_DIR)\$(APP_NAME)" >> "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-OUT:$(TARGET_FILE) >> "$(LINKER_OPTS_FILE)"
 	##for $f in $(TARGET_MOD_DIR)/*.obj; do \
-	    echo "$(TARGET_MOD_DIR)\$f" >> "$(LINKER_OPTS_FILE)"
+	    $(ECHO) "$(TARGET_MOD_DIR)\$f" >> "$(LINKER_OPTS_FILE)"
 	##done
 	@$(ECHO) "$(ADWM2_HOME)\rtl-win-amd64.lib" >> "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "$(ADWM2_HOME)\win64api.lib" >> "$(LINKER_OPTS_FILE)"
@@ -70,10 +80,22 @@ build_xds: $(DEFS) $(MODS)
 	fi
 	[ -d "$(TARGET_MOD_DIR)" ] || "$(MKDIR)" -p "$(TARGET_MOD_DIR)"
 	@$(CP) $(SOURCE_MOD_DIR)/*.mod "$(TARGET_MOD_DIR)"
+	[ -d "$(TARGET_BIN_DIR)" ] || "$(MKDIR)" -p "$(TARGET_BIN_DIR)"
+	@$(CP) $(LIB_DIR)/*.dll "$(TARGET_BIN_DIR)"
+	@$(CP) $(LIB_DIR)/*.lib "$(TARGET_BIN_DIR)"
+	[ -d "$(TARGET_SYM_DIR)" ] || "$(MKDIR)" -p "$(TARGET_SYM_DIR)"
+	@$(CP) $(LIB_DIR)/*.sym "$(TARGET_SYM_DIR)"
 	@# we compute the absolute path for PRJ_FILE since we use TARGET_DIR as current directory.
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	$(eval PRJ_FILE := $(shell cygpath -m $(ABS_TARGET_DIR))/$(APP_NAME).prj)
-	@$(ECHO) "-cpu = 486" > "$(PRJ_FILE)"
+	@$(ECHO) "%% generated on $(shell date '+%F %T')" > "$(PRJ_FILE)"
+	if $(DEBUG); then \
+	    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-lineno+" >> "$(PRJ_FILE)"; \
+	fi
+	@$(ECHO) "-cpu = 486" >> "$(PRJ_FILE)"
 	@$(ECHO) "-lookup = *.sym = sym;$(XDSM2_HOME)\sym" >> "$(PRJ_FILE)"
 	@$(ECHO) "-lookup = *.dll|*.lib = bin;$(XDSM2_HOME)\bin" >> "$(PRJ_FILE)"
 	@$(ECHO) "-m2" >> "$(PRJ_FILE)"

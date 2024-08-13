@@ -10,9 +10,13 @@ include ../Makefile.inc
 SOURCE_DIR = src
 SOURCE_DEF_DIR = src/def
 SOURCE_MOD_DIR = src/mod
+
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
+## library dependencies
+TARGET_BIN_DIR = $(TARGET_DIR)/bin
+TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
 ##############################################################################
 ## main rules
@@ -43,6 +47,10 @@ $(TARGET): $(DEFS) $(MODS)
 	@$(ECHO) "-werr" >> "$(PRJ_FILE)"
 	for f in $(MODS); do \
 	    $(ECHO) "!module $${f/$(SOURCE_DIR)\//}" >> "$(PRJ_FILE)"; \
+	done
+	for f in $(TARGET_BIN_DIR)/*.lib; do \
+	    [ -f "$$f" ] || continue; \
+	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
 	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
 

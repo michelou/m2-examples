@@ -5,6 +5,8 @@
 ##
 ##############################################################################
 
+DEBUG ?= false
+
 TOOLSET ?= xds
 
 include ../Makefile.inc
@@ -20,7 +22,7 @@ SOURCE_MOD_DIR = src/main/mod
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
-
+## library dependencies
 TARGET_BIN_DIR = $(TARGET_DIR)/bin
 TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
@@ -86,13 +88,14 @@ build_xds: $(DEFS) $(MODS)
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	$(eval PRJ_FILE := $(shell cygpath -m $(ABS_TARGET_DIR))/$(APP_NAME).prj)
 	@##[ -f "$(PRJ_FILE)" ] || "$(RM)" "$(PRJ_FILE)"
-	@##if $DEBUG; then
-	@##    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"
-	@##    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"
-	@##    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"
-	@##    @$(ECHO) "-lineno+" >> "$(PRJ_FILE)"
-	@##fi
-	@$(ECHO) "-cpu = 486" > "$(PRJ_FILE)"
+	@$(ECHO) "%% generated on $(shell date '+%F %T')" > "$(PRJ_FILE)"
+	if $(DEBUG); then \
+	    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-lineno+" >> "$(PRJ_FILE)"; \
+	fi
+	@$(ECHO) "-cpu = 486" >> "$(PRJ_FILE)"
 	@$(ECHO) "-lookup = *.sym = sym;$(XDSM2_HOME)\sym" >> "$(PRJ_FILE)"
 	@$(ECHO) "-lookup = *.dll|*.lib = bin;$(XDSM2_HOME)\bin" >> "$(PRJ_FILE)"
 	@$(ECHO) "-m2" >> "$(PRJ_FILE)"

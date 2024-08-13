@@ -229,7 +229,7 @@ compile_adw() {
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.obj" 2>/dev/null); do
         echo "${TARGET_MOD_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
-    for f in $(find "$TARGET_BIN_DIR)/" -type f -name "*.obj" 2>/dev/null); do
+    for f in $(find "$TARGET_BIN_DIR/" -type f -name "*.obj" 2>/dev/null); do
         echo "${TARGET_BIN_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
     (

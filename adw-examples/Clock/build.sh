@@ -221,7 +221,7 @@ compile_xds() {
         for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
             local def_file=$f
             pushd "$TARGET_SYM_DIR"
-            $DEBUG && debug "Current directory is \"$pwd\""
+            $DEBUG && debug "Current directory is \"$(pwd)\""
 
             if $DEBUG; then
                 debug "\"$XC_CMD\" \"$(mixed_path $f)\""

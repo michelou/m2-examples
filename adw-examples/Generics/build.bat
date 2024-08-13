@@ -39,19 +39,20 @@ set _WARNING_LABEL=%_STRONG_FG_YELLOW%Warning%_RESET%:
 set "_SOURCE_DIR=%_ROOT_DIR%src"
 set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\main\def"
 set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod"
+
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
+@rem library dependencies
+set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
 @rem 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -65,6 +66,15 @@ if not exist "%_ADWM2_HOME%\sblink.exe" (
     goto :eof
 )
 set "_SBLINK_CMD=%_ADWM2_HOME%\sblink.exe"
+
+if not exist "%XDSM2_HOME%\bin\xc.exe" (
+    echo %_ERROR_LABEL% XDS Modula-2 installation not found 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
+set "_HIS_CMD=%XDSM2_HOME%\bin\his.exe"
+set "_XLIB_CMD=%XDSM2_HOME%\bin\xlib.exe"
 
 @rem use newer PowerShell version if available
 where /q pwsh.exe
@@ -124,8 +134,8 @@ goto :eof
 @rem input parameter: %*
 :args
 set _COMMANDS=
-set _VERBOSE=0
 set _TOOLSET=adw
+set _VERBOSE=0
 set __N=0
 :args_loop
 set "__ARG=%~1"
@@ -137,9 +147,10 @@ if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
-    @rem ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
+    ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
     ) else (
         echo %_ERROR_LABEL% Unknown option "%__ARG%" 1>&2
         set _EXITCODE=1
@@ -164,10 +175,10 @@ goto args_loop
 set _STDOUT_REDIRECT=1^>NUL
 if %_DEBUG%==1 set _STDOUT_REDIRECT=
 
-if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
-    set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
+if exist "%_SOURCE_DIR%\main\mod-%_TOOLSET%" (
+    set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod-%_TOOLSET%"
 )
-for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
+for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
@@ -193,10 +204,11 @@ if %_VERBOSE%==1 (
 echo Usage: %__BEG_O%%_BASENAME% { ^<option^> ^| ^<subcommand^> }%__END%
 echo.
 echo   %__BEG_P%Options:%__END%
-@rem echo     %__BEG_O%-adw%__END%         select ADW Modula-2 toolset
+echo     %__BEG_O%-adw%__END%         select ADW Modula-2 toolset
 echo     %__BEG_O%-debug%__END%       print commands executed by this script
+echo     %__BEG_O%-gm2%__END%         select GNU Modula-2 toolset
 echo     %__BEG_O%-verbose%__END%     print progress messages
-@rem echo     %__BEG_O%-xds%__END%         select XDS Modula-2 toolset ^(default^)
+echo     %__BEG_O%-xds%__END%         select XDS Modula-2 toolset ^(default^)
 echo.
 echo   %__BEG_P%Subcommands:%__END%
 echo     %__BEG_O%clean%__END%        delete generated object files
@@ -206,6 +218,7 @@ goto :eof
 
 :clean
 call :rmdir "%_TARGET_DIR%"
+if exist "%_ROOT_DIR%*.err" del "%_ROOT_DIR%*.err"
 goto :eof
 
 @rem input parameter: %1=directory path
@@ -253,8 +266,8 @@ if exist "%_LIB_DIR%\*.sym" (
     xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_LIB_DIR%\*.obj" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
-    ycopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
@@ -267,11 +280,11 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
-set __M2C_OPTS=-sym:!_TARGET_DEF_DIR:%_ROOT_DIR%=!,!_TARGET_SYM_DIR:%_ROOT_DIR%=!
+@rem We must specify a relative path to the SYM directories
+set __M2C_OPTS=-sym:"!_TARGET_DEF_DIR:%_ROOT_DIR%=!,!_TARGET_SYM_DIR:%_ROOT_DIR%=!"
 
 set __N=0
-if %__ACTION_DEF%==0 goto compile_adw_main
+if %__ACTION_DEF%==0 goto compile_adw_mod
 @rem definition modules
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
@@ -300,7 +313,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" ^| findstr /v tsta
     )
     set /a __N+=1
 )
-:compile_adw_main
+:compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\tstack.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
@@ -321,9 +334,13 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -SUBSYSTEM:CONSOLE
     echo -MAP:%_TARGET_DIR%\%_APP_NAME%
     echo -OUT:%_TARGET_FILE%
+    echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
+)
+for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
+    echo !_TARGET_BIN_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
 )
 (
     echo %_ADWM2_HOME%\rtl-win-amd64.lib
@@ -345,11 +362,83 @@ if not %ERRORLEVEL%==0 (
 goto :eof
 
 :compile_gm2
-echo %_WARNING_LABEL% Not supported
+echo %_WARNING_LABEL% Not yet implemented
 goto :eof
 
 :compile_xds
-echo %_WARNING_LABEL% Not supported
+if exist "%_LIB_DIR%\*.dll" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.lib" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.lib" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.lib" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.sym" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_SOURCE_DEF_DIR%\*.def" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_SOURCE_MOD_DIR%\*.mod" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
+) else (
+    echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
+    goto :eof
+)
+set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
+) else if %_VERBOSE%==1 ( echo Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
+)
+(
+    if %_DEBUG%==1 (
+        echo %% debug ON
+        echo -gendebug+
+        echo -genhistory+
+        echo -lineno+
+    )
+    echo -cpu = 486
+    echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
+    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
+    echo -m2
+    echo -verbose
+    echo -werr
+    echo %% disable warning 301 ^(parameter "xxx" is never used^)
+    echo -woff301+
+    echo %% disable warning 303 ^(procedure "xxx" declared but never used^)
+    echo -woff303+
+) > "%__PRJ_FILE%"
+set __N=0
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
+    set "__MOD_FILE=%%f"
+    echo ^^!module !__MOD_FILE!
+    set /a __N+=1
+) >> "%__PRJ_FILE%"
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    set "__LIB_FILE=%%f"
+    echo ^^!module !__LIB_FILE!
+) >> "%__PRJ_FILE%"
+if %__N%==0 (
+    echo %_WARNING_LABEL% No Modula-2 test source file found 1>&2
+    goto :eof
+) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
+) else ( set __N_FILES=%__N% Modula-2 implementation modules
+)
+pushd "%_TARGET_DIR%"
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2
+) else if %_VERBOSE%==1 ( echo Compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
+)
+call "%_XC_CMD%" =p "%__PRJ_FILE%"
+if not %ERRORLEVEL%==0 (
+    popd
+    echo %_ERROR_LABEL% Failed to compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+popd
 goto :eof
 
 @rem input parameter: 1=target file 2,3,..=path (wildcards accepted)
@@ -419,6 +508,10 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_TARGET_FILE%" 1>&2
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute program "!_TARGET_FILE:%_ROOT_DIR%=!" 1>&2
     set _EXITCODE=1
+    if %_DEBUG%==1 if exist "%_ROOT_DIR%errinfo.$$$" (
+        echo %_DEBUG_LABEL% "%_HIS_CMD%" "%_ROOT_DIR%errinfo.$$$" 1>&2
+        call "%_HIS_CMD%" "%_ROOT_DIR%errinfo.$$$"
+    )
     goto :eof
 )
 goto :eof

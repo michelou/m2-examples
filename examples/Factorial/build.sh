@@ -49,6 +49,7 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=true ;;
+        -gm2)      TOOLSET=gm2 ;;
         -help)     HELP=true ;;
         -verbose)  VERBOSE=true ;;
         -xds)      TOOLSET=xds ;;
@@ -67,12 +68,11 @@ args() {
             ;;
         esac
     done
-    debug "Options    : VERBOSE=$VERBOSE"
+    debug "Options    : TOOLSET=$TOOLSET,  VERBOSE=$VERBOSE"
     debug "Subcommands: CLEAN=$CLEAN COMPILE=$COMPILE HELP=$HELP RUN=$RUN"
     debug "Variables  : ADWM2_HOME=$ADWM2_HOME"
     debug "Variables  : GIT_HOME=$GIT_HOME"
     debug "Variables  : XDSM2_HOME=$XDSM2_HOME"
-    debug "Variables  : TOOLSET=$TOOLSET"
 }
 
 help() {
@@ -82,6 +82,7 @@ Usage: $BASENAME { <option> | <subcommand> }
   Options:
     -adw         select ADW Modula-2 toolset
     -debug       print commands executed by this script
+    -gm2         select GNU Modula-2 toolset
     -verbose     print progress messages
     -xds         select XDS Modula-2 toolset
 
@@ -109,6 +110,8 @@ clean() {
 compile() {
     [[ -d "$TARGET_DEF_DIR" ]] || mkdir -p "$TARGET_DEF_DIR"
     [[ -d "$TARGET_MOD_DIR" ]] || mkdir -p "$TARGET_MOD_DIR"
+    [[ -d "$TARGET_BIN_DIR" ]] || mkdir -p "$TARGET_BIN_DIR"
+    [[ -d "$TARGET_SYM_DIR" ]] || mkdir -p "$TARGET_SYM_DIR"
 
     local is_required_def="$(action_required "$TARGET_FILE" "$SOURCE_DEF_DIR/" "*.def")"
 
@@ -143,18 +146,45 @@ compile_adw() {
     warning "Not yet implemented"
 }
 
+## input parameter: %1=.def files are out of date
 compile_xds() {
+    local is_required_def=$1
+
     if [[ -n "$(ls -A $SOURCE_DEF_DIR/*.def 2>/dev/null)" ]]; then
         if $DEBUG; then
             debug "cp \"$SOURCE_DEF_DIR*.def\" \"$TARGET_DEF_DIR\""
         fi
         cp "$(mixed_path $SOURCE_DEF_DIR)/"*.def "$(mixed_path $TARGET_DEF_DIR)"
     fi
-    if $DEBUG; then
-        debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
+    if [[ -n "$(ls -A $SOURCE_MOD_DIR/*.mod 2>/dev/null)" ]]; then
+       if $DEBUG; then
+           debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
+       fi
+       cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
+    else
+        warning "No Modula-2 source file found"
+        return 1
     fi
-    cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
-
+    if [[ $is_required_def -eq 1 ]]; then
+        [[ -d "$TARGET_SYM_DIR" ]] || mkdir "$TARGET_SYM_DIR"
+        for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
+            local def_file=$f
+            pushd "$TARGET_SYM_DIR" 1>/dev/null
+            $DEBUG && debug "Current directory is \"$(pwd)\""
+            if $DEBUG; then
+                debug "\"$XC_CMD\" \"$(mixed_path $f)\""
+            elif $VERBOSE; then
+                echo "Compile Modula-2 definition module \"${def_file/$ROOT_DIR\//}\"" 1>&2
+            fi
+            eval "$XC_CMD" "$(mixed_path $f)"
+            if [[ $? -ne 0 ]]; then
+                popd
+                error "Failed to compile Modula-2 definition module \"$(def_file/$ROOT_DIR//)\""
+                cleanup 1
+            fi
+            popd 1>/dev/null
+        done
+    fi
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
     $DEBUG && debug "# Create XDS project file \"$prj_file\""
     (
@@ -166,9 +196,14 @@ compile_xds() {
         fi
         echo "-cpu = 486" && \
         echo "-lookup = *.sym = sym;$(mixed_path $XDSM2_HOME)/sym" && \
+        echo "-lookup = *.dll|*.lib = bin;$(mixed_path $XDSM2_HOME)/bin" && \
         echo "-m2" && \
         echo "-verbose" && \
-        echo "-werr"
+        echo "-werr" && \
+        echo "% disable warning 301 (parameter \"xxx\" is never used)" && \
+        echo "-woff301+" && \
+        echo "% disable warning 303 (procedure \"xxx\" declared but never used)" && \
+        echo "-woff303+"
     ) > "$prj_file"
     local n=0
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.mod" 2>/dev/null); do
@@ -230,9 +265,12 @@ ROOT_DIR="$(getHome)"
 SOURCE_DIR="$ROOT_DIR/src"
 SOURCE_DEF_DIR="$SOURCE_DIR/main/def"
 SOURCE_MOD_DIR="$SOURCE_DIR/main/mod"
+
 TARGET_DIR="$ROOT_DIR/target"
 TARGET_DEF_DIR="$TARGET_DIR/def"
 TARGET_MOD_DIR="$TARGET_DIR/mod"
+## library dependencies
+TARGET_BIN_DIR="$TARGET_DIR/bin"
 TARGET_SYM_DIR="$TARGET_DIR/sym"
 
 CLEAN=false

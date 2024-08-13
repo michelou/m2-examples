@@ -159,8 +159,8 @@ compile_adw() {
     fi
     cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
 
-    # We must specify a relative path to the SYM directory
-    local m2c_opts=-sym:"$(win_path $TARGET_SYM_DIR)"
+    # We must specify a relative path to the SYM directories
+    local m2c_opts="-sym:\"$(win_path $TARGET_SYM_DIR)\""
 
     local n=0
     for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
@@ -183,17 +183,20 @@ compile_adw() {
         echo "-OUT:$(win_path $TARGET_FILE)"
     ) > "$linker_opts_file"
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.obj" 2>/dev/null); do
-        local x="${f/$ROOT_DIR\///}"
-        echo "target\\mod\\Hello.obj" >> "$linker_opts_file"
+        echo "${TARGET_MOD_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
+    done
+    for f in $(find "$TARGET_BIN_DIR/" -type f -name "*.obj" 2>/dev/null); do
+        echo "${TARGET_BIN_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
     (
         echo "$(win_path $ADWM2_HOME1)\\rtl-win-amd64.lib"
         echo "$(win_path $ADWM2_HOME1)\\win64api.lib"
     ) >> "$linker_opts_file"
     if $DEBUG; then
-        debug "\"$SBLINK_CMD\" @${linker_opts_file/$ROOT_DIR\///}"
+        debug "\"$SBLINK_CMD\" @$linker_opts_file"
     fi
-    eval "\"$SBLINK_CMD\" @${linker_opts_file/$ROOT_DIR\///}"
+    ## command sblink does NOT support quoted argument file
+    eval "\"$SBLINK_CMD\" @$linker_opts_file"
     if [[ $? -ne 0 ]]; then
         error "Failed to execute ADW linker"
         cleanup 1

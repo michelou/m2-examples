@@ -113,6 +113,7 @@ clean() {
 compile() {
     [[ -d "$TARGET_DEF_DIR" ]] || mkdir -p "$TARGET_DEF_DIR"
     [[ -d "$TARGET_MOD_DIR" ]] || mkdir -p "$TARGET_MOD_DIR"
+    [[ -d "$TARGET_BIN_DIR" ]] || mkdir -p "$TARGET_BIN_DIR"
     [[ -d "$TARGET_SYM_DIR" ]] || mkdir -p "$TARGET_SYM_DIR"
 
     local is_required_def="$(action_required "$TARGET_FILE" "$SOURCE_DEF_DIR/" "*.def")"

@@ -49,6 +49,7 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=true ;;
+        -gm2)      TOOLSET=gm2 ;;
         -help)     HELP=true ;;
         -verbose)  VERBOSE=true ;;
         -xds)      TOOLSET=xds ;;
@@ -112,6 +113,7 @@ clean() {
 compile() {
     [[ -d "$TARGET_DEF_DIR" ]] || mkdir -p "$TARGET_DEF_DIR"
     [[ -d "$TARGET_MOD_DIR" ]] || mkdir -p "$TARGET_MOD_DIR"
+    [[ -d "$TARGET_BIN_DIR" ]] || mkdir -p "$TARGET_BIN_DIR"
     [[ -d "$TARGET_SYM_DIR" ]] || mkdir -p "$TARGET_SYM_DIR"
 
     local is_required_def="$(action_required "$TARGET_FILE" "$SOURCE_DEF_DIR/" "*.def")"
@@ -192,9 +194,9 @@ compile_adw() {
         echo "$(win_path $ADWM2_HOME1)\\win64api.lib"
     ) >> "$linker_opts_file"
     if $DEBUG; then
-        debug "\"$SBLINK_CMD\" @${linker_opts_file/$ROOT_DIR\///}"
+        debug "\"$SBLINK_CMD\" @$linker_opts_file"
     fi
-    eval "\"$SBLINK_CMD\" @${linker_opts_file/$ROOT_DIR\///}"
+    eval "\"$SBLINK_CMD\" @$linker_opts_file"
     if [[ $? -ne 0 ]]; then
         error "Failed to execute ADW linker"
         cleanup 1

@@ -49,6 +49,7 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=true ;;
+        -gm2       TOOLSET=gm2 ;;
         -help)     HELP=true ;;
         -verbose)  VERBOSE=true ;;
         -xds)      TOOLSET=xds ;;
@@ -84,6 +85,7 @@ Usage: $BASENAME { <option> | <subcommand> }
   Options:
     -adw         select ADW Modula-2 toolset
     -debug       print commands executed by this script
+    -gm2         select GNU Modula-2 toolset
     -verbose     print progress messages
     -xds         select XDS Modula-2 toolset
 
@@ -111,6 +113,7 @@ clean() {
 compile() {
     [[ -d "$TARGET_DEF_DIR" ]] || mkdir -p "$TARGET_DEF_DIR"
     [[ -d "$TARGET_MOD_DIR" ]] || mkdir -p "$TARGET_MOD_DIR"
+    [[ -d "$TARGET_BIN_DIR" ]] || mkdir -p "$TARGET_BIN_DIR"
     [[ -d "$TARGET_SYM_DIR" ]] || mkdir -p "$TARGET_SYM_DIR"
 
     local is_required_def="$(action_required "$TARGET_FILE" "$SOURCE_DEF_DIR/" "*.def")"

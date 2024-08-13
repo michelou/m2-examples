@@ -47,14 +47,12 @@ set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
 set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
 @rem 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -258,8 +256,8 @@ set __ACTION_DEF=%~1
 
 if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
 xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
-if %ERRORLEVEL%==0 (
-    echo %_ERROR_LABEL% Failed to copy ADW symbol files ^("%_ADWM2_HOME%\winamd64sym"^) 1>&2
+if not %ERRORLEVEL%==0 (
+    echo %_ERROR_LABEL% Failed to copy ADW Modula-2 symbol files 1>&2
     set _EXITCODE=1
     goto :eof
 )
@@ -282,20 +280,21 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
+@rem We must specify a relative path to the SYM directories
 set __M2C_OPTS=-sym:"%_TARGET_SYM_DIR%,%_TARGET_DEF_DIR%"
 if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
+@rem definition modules
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
     )
-    call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
+    call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" %_STDOUT_REDIRECT%
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
@@ -305,11 +304,11 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
-    call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!"
+    call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" %_STDOUT_REDIRECT%
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
@@ -335,10 +334,10 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
     echo %_ADWM2_HOME%\win64api.lib
 ) >> "%__LINKER_OPTS_FILE%"
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_SBLINK_CMD% @%__LINKER_OPTS_FILE% 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
-call "%_SBLINK_CMD%" @!__LINKER_OPTS_FILE:%_ROOT_DIR%=!
+call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2
     if %_DEBUG%==1 ( if exist "%_ROOT_DIR%linker.err" type "%_ROOT_DIR%linker.err"

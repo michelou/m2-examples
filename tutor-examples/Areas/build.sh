@@ -151,7 +151,10 @@ compile_adw() {
     warning "Not yet implemented"
 }
 
+## input parameter: %1=.def files are out of date
 compile_xds() {
+    local is_required_def=$1
+
     if [[ -n "$(ls -A $LIB_DIR/*.dll 2>/dev/null)" ]]; then
         if $DEBUG; then
             debug "cp \"$(mixed_path $LIB_DIR)/*.dll\" \"$(mixed_path $TARGET_BIN_DIR)\""
@@ -185,9 +188,36 @@ compile_xds() {
         warning "No Modula-2 source file found"
         return 1
     fi
+    if [[ $is_required_def -eq 1 ]]; then
+        [[ -d "$TARGET_SYM_DIR" ]] || mkdir "$TARGET_SYM_DIR"
+        for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
+            local def_file=$f
+            pushd "$TARGET_SYM_DIR"
+            $DEBUG && debug "Current directory is \"$(pwd)\""
+
+            if $DEBUG; then
+                debug "\"$XC_CMD\" \"$(mixed_path $f)\""
+            elif $VERBOSE; then
+                echo "Compile Modula-2 definition module \"$(def_file/$ROOT_DIR//)\"" 1>&2
+            fi
+            eval "$XC_CMD" "$(mixed_path $f)"
+            if [[ $? -ne 0 ]]; then
+                popd
+                error "Failed to compile Modula-2 definition module \"$(def_file/$ROOT_DIR//)\""
+                cleanup 1
+            fi
+            popd 1>/dev/null
+        done
+    fi
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
     $DEBUG && debug "# Create XDS project file \"$prj_file\""
     (
+        if $DEBUG; then
+            echo "% debug ON" && \
+            echo "-gendebug+" && \
+            echo "-genhistory+" && \
+            echo "-lineno+"
+        fi
         echo "-cpu = 486" && \
         echo "-lookup = *.sym = sym;$(mixed_path $XDSM2_HOME)/sym" && \
         echo "-lookup = *.dll|*.lib = bin;$(mixed_path $XDSM2_HOME)/bin" && \
@@ -253,15 +283,15 @@ EXITCODE=0
 
 ROOT_DIR="$(getHome)"
 
-SOURCE_DIR=$ROOT_DIR/src
-SOURCE_DEF_DIR=$SOURCE_DIR/main/def
-SOURCE_MOD_DIR=$SOURCE_DIR/main/mod
-TARGET_DIR=$ROOT_DIR/target
-TARGET_DEF_DIR=$TARGET_DIR/def
-TARGET_MOD_DIR=$TARGET_DIR/mod
+SOURCE_DIR="$ROOT_DIR/src"
+SOURCE_DEF_DIR="$SOURCE_DIR/main/def"
+SOURCE_MOD_DIR="$SOURCE_DIR/main/mod"
+TARGET_DIR="$ROOT_DIR/target"
+TARGET_DEF_DIR="$TARGET_DIR/def"
+TARGET_MOD_DIR="$TARGET_DIR/mod"
 ## library dependencies
-TARGET_BIN_DIR=$TARGET_DIR/bin
-TARGET_SYM_DIR=$TARGET_DIR/sym
+TARGET_BIN_DIR="$TARGET_DIR/bin"
+TARGET_SYM_DIR="$TARGET_DIR/sym"
 
 CLEAN=false
 COMPILE=false

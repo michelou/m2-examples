@@ -10,9 +10,12 @@ include ../Makefile.inc
 SOURCE_DIR = src
 SOURCE_DEF_DIR = src/main/def
 SOURCE_MOD_DIR = src/main/mod
+
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
+## library dependencies
+TARGET_BIN_DIR = $(TARGET_DIR)/bin
 TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
 ##############################################################################

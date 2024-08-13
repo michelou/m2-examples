@@ -68,7 +68,7 @@ args() {
         esac
     done
     if [[ -d "$SOURCE_DIR/main/mod-$TOOLSET" ]]; then
-        SOURCE_MOD_DIR="$(mixed_path SOURCE_DIR/main/mod-$TOOLSET)"
+        SOURCE_MOD_DIR="$(mixed_path $SOURCE_DIR/main/mod-$TOOLSET)"
     fi
     LIB_DIR="$(mixed_path $(dirname $ROOT_DIR)/lib/$TOOLSET)"
 
@@ -184,7 +184,7 @@ compile_adw() {
         return 1
     fi
     ## We must specify a relative path to the SYM directory
-    local m2c_opts="-sym:$(cygpath -w $TARGET_SYM_DIR),$(cygpath -w $TARGET_DEF_DIR)"
+    local m2c_opts="-sym:\"$(cygpath -w $TARGET_SYM_DIR),$(cygpath -w $TARGET_DEF_DIR)\""
     $DEBUG || m2c_opts="-quiet $m2c_opts"
 
     local n=0
@@ -228,7 +228,7 @@ compile_adw() {
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.obj" 2>/dev/null); do
         echo "${TARGET_MOD_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
-    for f in $(find "$TARGET_BIN_DIR)/" -type f -name "*.obj" 2>/dev/null); do
+    for f in $(find "$TARGET_BIN_DIR/" -type f -name "*.obj" 2>/dev/null); do
         echo "${TARGET_BIN_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
     (

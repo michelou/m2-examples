@@ -5,6 +5,8 @@
 ##
 ##############################################################################
 
+TOOLSET ?= xds
+
 include ../Makefile.inc
 
 SOURCE_DIR = src
@@ -14,6 +16,8 @@ SOURCE_MOD_DIR = src/main/mod
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
+## library dependencies
+TARGET_BIN_DIR = $(TARGET_DIR)/bin
 TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
 ##############################################################################
@@ -50,6 +54,10 @@ $(TARGET): $(DEFS) $(MODS)
 	@$(ECHO) "-verbose" >> "$(PRJ_FILE)"
 	@$(ECHO) "-werr" >> "$(PRJ_FILE)"
 	for f in $(TARGET_MOD_DIR)/*.mod; do \
+	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
+	done
+	for f in $(TARGET_BIN_DIR)/*.lib; do \
+	    [ -f "$$f" ] || continue; \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
 	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"

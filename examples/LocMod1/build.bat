@@ -46,14 +46,12 @@ set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
 @rem 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -146,6 +144,7 @@ if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
     ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
@@ -251,19 +250,26 @@ set __ACTION_DEF=%~1
 
 if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
 xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+if not %ERRORLEVEL%==0 (
+    echo %_ERROR_LABEL% Failed to copy ADW Modula-2 symbol files 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
 if exist "%_LIB_DIR%\*.sym" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
-    copy /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.obj" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
     xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
 )
-if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
-xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
-if exist "%_LIB_DIR%\*.obj" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
-    copy /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
+if exist "%_SOURCE_MOD_DIR%\*.mod" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 )
 @rem We must specify a relative path to the SYM directory
 set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!"
@@ -273,11 +279,11 @@ if %__ACTION_DEF%==0 goto compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )

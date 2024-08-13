@@ -43,7 +43,7 @@ set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod"
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
-
+@rem library dependencies
 set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
@@ -52,9 +52,7 @@ set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
 @rem 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -261,13 +259,13 @@ if not %ERRORLEVEL%==0 (
     set _EXITCODE=1
     goto :eof
 )
-if exist "%_LIB_DIR%\*.obj" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
-    xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
-)
 if exist "%_LIB_DIR%\*.sym" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
     xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.obj" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
