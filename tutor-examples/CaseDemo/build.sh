@@ -49,6 +49,7 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=true ;;
+        -gm2)      TOOLSET=gm2 ;;
         -help)     HELP=true ;;
         -verbose)  VERBOSE=true ;;
         -xds)      TOOLSET=xds ;;
@@ -254,6 +255,10 @@ compile_adw() {
     fi
 }
 
+compile_gm2() {
+    warning "Not yet implemented"
+}
+
 ## input parameter: %1=.def files are out of date
 compile_xds() {
     local action_def=$1
@@ -294,10 +299,18 @@ compile_xds() {
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
     $DEBUG && debug "# Create XDS project file \"$prj_file\""
     (
+        if $DEBUG; then
+            echo "% debug ON" && \
+            echo "-gendebug+" && \
+            echo "-genhistory+" && \
+            echo "-lineno+"
+        fi
         echo "-cpu = 486" && \
         echo "-lookup = *.sym = sym;$(mixed_path $XDSM2_HOME)/sym" && \
         echo "-lookup = *.dll|*.lib = bin;$(mixed_path $XDSM2_HOME)/bin" && \
         echo "-m2" && \
+        echo "%% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD" && \
+        echo "%% -m2addtypes" && \
         echo "-verbose" && \
         echo "-werr" && \
         echo "% disable warning 301 (parameter \"xxx\" is never used)" && \
@@ -312,7 +325,6 @@ compile_xds() {
     done
     for f in $(find "$TARGET_BIN_DIR/" -type f -name "*.lib" 2>/dev/null); do
         echo "!module $(mixed_path $f)" >> "$prj_file"
-        n=$((n + 1))
     done
     if [[ $n -eq 0 ]]; then
         warning "No Modula-2 source file found"

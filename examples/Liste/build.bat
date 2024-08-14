@@ -47,15 +47,13 @@ set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 set "_TARGET_TEST_DIR=%_TARGET_DIR%\test"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.lib"
 set "_TARGET_TEST_FILE=%_TARGET_DIR%\%_APP_NAME%Test.exe"
 
 @rem 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -186,6 +184,9 @@ for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
+    echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
 goto :eof
 
@@ -258,11 +259,6 @@ set __ACTION_DEF=%~1
 
 if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
 xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
-if %ERRORLEVEL%==0 (
-    echo %_ERROR_LABEL% Failed to copy XDS symbol files 1>&2
-    set _EXITCODE=1
-    goto :eof
-)
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to copy ADW Modula-2 symbol files 1>&2
     set _EXITCODE=1
@@ -287,8 +283,8 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
-set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
+@rem We must specify a relative path for the SYM directories
+set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!"
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
@@ -330,6 +326,7 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -SUBSYSTEM:CONSOLE
     echo -MAP:%_TARGET_DIR%\%_APP_NAME%
     echo -OUT:%_TARGET_FILE%
+    echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
@@ -342,6 +339,7 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
+@rem command sblink does NOT support quoted argument file
 call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2

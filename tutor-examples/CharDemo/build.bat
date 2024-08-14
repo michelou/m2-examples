@@ -47,14 +47,12 @@ set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
 set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
-@rem 2 choices: ASCII, Unicode
+@rem ADWM2 gives us 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -76,7 +74,7 @@ if not exist "%XDSM2_HOME%\bin\xc.exe" (
 )
 set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 
-@rem use newer PowerShell version if available
+@rem we use the newer PowerShell version if available
 where /q pwsh.exe
 if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
 ) else ( set _PWSH_CMD=powershell.exe
@@ -280,7 +278,7 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
+@rem We must specify a relative path for the SYM directories
 set __M2C_OPTS=-sym:"%_TARGET_SYM_DIR%,%_TARGET_DEF_DIR%"
 if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
@@ -390,6 +388,8 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
     echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
     echo -m2
+    echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
+    echo %% -m2addtypes
     echo -verbose
     echo -werr
     echo %% disable warning 301 ^(parameter "xxx" is never used^)
@@ -403,6 +403,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     echo ^^!module !__MOD_FILE!
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
+@rem add library dependencies to project file
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
     set "__LIB_FILE=%%f"
     echo ^^!module !__LIB_FILE!

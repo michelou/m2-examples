@@ -49,15 +49,13 @@ set "_TARGET_TEST_DIR=%_TARGET_DIR%\test"
 set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.lib"
 set "_TARGET_TEST_FILE=%_TARGET_DIR%\%_APP_NAME%Test.exe"
 
-@rem 2 choices: ASCII, Unicode
+@rem ADWM2 gives us 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -81,7 +79,7 @@ set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 set "_HIS_CMD=%XDSM2_HOME%\bin\his.exe"
 set "_XLIB_CMD=%XDSM2_HOME%\bin\xlib.exe"
 
-@rem use newer PowerShell version if available
+@rem we use the newer PowerShell version if available
 where /q pwsh.exe
 if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
 ) else ( set _PWSH_CMD=powershell.exe
@@ -152,6 +150,7 @@ if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
     ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
@@ -211,6 +210,7 @@ echo.
 echo   %__BEG_P%Options:%__END%
 echo     %__BEG_O%-adw%__END%         select ADW Modula-2 toolset
 echo     %__BEG_O%-debug%__END%       print commands executed by this script
+echo     %__BEG_O%-gm2%__END%         select GNU Modula-2 toolset
 echo     %__BEG_O%-verbose%__END%     print progress messages
 echo     %__BEG_O%-xds%__END%         select XDS Modula-2 toolset ^(default^)
 echo.
@@ -269,8 +269,9 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
-set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!,!_TARGET_DEF_DIR:%_ROOT_DIR%\=!
+@rem We must specify a relative path for the SYM directories
+set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!,!_TARGET_DEF_DIR:%_ROOT_DIR%\=!"
+if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
@@ -318,7 +319,7 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo %_ADWM2_HOME%\win64api.lib
 ) >> "%__LINKER_OPTS_FILE%"
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_SBLINK_CMD% @%__LINKER_OPTS_FILE% 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
 call "%_SBLINK_CMD%" @!__LINKER_OPTS_FILE:%_ROOT_DIR%=!

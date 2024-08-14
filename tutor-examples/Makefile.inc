@@ -5,8 +5,11 @@ ifndef XDSM2_HOME
 $(error Variable XDSM2_HOME is not set)
 endif
 
+## ADWM2 gives us 2 choices: ASCII, Unicode
+ADWM2_ENCODING = ASCII
+
 ifeq ($(OS),Windows_NT)
-M2C        = $(subst \,/,$(ADWM2_HOME))/ASCII/m2amd64.exe
+M2C        = $(subst \,/,$(ADWM2_HOME))/$(ADWM2_ENCODING)/m2amd64.exe
 XC         = $(subst \,/,$(XDSM2_HOME))/bin/xc.exe
 LOCAL_REPO = $(subst \,/,$(USERPROFILE))/.m2/repository
 PSEP       = ;

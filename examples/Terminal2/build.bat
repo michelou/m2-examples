@@ -279,7 +279,7 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
+@rem We must specify a relative path for the SYM directories
 set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
 
 set __N=0
@@ -322,9 +322,15 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -SUBSYSTEM:CONSOLE
     echo -MAP:%_TARGET_DIR%\%_APP_NAME%
     echo -OUT:%_TARGET_FILE%
+    echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
+@rem object files of current program
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo %%f >> "%__LINKER_OPTS_FILE%"
+)
+@rem object files of library depencencies
+for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
+    echo !_TARGET_BIN_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
 )
 (
     echo %_ADWM2_HOME%\rtl-win-amd64.lib
@@ -334,7 +340,8 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
-call "%_SBLINK_CMD%" @!__LINKER_OPTS_FILE:%_ROOT_DIR%=! %_STDOUT_REDIRECT%
+@rem command sblink does NOT support quoted argument file
+call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2
     if %_DEBUG%==1 ( if exist "%_ROOT_DIR%linker.err" type "%_ROOT_DIR%linker.err"
@@ -418,7 +425,15 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     echo ^^!module !__MOD_FILE!
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
-if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
+@rem add library dependencies to project file
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    set "__LIB_FILE=%%f"
+    echo ^^!module !__LIB_FILE!
+) >> "%__PRJ_FILE%"
+if %__N%==0 (
+    echo %_WARNING_LABEL% No Modula-2 test source file found 1>&2
+    goto :eof
+) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
 ) else ( set __N_FILES=%__N% Modula-2 implementation modules
 )
 pushd "%_TARGET_DIR%"

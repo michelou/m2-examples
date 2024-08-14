@@ -49,6 +49,7 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=true ;;
+        -gm2)      TOOLSET=gm2 ;;
         -help)     HELP=true ;;
         -verbose)  VERBOSE=true ;;
         -xds)      TOOLSET=xds ;;
@@ -87,6 +88,7 @@ Usage: $BASENAME { <option> | <subcommand> }
   Options:
     -adw         select ADW Modula-2 toolset
     -debug       print commands executed by this script
+    -gm2         select GNU Modula-2 toolset
     -verbose     print progress messages
     -xds         select XDS Modula-2 toolset
 
@@ -94,7 +96,7 @@ Usage: $BASENAME { <option> | <subcommand> }
     clean        delete generated files
     compile      compile Modula-2 source files
     help         print this help message
-    run          execute main class "$APP_NAME"
+    run          execute main program "$APP_NAME"
 EOS
 }
 
@@ -148,7 +150,7 @@ action_required() {
 
 ## input parameter: %1=.def files are out of date
 compile_adw() {
-    local action_def=$1
+    local is_required_def=$1
 
     if [[ -n "$(ls -A $ADWM2_HOME/winamd64sym/*.sym 2>/dev/null)" ]]; then
         if $DEBUG; then
@@ -184,7 +186,7 @@ compile_adw() {
         return 1
     fi
     ## We must specify a relative path to the SYM directory
-    local m2c_opts="-sym:$(cygpath -w $TARGET_SYM_DIR),$(cygpath -w $TARGET_DEF_DIR)"
+    local m2c_opts="-sym:\"$(cygpath -w ${TARGET_SYM_DIR/$ROOT_DIR\//}),$(cygpath -w ${TARGET_DEF_DIR/$ROOT_DIR\//})\""
     $DEBUG || m2c_opts="-quiet $m2c_opts"
 
     local n=0
@@ -255,7 +257,7 @@ compile_adw() {
 
 ## input parameter: %1=.def files are out of date
 compile_xds() {
-    local action_def=$1
+    local is_required_def=$1
 
     if [[ -n "$(ls -A $LIB_DIR/*.dll 2>/dev/null)" ]]; then
         if $DEBUG; then
@@ -293,10 +295,18 @@ compile_xds() {
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
     $DEBUG && debug "# Create XDS project file \"$prj_file\""
     (
+        if $DEBUG; then
+            echo "% debug ON" && \
+            echo "-gendebug+" && \
+            echo "-genhistory+" && \
+            echo "-lineno+"
+        fi
         echo "-cpu = 486" && \
         echo "-lookup = *.sym = sym;$(mixed_path $XDSM2_HOME)/sym" && \
         echo "-lookup = *.dll|*.lib = bin;$(mixed_path $XDSM2_HOME)/bin" && \
         echo "-m2" && \
+        echo "%% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD" && \
+        echo "%% -m2addtypes" && \
         echo "-verbose" && \
         echo "-werr" && \
         echo "% disable warning 301 (parameter \"xxx\" is never used)" && \
@@ -309,7 +319,13 @@ compile_xds() {
         echo "!module $(mixed_path $f)" >> "$prj_file"
         n=$((n + 1))
     done
-    echo "!module $(mixed_path $TARGET_BIN_DIR)/Terminal2.lib" >> "$prj_file"
+    for f in $(find "$TARGET_BIN_DIR/" -type f -name "*.lib" 2>/dev/null); do
+        echo "!module $(mixed_path $f)" >> "$prj_file"
+    done
+    if [[ $n -eq 0 ]]; then
+        warning "No Modula-2 source file found"
+        return 1
+    fi
     local s=; [[ $n -gt 1 ]] && s="s"
     local n_files="$n Modula-2 source file$s"
     pushd "$(mixed_path $TARGET_DIR)" 1>/dev/null

@@ -280,14 +280,14 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
+@rem We must specify a relative path for the SYM directories
 set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__DEF_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
@@ -301,7 +301,7 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
 :compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set "__MOD_FILE=%%f"
-    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_M2C_CMD% %__M2C_OPTS% "!__MOD_FILE!" 1>&2
+    if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_MOD_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" %_STDOUT_REDIRECT%
@@ -319,6 +319,7 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -SUBSYSTEM:CONSOLE
     echo -MAP:%_TARGET_DIR%\%_APP_NAME%
     echo -OUT:%_TARGET_FILE%
+    echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
@@ -331,6 +332,7 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
+@rem command sblink does NOT support quoted argument file
 call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2

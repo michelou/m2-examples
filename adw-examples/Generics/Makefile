@@ -5,20 +5,23 @@
 ##
 ##############################################################################
 
+TOOLSET ?= adw
+
 include ../Makefile.inc
 
 SOURCE_DIR = src
 SOURCE_DEF_DIR = src/main/def
 SOURCE_MOD_DIR = src/main/mod
+
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
+## library dependencies
+TARGET_BIN_DIR = $(TARGET_DIR)/bin
 TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
 ##############################################################################
 ## main rules
-
-TOOLSET = adw
 
 DEFS = $(shell [ -d "$(SOURCE_DEF_DIR)" ] && $(FIND) "$(SOURCE_DEF_DIR)" -type f -name "*.def")
 MODS = $(shell $(FIND) "$(SOURCE_MOD_DIR)" -type f -name "*.mod")

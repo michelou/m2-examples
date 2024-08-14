@@ -1,6 +1,6 @@
 MODULE except;
 
-IMPORT M2EXCEPTION, WholeConv, STextIO, SWholeIO;
+IMPORT M2EXCEPTION, (*WholeConv,*) STextIO, SWholeIO;
 
 CONST
   ws = STextIO.WriteString;

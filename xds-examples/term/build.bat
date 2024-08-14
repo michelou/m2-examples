@@ -52,11 +52,9 @@ set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
-@rem 2 choices: ASCII, Unicode
-set "_ADWM2_HOME=%ADWM2_HOME%\Unicode"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+@rem ADWM2 gives us 2 choices: ASCII, Unicode
+set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -78,7 +76,7 @@ if not exist "%XDSM2_HOME%\bin\xc.exe" (
 )
 set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 
-@rem use newer PowerShell version if available
+@rem we use the newer PowerShell version if available
 where /q pwsh.exe
 if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
 ) else ( set _PWSH_CMD=powershell.exe
@@ -136,8 +134,8 @@ goto :eof
 @rem input parameter: %*
 :args
 set _COMMANDS=
-set _VERBOSE=0
 set _TOOLSET=xds
+set _VERBOSE=0
 set __N=0
 :args_loop
 set "__ARG=%~1"
@@ -180,6 +178,8 @@ if %_DEBUG%==1 set _STDOUT_REDIRECT=
 if exist "%_SOURCE_DIR%\main\mod-%_TOOLSET%" (
     set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod-%_TOOLSET%"
 )
+for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
+
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Variables  : _APP_NAME=%_APP_NAME% 1>&2
@@ -278,8 +278,9 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
+@rem We must specify a relative path for the SYM directories
 set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!"
+if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
@@ -317,6 +318,7 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -SUBSYSTEM:WINDOWS
     echo -MAP:%_TARGET_DIR%\%_APP_NAME%
     echo -OUT:%_TARGET_FILE%
+    echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
@@ -329,7 +331,8 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
-call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE%
+@rem command sblink does NOT support quoted argument file
+call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2
     if %_DEBUG%==1 ( if exist "%_ROOT_DIR%linker.err" type "%_ROOT_DIR%linker.err"
@@ -340,7 +343,10 @@ if not %ERRORLEVEL%==0 (
 )
 goto :eof
 
+@rem input parameter: %1=.def files are out of date
 :compile_xds
+set __ACTION_DEF=%~1
+
 if exist "%_LIB_DIR%\*.dll" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" 1>&2
     xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
@@ -360,6 +366,9 @@ if exist "%_SOURCE_DEF_DIR%\*.def" (
 if exist "%_SOURCE_MOD_DIR%\*.mod" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" 1>&2
     xcopy /i /q /y "%_SOURCE_MOD_DIR%\*.mod" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
+) else (
+    echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
+    goto :eof
 )
 set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
@@ -376,8 +385,14 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
     echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
     echo -m2
+    echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
+    echo %% -m2addtypes
     echo -verbose
     echo -werr
+    echo %% disable warning 301 ^(parameter "xxx" is never used^)
+    echo -woff301+
+    echo %% disable warning 303 ^(procedure "xxx" declared but never used^)
+    echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (

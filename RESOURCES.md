@@ -29,7 +29,9 @@
 
 ## <span id="projects">Projects</span>
 
-- GitHub &ndash; [Historical ETH Zürich Modula-2 Compiler](https://github.com/afborchert/lilith-multipass-modula2-compiler).
+- GitHub/[afborchert](https://github.com/afborchert/lilith-multipass-modula2-compiler) &ndash; historical ETH Zürich Modula-2 Compiler.
+- GitHub/[GunterMueller](https://github.com/GunterMueller?tab=repositories&q=Modula) &ndash; Modula-2 related archives.
+- Github/[m2lang](https://github.com/redstar/m2lang) &ndash; the LLVM-based Modula-2 compiler.
 
 ## <span id="resources">Resources</span>
 

@@ -152,70 +152,35 @@ action_required() {
 compile_adw() {
     local is_required_def=$1
 
-    if [[ -n "$(ls -A $ADWM2_HOME/winamd64sym/*.sym 2>/dev/null)" ]]; then
-        if $DEBUG; then
-            debug "cp \"$ADWM2_HOME/winamd64sum/*.sym\" \"$TARGET_SYM_DIR\""
-        fi
-        cp "$ADWM2_HOME/winamd64sym/"*.sym "$(mixed_path $TARGET_SYM_DIR)"
+    if $DEBUG; then
+        debug "cp \"$(mixed_path $ADWM2_HOME1)/winamd64sym/*.sym\" \"$(mixed_path $TARGET_SYM_DIR)\""
     fi
-    if [[ -n "$(ls -A $LIB_DIR/*.sym 2>/dev/null)" ]]; then
-        if $DEBUG; then
-            debug "cp \"$LIB_DIR/*.sym\" \"$TARGET_SYM_DIR\""
-        fi
-        cp "$LIB_DIR/"*.sym "$(mixed_path $TARGET_SYM_DIR)"
-    fi
-    if [[ -n "$(ls -A $LIB_DIR/*.obj 2>/dev/null)" ]]; then
-        if $DEBUG; then
-            debug "cp \"$LIB_DIR/*.obj\" \"$TARGET_BIN_DIR\""
-        fi
-        cp "$LIB_DIR/"*.obj "$(mixed_path $TARGET_BIN_DIR)"
-    fi
+    cp "$(mixed_path $ADWM2_HOME1)/winamd64sym/"*.sym "$(mixed_path $TARGET_SYM_DIR)"
+
     if [[ -n "$(ls -A $SOURCE_DEF_DIR/*.def 2>/dev/null)" ]]; then
         if $DEBUG; then
-            debug "cp \"$SOURCE_DEF_DIR/\"*.def \"$TARGET_DEF_DIR\""
+            debug "cp \"$SOURCE_DEF_DIR*.def\" \"$TARGET_DEF_DIR\""
         fi
-        cp "$SOURCE_DEF_DIR/"*.def "$(mixed_path $TARGET_DEF_DIR)"
+        cp "$(mixed_path $SOURCE_DEF_DIR)/"*.def "$(mixed_path $TARGET_DEF_DIR)"
     fi
-    if [[ -n "$(ls -A $SOURCE_MOD_DIR/*.mod 2>/dev/null)" ]]; then
-        if $DEBUG; then
-            debug "cp \"$SOURCE_MOD_DIR/*.mod\" \"$TARGET_MOD_DIR\""
-        fi
-        cp "$SOURCE_MOD_DIR/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
-    else
-        warning "No Modula-2 implementation module found"
-        return 1
+    if $DEBUG; then
+        debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
     fi
-    ## We must specify a relative path to the SYM directory
-    local m2c_opts="-sym:\"$(win_path $TARGET_SYM_DIR)\""
-    $DEBUG || m2c_opts="-quiet $m2c_opts"
+    cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
+
+    # We must specify a relative path to the SYM directory
+    local m2c_opts=-sym:"$(win_path $TARGET_SYM_DIR)"
 
     local n=0
     for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
-        local def_file="$(mixed_path $f)"
-        if $DEBUG; then
-            debug "\"$M2C_CMD\" $m2c_opts \"$def_file\""
-        elif $VERBOSE; then
-            echo "Compile \"$def_file\"" 1>&2
-        fi
-        eval "$M2C_CMD" $m2c_opts "$def_file"
-        if [[ $? -ne 0 ]]; then
-            error "Failed to compile \"$def_file\" into directory \"$(mixed_path $TARGET_DIR)\""
-            cleanup 1
-        fi
+        eval "$M2C_CMD" $m2c_opts "$(win_path $f)"
         n=$((n + 1))
     done
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.mod" 2>/dev/null); do
-        local mod_file="$(cygpath -w $f)"
         if $DEBUG; then
-            debug "\"$M2C_CMD\" $m2c_opts \"$(mixed_path $mod_file)\""
-        elif $VERBOSE; then
-            echo "Compile \"$mod_file\"" 1>&2
+            debug "\"$M2C_CMD\" $m2c_opts \"$(win_path $f)\""
         fi
-        eval "$M2C_CMD" $m2c_opts $(mixed_path $mod_file)
-        if [[ $? -ne 0 ]]; then
-            error "Failed to compile \"$mod_file\" into directory \"$(mixed_path $TARGET_DIR)\""
-            cleanup 1
-        fi
+        eval "$M2C_CMD" $m2c_opts "$(win_path $f)"
         n=$((n + 1))
     done
     local linker_opts_file="$(mixed_path $TARGET_DIR)/linker_opts.txt"
@@ -223,27 +188,28 @@ compile_adw() {
         ## echo -EXETYPE:exe
         echo "-MACHINE:X86_64"
         echo "-SUBSYSTEM:CONSOLE"
-        echo "-MAP:$(win_path $TARGET_DIR)\\$APP_NAME"
+        echo "-MAP:$(win_path $TARGET_DIR/$APP_NAME)"
         echo "-OUT:$(win_path $TARGET_FILE)"
         echo "-LARGEADDRESSAWARE"
     ) > "$linker_opts_file"
+    ## object files of current program
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.obj" 2>/dev/null); do
-        echo "$(win_path $f)" >> "$linker_opts_file"
+        echo "${TARGET_MOD_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
+    ## object files of library depencencies
     for f in $(find "$TARGET_BIN_DIR/" -type f -name "*.obj" 2>/dev/null); do
-        echo "$(win_path $f)" >> "$linker_opts_file"
+        echo "${TARGET_BIN_DIR/$ROOT_DIR/}/$f" >> "$linker_opts_file"
     done
     (
-        echo "$(win_path $ADWM2_HOME)/rtl-win-amd64.lib)"
-        echo "$(win_path $ADWM2_HOME)/win64api.lib)"
+        echo "$(win_path $ADWM2_HOME/rtl-win-amd64.lib)"
+        echo "$(win_path $ADWM2_HOME/win64api.lib)"
     ) >> "$linker_opts_file"
-
     if $DEBUG; then
         debug "\"$SBLINK_CMD\" @$linker_opts_file"
     elif $VERBOSE; then
         verbose "Execute ADW linker"
     fi
-    ## command sblink does NOT support quoted argument files
+    ## command sblink does NOT support quoted argument file
     eval "$SBLINK_CMD" @$linker_opts_file
     if [[ $? -ne 0 ]]; then
         error "Failed to execute ADW linker"
@@ -296,6 +262,26 @@ compile_xds() {
     else
         warning "No Modula-2 source file found"
         return 1
+    fi
+    if [[ $is_required_def -eq 1 ]]; then
+        [[ -d "$TARGET_SYM_DIR" ]] || mkdir "$TARGET_SYM_DIR"
+        for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
+            local def_file=$f
+            pushd "$TARGET_SYM_DIR" 1>/dev/null
+            $DEBUG && debug "Current directory is \"$(pwd)\""
+            if $DEBUG; then
+                debug "\"$XC_CMD\" \"$(mixed_path $f)\""
+            elif $VERBOSE; then
+                echo "Compile Modula-2 definition module \"${def_file/$ROOT_DIR\//}\"" 1>&2
+            fi
+            eval "$XC_CMD" "$(mixed_path $f)"
+            if [[ $? -ne 0 ]]; then
+                popd
+                error "Failed to compile Modula-2 definition module \"$(def_file/$ROOT_DIR//)\""
+                cleanup 1
+            fi
+            popd 1>/dev/null
+        done
     fi
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
     $DEBUG && debug "# Create XDS project file \"$prj_file\""
@@ -370,12 +356,12 @@ win_path() {
 
 run() {
     if [[ ! -f "$TARGET_FILE" ]]; then
-        error "Program \"$TARGET_FILE\" not found"
+        error "Program \"$(mixed_path $TARGET_FILE)\" not found"
         cleanup 1
     fi
     eval "$(mixed_path $TARGET_FILE)"
     if [[ $? -ne 0 ]]; then
-        error "Failed to execute program \"$TARGET_FILE\""
+        error "Failed to execute program \"$(mixed_path $TARGET_FILE)\""
         cleanup 1
     fi
 }

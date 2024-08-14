@@ -49,6 +49,7 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=true ;;
+        -gm2)      TOOLSET=gm2 ;;
         -help)     HELP=true ;;
         -verbose)  VERBOSE=true ;;
         -xds)      TOOLSET=xds ;;
@@ -92,7 +93,7 @@ Usage: $BASENAME { <option> | <subcommand> }
     clean        delete generated files
     compile      compile Modula-2 source files
     help         print this help message
-    run          execute main class "$APP_NAME"
+    run          execute main program "$APP_NAME"
 EOS
 }
 
@@ -144,7 +145,10 @@ action_required() {
     fi
 }
 
+## input parameter: %1=.def files are out of date
 compile_adw() {
+    local action_def=$1
+
     if $DEBUG; then
         debug "cp \"$(mixed_path $ADWM2_HOME1)/winamd64sym/*.sym\" \"$(mixed_path $TARGET_SYM_DIR)\""
     fi
@@ -163,6 +167,7 @@ compile_adw() {
 
     # We must specify a relative path to the SYM directory
     local m2c_opts=-sym:"$(win_path $TARGET_SYM_DIR)"
+    $DEBUG || m2c_opts="-quiet $m2c_opts"
 
     local n=0
     for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
@@ -183,6 +188,7 @@ compile_adw() {
         echo "-SUBSYSTEM:WINDOWS"
         echo "-MAP:$(win_path $TARGET_DIR)\\$APP_NAME"
         echo "-OUT:$(win_path $TARGET_FILE)"
+        echo "-LARGEADDRESSAWARE"
     ) > "$linker_opts_file"
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.obj" 2>/dev/null); do
         local x="${f/$ROOT_DIR\///}"
@@ -209,19 +215,31 @@ compile_xds() {
         fi
         cp "$(mixed_path $SOURCE_DEF_DIR)/"*.def "$(mixed_path $TARGET_DEF_DIR)"
     fi
-    if $DEBUG; then
-        debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
+    if [[ -n "$(ls -A $SOURCE_MOD_DIR/*.mod 2>/dev/null)" ]]; then
+        if $DEBUG; then
+            debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
+        fi
+        cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
     fi
-    cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
-
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
     $DEBUG && debug "# Create XDS project file \"$prj_file\""
     (
+        if $DEBUG; then
+            echo "% debug ON" && \
+            echo "-gendebug+" && \
+            echo "-genhistory+" && \
+            echo "-lineno+"
+        fi
         echo "-cpu = 486" && \
         echo "-lookup = *.sym = sym;$(mixed_path $XDSM2_HOME)/sym" && \
+        echo "-lookup = *.dll|*.lib = bin;$(mixed_path $XDSM2_HOME)/bin" && \
         echo "-m2" && \
         echo "-verbose" && \
-        echo "-werr"
+        echo "-werr" && \
+        echo "% disable warning 301 (parameter \"xxx\" is never used)" && \
+        echo "-woff301+" && \
+        echo "% disable warning 303 (procedure \"xxx\" declared but never used)" && \
+        echo "-woff303+"
     ) > "$prj_file"
     local n=0
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.mod" 2>/dev/null); do
@@ -261,7 +279,7 @@ mixed_path() {
 
 win_path() {
     if [[ -x "$CYGPATH_CMD" ]]; then
-        $CYGPATH_CMD -aw $1 | sed 's|\\|\\\\|g'
+        $CYGPATH_CMD -aw $1
     elif $mingw || $msys; then
         echo $1 | sed 's|/|\\\\|g'
     else
@@ -291,19 +309,20 @@ EXITCODE=0
 ROOT_DIR="$(getHome)"
 
 SOURCE_DIR="$ROOT_DIR/src"
-SOURCE_DEF_DIR="$SOURCE_DIR/def"
-SOURCE_MOD_DIR="$SOURCE_DIR/mod"
+SOURCE_DEF_DIR="$SOURCE_DIR/main/def"
+SOURCE_MOD_DIR="$SOURCE_DIR/main/mod"
+
 TARGET_DIR="$ROOT_DIR/target"
 TARGET_DEF_DIR="$TARGET_DIR/def"
 TARGET_MOD_DIR="$TARGET_DIR/mod"
+## library dependencies
+TARGET_BIN_DIR="$TARGET_DIR/bin"
 TARGET_SYM_DIR="$TARGET_DIR/sym"
 
 CLEAN=false
 COMPILE=false
 DEBUG=false
 HELP=false
-MAIN_CLASS=Main
-MAIN_ARGS=
 RUN=false
 TOOLSET=xds
 VERBOSE=false

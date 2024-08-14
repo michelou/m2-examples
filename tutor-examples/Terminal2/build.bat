@@ -39,19 +39,20 @@ set _WARNING_LABEL=%_STRONG_FG_YELLOW%Warning%_RESET%:
 set "_SOURCE_DIR=%_ROOT_DIR%src"
 set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\def"
 set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod"
+
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
 set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
+@rem library dependencies
+set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
+for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.lib"
 
-@rem 2 choices: ASCII, Unicode
+@rem ADWM2 gives us 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -75,7 +76,7 @@ set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 set "_HIS_CMD=%XDSM2_HOME%\bin\his.exe"
 set "_XLIB_CMD=%XDSM2_HOME%\bin\xlib.exe"
 
-@rem use newer PowerShell version if available
+@rem we use the newer PowerShell version if available
 where /q pwsh.exe
 if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
 ) else ( set _PWSH_CMD=powershell.exe
@@ -146,6 +147,7 @@ if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
     ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
@@ -176,11 +178,14 @@ if %_DEBUG%==1 set _STDOUT_REDIRECT=
 if exist "%_SOURCE_DIR%\mod-%_TOOLSET%" (
     set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\mod-%_TOOLSET%"
 )
-for %%f in (%~dp0.) do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
+for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 
 if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
+    echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
 goto :eof
 
@@ -201,6 +206,7 @@ echo.
 echo   %__BEG_P%Options:%__END%
 echo     %__BEG_O%-adw%__END%         select ADW Modula-2 toolset
 echo     %__BEG_O%-debug%__END%       print commands executed by this script
+echo     %__BEG_O%-gm2%__END%         select GNU Modula-2 toolset
 echo     %__BEG_O%-verbose%__END%     print progress messages
 echo     %__BEG_O%-xds%__END%         select XDS Modula-2 toolset ^(default^)
 echo.
@@ -247,7 +253,11 @@ set __ACTION_DEF=%~1
 
 if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
 xcopy /i /q /y "%_ADWM2_HOME%\winamd64sym\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
-
+if %ERRORLEVEL%==0 (
+    echo %_ERROR_LABEL% Failed to copy ADW symbol files ^("%_ADWM2_HOME%\winamd64sym"^) 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
     xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
@@ -259,8 +269,9 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
-set __M2C_OPTS=-sym:!_TARGET_DEF_DIR:%_ROOT_DIR%\=!,!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
+@rem We must specify a relative path for the SYM directories
+set __M2C_OPTS=-sym:"!_TARGET_DEF_DIR:%_ROOT_DIR%\=!,!_TARGET_SYM_DIR:%_ROOT_DIR%\=!"
+if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
@@ -300,18 +311,24 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -LARGEADDRESSAWARE
     echo -ENTRY:%_APP_NAME%_$InitCode
 ) > "%__LINKER_OPTS_FILE%"
+@rem object files of current program
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
+)
+@rem object files of library dependencies
+for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
+    echo !_TARGET_BIN_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
 )
 (
     echo %_ADWM2_HOME%\rtl-win-amd64.lib
     echo %_ADWM2_HOME%\win64api.lib
 ) >> "%__LINKER_OPTS_FILE%"
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% %_SBLINK_CMD% @%__LINKER_OPTS_FILE% 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
-call "%_SBLINK_CMD%" @!__LINKER_OPTS_FILE:%_ROOT_DIR%=!
+@rem command sblink does NOT support quoted argument file
+call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2
     if %_DEBUG%==1 ( if exist "%_ROOT_DIR%linker.err" type "%_ROOT_DIR%linker.err"
@@ -326,6 +343,7 @@ goto :eof
 echo %_WARNING_LABEL% Not yet implemented
 goto :eof
 
+@rem input parameter: %1=.def files are out of date
 :compile_xds
 set __ACTION_DEF=%~1
 

@@ -50,11 +50,9 @@ set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
-@rem 2 choices: ASCII, Unicode
+@rem ADWM2 gives us 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -76,7 +74,7 @@ if not exist "%XDSM2_HOME%\bin\xc.exe" (
 )
 set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 
-@rem use newer PowerShell version if available
+@rem we use the newer PowerShell version if available
 where /q pwsh.exe
 if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
 ) else ( set _PWSH_CMD=powershell.exe
@@ -280,7 +278,7 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-@rem We must specify a relative path to the SYM directory
+@rem We must specify a relative path for the SYM directories
 set __M2C_OPTS=-sym:"%_TARGET_SYM_DIR%,%_TARGET_DEF_DIR%"
 if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
@@ -322,9 +320,11 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -OUT:%_TARGET_FILE%
     echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
+@rem object files of current program
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
 )
+@rem object files of library dependencies
 for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_BIN_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
 )
@@ -333,10 +333,11 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
     echo %_ADWM2_HOME%\win64api.lib
 ) >> "%__LINKER_OPTS_FILE%"
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE%" 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% 1>&2
 ) else if %_VERBOSE%==1 ( echo Execute ADW linker 1>&2
 )
-call "%_SBLINK_CMD%" "@%__LINKER_OPTS_FILE%"
+@rem command sblink does NOT support quoted argument file
+call "%_SBLINK_CMD%" @%__LINKER_OPTS_FILE% %_STDOUT_REDIRECT%
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute ADW linker 1>&2
     if %_DEBUG%==1 ( if exist "%_ROOT_DIR%linker.err" type "%_ROOT_DIR%linker.err"
@@ -351,7 +352,10 @@ goto :eof
 echo %_WARNING_LABEL% Not yet implemented
 goto :eof
 
+@rem input parameter: %1=.def files are out of date
 :compile_xds
+set __ACTION_DEF=%~1
+
 if exist "%_LIB_DIR%\*.dll" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" 1>&2
     xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
@@ -390,6 +394,8 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
     echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
     echo -m2
+    echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
+    echo %% -m2addtypes
     echo -verbose
     echo -werr
     echo %% disable warning 301 ^(parameter "xxx" is never used^)
