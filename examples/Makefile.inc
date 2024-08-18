@@ -9,9 +9,13 @@ endif
 ADWM2_ENCODING = ASCII
 
 ifeq ($(OS),Windows_NT)
-M2C        = $(subst \,/,$(ADWM2_HOME))/$(ADWM2_ENCODING)/m2amd64.exe
+ADWM2_BIN_DIR = $(subst \,/,$(ADWM2_HOME))/$(ADWM2_ENCODING)
+ADWM2_SYM_DIR = $(ADWM2_BIN_DIR)/winamd64sym
+
+M2C        = $(ADWM2_BIN_DIR)/m2amd64.exe
+SBLINK     = $(ADWM2_BIN_DIR)/sblink.exe
 XC         = $(subst \,/,$(XDSM2_HOME))/bin/xc.exe
-LOCAL_REPO = $(subst \,/,$(USERPROFILE))/.m2/repository
+#
 PSEP       = ;
 ## $(MSYS_HOME)\usr\bin\{cp.exe, make.exe, wget.exe}
 CP         = /usr/bin/cp.exe
@@ -24,7 +28,10 @@ WGET       = /usr/bin/wget
 #
 TARGET_EXT = .exe
 else
-LOCAL_REPO = $(HOME)/.m2/repository
+M2C        = m2amd64
+SBLINK     = sblink
+XC         = xc
+#
 PSEP       = :
 CP         = cp
 ECHO       = echo

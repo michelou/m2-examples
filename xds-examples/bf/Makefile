@@ -5,22 +5,23 @@
 ##
 ##############################################################################
 
+DEBUG ?= false
+
 TOOLSET ?= xds
 
 include ../Makefile.inc
-
-ADWM2_SYM_DIR = $(subst \,/,$(ADWM2_HOME))/ascii/winamd64sym
 
 LIB_DIR = ../lib/$(TOOLSET)
 
 SOURCE_DIR = src
 SOURCE_DEF_DIR = src/main/def
 SOURCE_MOD_DIR = src/main/mod
+SOURCE_MOD_ADW_DIR = src/main/mod-adw
 
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
-
+## library dependencies
 TARGET_BIN_DIR = $(TARGET_DIR)/bin
 TARGET_SYM_DIR = $(TARGET_DIR)/sym
 
@@ -33,39 +34,52 @@ MODS = $(shell $(FIND) "$(SOURCE_MOD_DIR)" -type f -name "*.mod")
 APP_NAME = bf
 TARGET = $(TARGET_DIR)/$(APP_NAME)$(TARGET_EXT)
 
+M2C_OPTS =
+LINKER_OPTS_FILE = $(TARGET_DIR)/linker_opts.txt
+
 all: build
 
 build: build_$(TOOLSET)
 
 build_adw: $(DEFS) $(MODS)
 	[ -d "$(TARGET_DIR)" ] || "$(MKDIR)" -p "$(TARGET_DIR)"
-	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	if [ -d "$(SOURCE_DEF_DIR)" ]; then \
 	    [ -d "$(TARGET_DEF_DIR)" ] || "$(MKDIR)" -p "$(TARGET_DEF_DIR)"; \
 	    "$(CP)" "$(SOURCE_DEF_DIR)"/*.def "$(TARGET_DEF_DIR)"; \
-	    for f in $(ABS_TARGET_DIR)/def/*.def; do \
-	        "$(M2C)" $(M2C_OPTS) $$f; \
+	    for f in $(TARGET_DEF_DIR)/*.def; do \
+	        "$(M2C)" $(M2C_OPTS) "$$f"; \
 	    done; \
 	fi
 	[ -d "$(TARGET_MOD_DIR)" ] || "$(MKDIR)" -p "$(TARGET_MOD_DIR)"
-	@$(CP) $(SOURCE_MOD_DIR)/*.mod "$(TARGET_MOD_DIR)"
-	[ -d "$(TARGET_BIN_DIR)" ] || "$(MKDIR)" -p "$(TARGET_BIN_DIR)"
-	@$(CP) $(LIB_DIR)/*.obj "$(TARGET_BIN_DIR)"
+	@$(CP) $(SOURCE_MOD_ADW_DIR)/*.mod "$(TARGET_MOD_DIR)"
 	[ -d "$(TARGET_SYM_DIR)" ] || "$(MKDIR)" -p "$(TARGET_SYM_DIR)"
 	@$(CP) $(ADWM2_SYM_DIR)/*.sym "$(TARGET_SYM_DIR)"
-	@$(CP) $(LIB_DIR)/*.sym "$(TARGET_SYM_DIR)"
-
+	[ -d "$(TARGET_BIN_DIR)" ] || "$(MKDIR)" -p "$(TARGET_BIN_DIR)"
+	if [ -d "$(LIB_DIR)" ]; then \
+	    "$(CP)" $(LIB_DIR)/*.obj "$(TARGET_BIN_DIR)"; \
+	    "$(CP)" $(LIB_DIR)/*.sym "$(TARGET_SYM_DIR)"; \
+	fi
+	$(eval M2C_OPTS := -sym:"$(shell cygpath -w $(TARGET_SYM_DIR))")
+	##for f in $(TARGET_MOD_DIR)/*.mod; do \
+	##    @$(ECHO) $$f \
+	"$(M2C)" $(M2C_OPTS) "$(shell cygpath -w $(TARGET_MOD_DIR)/$(APP_NAME).mod)"
+	##done
+	##@$(ECHO) "-EXETYPE:exe"
 	@$(ECHO) "-MACHINE:X86_64" > "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-SUBSYSTEM:CONSOLE" >> "$(LINKER_OPTS_FILE)"
-	@$(ECHO) "-MAP:$(TARGET_DIR)/$(APP_NAME)" >> "$(LINKER_OPTS_FILE)"
-	@$(ECHO) "-OUT:$(TARGET)" >> "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "-MAP:$(shell cygpath -w $(TARGET_DIR))\$(APP_NAME)" >> "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "-OUT:$(shell cygpath -w $(TARGET))" >> "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-LARGEADDRESSAWARE" >> "$(LINKER_OPTS_FILE)"
 	@for f in $(TARGET_MOD_DIR)/*.obj; do \
-	    $(ECHO) $$f >> "$(LINKER_OPTS_FILE)"; \
+	    $(ECHO) "$$(shell cygpath -w $$f)" >> "$(LINKER_OPTS_FILE)"; \
 	done
 	@for f in $(TARGET_BIN_DIR)/*.obj; do \
-	    $(ECHO) $$f >> "$(LINKER_OPTS_FILE)"; \
+	    [ -f "$$f" ] || continue; \
+	    $(ECHO) "$$(shell cygpath -w $$f)" >> "$(LINKER_OPTS_FILE)"; \
 	done
+	@$(ECHO) "$(shell cygpath -w $(ADWM2_BIN_DIR))\rtl-win-amd64.lib" >> "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "$(shell cygpath -w $(ADWM2_BIN_DIR))\win64api.lib" >> "$(LINKER_OPTS_FILE)"
+	"$(SBLINK)" "@$(LINKER_OPTS_FILE)"
 
 build_xds: $(DEFS) $(MODS)
 	if [ -d "$(SOURCE_DEF_DIR)" ]; then \
@@ -82,14 +96,14 @@ build_xds: $(DEFS) $(MODS)
 	@# we compute the absolute path for PRJ_FILE since we use TARGET_DIR as current directory.
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	$(eval PRJ_FILE := $(ABS_TARGET_DIR)/$(APP_NAME).prj)
-	@##[ -f "$(PRJ_FILE)" ] || "$(RM)" "$(PRJ_FILE)"
-	@##if $DEBUG; then
-	@##    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"
-	@##    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"
-	@##    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"
-	@##    @$(ECHO) "-lineno+" >> "$(PRJ_FILE)"
-	@##fi
-	@$(ECHO) "-cpu = 486" > "$(PRJ_FILE)"
+	@$(ECHO) "%% generated on $(shell date '+%F %T')" > "$(PRJ_FILE)"
+	if $(DEBUG); then \
+	    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"; \
+	    @$(ECHO) "-lineno+" >> "$(PRJ_FILE)"; \
+	fi
+	@$(ECHO) "-cpu = 486" >> "$(PRJ_FILE)"
 	@$(ECHO) "-lookup = *.sym = sym;$(XDSM2_HOME)\sym" >> "$(PRJ_FILE)"
 	@$(ECHO) "-lookup = *.dll|*.lib = bin;$(XDSM2_HOME)\bin" >> "$(PRJ_FILE)"
 	@$(ECHO) "-m2" >> "$(PRJ_FILE)"
@@ -99,10 +113,10 @@ build_xds: $(DEFS) $(MODS)
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
 	for f in $(TARGET_BIN_DIR)/*.lib; do \
+	    [ -f "$$f" ] || continue; \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
 	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
-
 
 clean:
 	"$(RM)" -rf "$(TARGET_DIR)"
@@ -127,4 +141,4 @@ help:
 .PHONY: all build clean help run test
 
 .SUFFIXES:
-.SUFFIXES: .def .exe .mod .obj .prj
+.SUFFIXES: .def .err .exe .map .mod .obj .prj

@@ -27,7 +27,7 @@
 - [Coronado Enterprises Modula-2 TUTOR][paper_dodrill] by Gordon Dodrill, March 1987.
 - [A Proposal for a Revision of ISO Modula-2](https://arxiv.org/abs/2006.07193) by Benjamin Kowarsch, June 2020.
 
-## <span id="projects">Projects</span>
+## <span id="projects">Projects</span> [**&#x25B4;**](#top)
 
 - GitHub/[afborchert](https://github.com/afborchert/lilith-multipass-modula2-compiler) &ndash; historical ETH Zürich Modula-2 Compiler.
 - GitHub/[GunterMueller](https://github.com/GunterMueller?tab=repositories&q=Modula) &ndash; Modula-2 related archives.

@@ -13,6 +13,21 @@
 
 ### <span id="clock">`Clock` Example</span>
 
+This project has the following directory structure :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /f /a . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /v /b [A-Z]</b>
+|   <a href="./Clock/build.bat">build.bat</a>
+|   <a href="./Clock/build.sh">build.sh</a>
+|   <a href="./Clock/Makefile">Makefile</a>
+\---<b>src</b>
+    \---<b>main</b>
+        \---<b>mod</b>
+                <a href="./Clock/src/main/mod/Clock.mod">Clock.mod</a>
+</pre>
+
+Command [`build.bat`](./Clock/build.bat)`-verbose clean run` generated and executes :
+
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Clock/build.bat">build</a> -verbose clean run</b>
 Delete directory "target"
@@ -42,82 +57,7 @@ Procedure    PROC_THREAD_ATTRIBUTE_UMS_THREAD
 Procedure    PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY
 Procedure    PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES
 Procedure    PROC_THREAD_ATTRIBUTE_PROTECTION_LEVEL
-Procedure    WT_SET_MAX_THREADPOOL_THREADS
-Procedure    TpInitializeCallbackEnviron
-Procedure    TpSetCallbackThreadpool
-Procedure    TpSetCallbackCleanupGroup
-Procedure    TpSetCallbackActivationContext
-Procedure    TpSetCallbackNotivationContext
-Procedure    TpSetCallbackLongFunction
-Procedure    TpSetCallbackRaceWithDll
-Procedure    TpSetCallbackFinalizationCallback
-Procedure    TpSetCallbackPriority
-Procedure    TpSetCallbackPersistent
-Procedure    TpDestroyCallbackEnviron
-Procedure    InitializeThreadpoolEnvironment
-Procedure    SetThreadpoolCallbackPool
-Procedure    SetThreadpoolCallbackCleanupGroup
-Procedure    SetThreadpoolCallbackRunsLong
-Procedure    SetThreadpoolCallbackLibrary
-Procedure    SetThreadpoolCallbackPriority
-Procedure    SetThreadpoolCallbackPersistent
-Procedure    DestroyThreadpoolEnvironment
-Procedure    HasOverlappedIoCompleted
-Procedure    GetRValue
-Procedure    GetGValue
-Procedure    GetBValue
-Procedure    RGB
-Procedure    PALETTEINDEX
-Procedure    PALETTERGB
-Procedure    GetKValue
-Procedure    GetYValue
-Procedure    GetMValue
-Procedure    GetCValue
-Procedure    CMYK
-Procedure    MAKEROP4
-Procedure    MAKEINTRESOURCEA
-Procedure    MAKEINTRESOURCEW
-Procedure    MAKEINTRESOURCE
-Procedure    PostAppMessageA
-Procedure    PostAppMessageW
-Procedure    CreateWindowA
-Procedure    CreateWindowW
-Procedure    CreateDialogA
-Procedure    CreateDialogW
-Procedure    CreateDialogIndirectW
-Procedure    CreateDialogIndirectA
-Procedure    DialogBoxA
-Procedure    DialogBoxW
-Procedure    DialogBoxIndirectA
-Procedure    DialogBoxIndirectW
-Procedure    DefHookProc
-Procedure    ExitWindows
-Procedure    GetNextWindow
-Procedure    GetSysModalWindow
-Procedure    SetSysModalWindow
-Procedure    GetWindowTask
-Procedure    CopyCursor
-Procedure    MAKELONG
-Procedure    MAKELPARAM
-Procedure    MAKEWPARAM
-Procedure    MAKELRESULT
-Procedure    MAKEWORD
-Procedure    LOWORD
-Procedure    HIWORD
-Procedure    LOBYTE
-Procedure    HIBYTE
-Procedure    AnsiToOem
-Procedure    OemToAnsi
-Procedure    AnsiToOemBuff
-Procedure    OemToAnsiBuff
-Procedure    AnsiUpper
-Procedure    AnsiUpperBuff
-Procedure    AnsiLower
-Procedure    AnsiLowerBuff
-Procedure    AnsiNext
-Procedure    AnsiPrev
-Procedure    MakeWndProcInstance
-Procedure    FreeWndProcInstance
+[...]
 Procedure    WM_ACTIVATE_STATE
 Procedure    WM_ACTIVATE_FMINIMIZED
 Procedure    WM_ACTIVATE_HWND
@@ -128,38 +68,7 @@ Procedure    WM_CHARTOITEM_HWND
 Procedure    WM_COMMAND_ID
 Procedure    WM_COMMAND_HWND
 Procedure    WM_COMMAND_CMD
-Procedure    WM_CTLCOLOR_HDC
-Procedure    WM_CTLCOLOR_HWND
-Procedure    WM_CTLCOLOR_TYPE
-Procedure    WM_MENUSELECT_CMD
-Procedure    WM_MENUSELECT_FLAGS
-Procedure    WM_MENUSELECT_HMENU
-Procedure    WM_MDIACTIVATE_FACTIVATE
-Procedure    WM_MDIACTIVATE_HWNDDEACT
-Procedure    WM_MDIACTIVATE_HWNDACTIVATE
-Procedure    WM_MENUCHAR_CHAR
-Procedure    WM_MENUCHAR_CHARW
-Procedure    WM_MENUCHAR_HMENU
-Procedure    WM_MENUCHAR_FMENU
-Procedure    WM_PARENTNOTIFY_MSG
-Procedure    WM_PARENTNOTIFY_ID
-Procedure    WM_PARENTNOTIFY_HWNDCHILD
-Procedure    WM_PARENTNOTIFY_X
-Procedure    WM_PARENTNOTIFY_Y
-Procedure    WM_VKEYTOITEM_CODE
-Procedure    WM_VKEYTOITEM_ITEM
-Procedure    WM_VKEYTOITEM_HWND
-Procedure    EM_SETSEL_START
-Procedure    EM_SETSEL_END
-Procedure    WM_CHANGECBCHAIN_HWNDNEXT
-Procedure    WM_HSCROLL_CODE
-Procedure    WM_HSCROLL_POS
-Procedure    WM_HSCROLL_HWND
-Procedure    WM_VSCROLL_CODE
-Procedure    WM_VSCROLL_POS
-Procedure    WM_VSCROLL_HWND
-Procedure    MAKE_WM_COMMAND
-
+[...]]
 Procedure    GetTime
 Procedure    HourHandPos
 Procedure    VertEquiv
@@ -191,22 +100,126 @@ Memory = 1616k
 <img src="./Clock/Clock.png" width="40%"/>
 
 <pre style="font-size:80%;">
-<b>&gt; <a href="">tree</a> /a /f target |findstr /v /b [A-Z]</b>
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a /f target | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
 |   Clock.exe
 |   Clock.map
 |   linker_opts.txt
-|
-+---mod
++---<b>mod</b>
 |       Clock.MOD
 |       Clock.obj
-|
-\---sym
+\---<b>sym</b>
         AES.sym
         [...]
         WIN32.sym
         WINUSER.sym
         WINVER.sym
         WINX.sym
+</pre>
+
+<!--=======================================================================-->
+
+### <span id="estimatepi">`EstimatePi` Example</span> [**&#x25B4;**](#top)
+
+This project has the following directory structure :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /f /a . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /v /b [A-Z]</b>
+|   <a href="./EstimatePi/build.bat">build.bat</a>
+|   <a href="./EstimatePi/build.sh">build.sh</a>
+|   <a href="./EstimatePi/Makefile">Makefile</a>
+\---<b>src</b>
+    \---<b>main</b>
+        +---<b>def</b>
+        |       <a href="./EstimatePi/src/main/def/Rand.def">Rand.def</a>
+        \---<b>mod</b>
+                <a href="./EstimatePi/src/main/mod/EstimatePi.mod">EstimatePi.mod</a>
+                <a href="./EstimatePi/src/main/mod/Rand.mod">Rand.mod</a>
+</pre>
+
+Command [`build.bat`](./EstimatePi/build.bat)`-verbose clean run` generates and executes the Modula-2 program `target\EstimatePi.exe` :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="./EstimatePi/build.bat">build</a> -verbose clean run</b>
+Compile "P:\adw-examples\EstimatePi\target\def\Rand.def" into directory "target\def"
+Compile "P:\adw-examples\EstimatePi\target\mod\Rand.mod" into directory "target\mod"
+Compile "P:\adw-examples\EstimatePi\target\mod\EstimatePi.mod" into directory "target\mod"
+Execute ADW linker
+Execute program "target\EstimatePi.exe"
+PI by Monte Carlo simulation = 3.14332
+PI true value                = 3.14159
+</pre>
+
+<!--=======================================================================-->
+
+### <span id="realspeedtest">`RealSpeedTest` Example</span> [**&#x25B4;**](#top)
+
+This project has the following directory structure :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /f /a . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /v /b [A-Z]</b>
+|   <a href="./RealSpeedTest/build.bat">build.bat</a>
+|   <a href="./RealSpeedTest/build.sh">build.sh</a>
+|   <a href="./RealSpeedTest/Makefile">Makefile</a>
+\---<b>src</b>
+    \---<b>main</b>
+        \---<b>mod</b>
+                <a href="./RealSpeedTest/src/main/mod/RealSpeedTest.mod">RealSpeedTest.mod</a>
+</pre>
+
+Command [`build.bat`](./RealSpeedTest/build.bat)`-verbose clean run` generates and executes the Modula-2 program `target\RealSpeedTest.exe` :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="./RealSpeedTest/build.bat">build</a> -verbose clean run</b>
+Delete directory "target"
+Compile "P:\adw-examples\RealSpeedTest\target\mod\RealSpeedTest.mod" into directory "target\mod"
+Execute ADW linker
+Execute program "target\RealSpeedTest.exe"
+REAL     :   156
+LONGREAL :   141
+</pre>
+
+<!--=======================================================================-->
+
+### <span id="whetstone">`Whetstone_benchmark` Example</span> [**&#x25B4;**](#top)
+
+This project has the following directory structure :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /f /a . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /v /b [A-Z]</b>
+|   <a href="./Whetstone_benchmark/build.bat">build.bat</a>
+|   <a href="./Whetstone_benchmark/build.sh">build.sh</a>
+|   <a href="./Whetstone_benchmark/Makefile">Makefile</a>
+\---<b>src</b>
+    \---<b>main</b>
+        \---<b>mod</b>
+                <a href="./Whetstone_benchmark/src/main/mod/Whetstone.mod">Whetstone.mod</a>
+</pre>
+
+Command [`build.bat`](./Whetstone_benchmark/build.bat)`-verbose clean run` genreates and executes the Modula-2 program `target\Whetstone.exe` :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="./Whetstone_benchmark/build.bat">build</a> -verbose clean run</b>
+Delete directory "target"
+Compile "P:\adw-examples\Whetstone_benchmark\target\mod\Whetstone.mod" into directory "target\mod"
+Execute ADW linker
+Execute program "target\Whetstone.exe"
+LOOP   TIME  ITER
+# 1   0.000    20     0     0    -0.067    -0.466    -0.733    -1.132
+# 2   0.017   120     0     0    -0.068    -0.463    -0.730    -1.124
+# 3   0.048   140     0     0    -0.055    -0.447    -0.711    -1.103
+# 4   0.006  3450     1     1     0.000     0.000     0.000     0.000
+# 6   0.044  2100     1     2     6.000     6.000    -0.711    -1.103
+# 7   0.387   320     0     0     0.490     0.490     0.490     0.490
+# 8   0.000  8990     0     0     1.000     1.000     1.000     1.000
+# 9   0.025  6160     1     2     3.000     2.000     3.000    -1.103
+#10   0.000     0     2     3     0.000     0.000     0.000     0.000
+#11   0.266   930     0     0     0.835     0.835     0.835     0.835
+      0.854
+
+Whetstone KIPS  0
+Whetstone MIPS   Infinite
+&nbsp;
+Press any key to exit
 </pre>
 
 ***

@@ -1,6 +1,6 @@
 MODULE CaseDemo;
 
-FROM InOut IMPORT WriteString, WriteInt, WriteLn;
+FROM Terminal2 IMPORT WriteString, WriteInt, WriteLn;
 
 VAR Dummy : INTEGER;
 

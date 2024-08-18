@@ -1,6 +1,6 @@
 MODULE LoopDemo;
 
-FROM InOut IMPORT WriteString, WriteInt, WriteLn, Write;
+FROM Terminal2 IMPORT WriteString, WriteInt, WriteLn, WriteChar;
 
 CONST Where = 11;
 
@@ -60,12 +60,12 @@ BEGIN
           type variable to index a FOR loop.                      *)
 
    FOR Letter := "A" TO 'Z' DO
-      Write(Letter);
+      WriteChar(Letter);
    END;
    WriteLn;
 
    FOR Letter := 'z' TO 'a' BY -1 DO
-      Write(Letter);
+      WriteChar(Letter);
    END;
    WriteLn;
 

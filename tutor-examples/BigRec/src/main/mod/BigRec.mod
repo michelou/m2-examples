@@ -1,6 +1,6 @@
 MODULE BigRec;
 
-FROM InOut   IMPORT WriteString, Write, WriteLn;
+FROM Terminal2 IMPORT WriteString, WriteChar, WriteLn;
 
 CONST  NumberOfFriends = 50;
 
@@ -49,7 +49,7 @@ BEGIN  (* Main Program *)
 
    WriteString(Friend[27].Name.FirstName);
    WriteString(' ');
-   Write(Friend[33].Name.Initial);
+   WriteChar(Friend[33].Name.Initial);
    WriteString(' ');
    WriteString(Father.Name.LastName);
    WriteLn;
