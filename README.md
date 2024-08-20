@@ -58,7 +58,7 @@ README.md
 
 where
 
-- directory [**adw-examples**](adw-examples) contains [Modula-2][pim4] examples from the ADW Modula-2 distribution.
+- directory [**`adw-examples\`**](adw-examples/) contains [Modula-2][pim4] examples from the ADW Modula-2 distribution.
 - directory [**`docs\`**](docs/) contains [Modula-2][pim4] related papers/articles.
 - directory [**`examples\`**](examples/) contains [Modula-2][pim4] examples grabbed from various websites (see file [**`examples\README.md`**](examples/README.md)).
 - directory [**`tutor-examples\`**](examples/) contains [Modula-2][pim4] examples from the online [Modula-2 Tutor](https://www.modula2.org/tutor/).
