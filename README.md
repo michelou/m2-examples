@@ -4,7 +4,7 @@
   <tr>
   <td style="border:0;padding:0 10px 0 0;min-width:25%;"><a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1"><img src="./docs/images/pim4.png" width="120" alt="Modula-2 project"/></a></td>
   <td style="border:0;padding:0;vertical-align:text-top;">This repository gathers <a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1" rel="external">Modula-2</a> code examples coming from various websites and books.<br/>
-  It also includes several build scripts (<a href="https://en.wikibooks.org/wiki/Windows_Batch_Scripting" rel="external">batch files</a>) for experimenting with <a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1" rel="external">Modula-2</a> on a Windows machine.
+  It also includes several build scripts (<a href="https://cloudblogs.microsoft.com/opensource/2023/02/21/introducing-bash-for-beginners/" rel="external">Bash scripts</a>, <a href="https://en.wikibooks.org/wiki/Windows_Batch_Scripting" rel="external">batch files</a>, <a href="https://makefiletutorial.com/" rel="external">Make scripts</a>) for experimenting with <a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1" rel="external">Modula-2</a> on a Windows machine.
   </td>
   </tr>
 </table>
@@ -52,8 +52,11 @@ examples\{<a href="examples/README.md">README.md</a>, <a href="./examples/Factor
 tutor-examples\{<a href="./tutor-examples/README.md">README.md</a>, <a href="./tutor-examples/Areas/">Areas</a>, <a href="./tutor-examples/Arrays/">Arrays</a>, ..}
 xds-examples\{<a href="xds-examples/README.md">README.md</a>. <a href="./xds-examples/exp/">exp</a>, <a href="./xds-examples/queens/">queens</a>, ..}
 README.md
+<a href="ADW_M2.md">ADW_M2.md</a>
+<a href="GCC_M2.md">GCC_M2.md</a>
 <a href="RESOURCES.md">RESOURCES.md</a>
 <a href="setenv.bat">setenv.bat</a>
+<a href="XDS_M2.md">XDS_M2.md</a>
 </pre>
 
 where
@@ -63,9 +66,11 @@ where
 - directory [**`examples\`**](examples/) contains [Modula-2][pim4] examples grabbed from various websites (see file [**`examples\README.md`**](examples/README.md)).
 - directory [**`tutor-examples\`**](examples/) contains [Modula-2][pim4] examples from the online [Modula-2 Tutor](https://www.modula2.org/tutor/).
 - directory [**`xds-examples\`**](xds-examples/) contains [Modula-2][pim4] examples from the XDS Modula-2 distribution.
-- file [**`README.md`**](README.md) is the [Markdown][github_markdown] document for this page.
+- file [**`ADW_M2.md`**](ADW_M2.md) is the [Markdown][github_markdown] document presenting [ADW Modula-2][adwm2] related informations.
+- file **`README.md`** is the [Markdown][github_markdown] document for this page.
 - file [**`RESOURCES.md`**](RESOURCES.md) is the [Markdown][github_markdown] document presenting external resources.
 - file [**`setenv.bat`**](setenv.bat) is the batch command for setting up our environment.
+- file [**`XDS_M2.md`**](XDS_M2.md) is the [Markdown][github_markdown] document presenting [XDS Modula-2][xdsm2] related informations.
 
 We also define a virtual drive &ndash; e.g. drive **`T:`** &ndash; in our working environment in order to reduce/hide the real path of our project directory (see article ["Windows command prompt limitation"][windows_limitation] from Microsoft Support).
 > **:mag_right:** We use the Windows external command [**`subst`**][windows_subst] to create virtual drives; for instance:
@@ -180,6 +185,7 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 <!-- link refs -->
 
 [ada_examples]: https://github.com/michelou/ada-examples#top
+[adwm2]: https://www.modula2.org/adwm2/
 [adwm2_downloads]: https://www.modula2.org/adwm2/download.php
 [adwm2_relnotes]: https://www.modula2.org/adwm2/
 [akka_examples]: https://github.com/michelou/akka-examples#top
@@ -237,9 +243,7 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 [windows_limitation]: https://support.microsoft.com/en-gb/help/830473/command-prompt-cmd-exe-command-line-string-limitation
 [windows_subst]: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/subst
 [wix_examples]: https://github.com/michelou/wix-examples#top
-<!--
-[xdsm2_downloads]: https://github.com/excelsior-oss/xds-2.60
--->
+[xdsm2]: https://github.com/excelsior-oss/xds-ide
 [xdsm2_downloads]: https://github.com/excelsior-oss/xds-ide/releases
 [zig_examples]: https://github.com/michelou/zig-examples#top
 [zip_archive]: https://www.howtogeek.com/178146/htg-explains-everything-you-need-to-know-about-zipped-files/
