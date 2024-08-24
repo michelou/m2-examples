@@ -43,7 +43,7 @@ C:\opt\XDS-Modula-2\<sup id="anchor_02"><a href="#footnote_02">2</a></sup>   <i>
 
 ## <span id="structure">Directory structure</span> [**&#x25B4;**](#top)
 
-This project is organized as follows:
+This project has the following directory structure :
 
 <pre style="font-size:80%;">
 adw-examples\{<a href="adw-examples/README.md">README.md</a>}
@@ -51,6 +51,7 @@ docs\
 examples\{<a href="examples/README.md">README.md</a>, <a href="./examples/Factorial/">Factorial</a>, <a href="./examples/Hello/">Hello</a>, <a href="./examples/PascalTriangle/">PascalTriangle</a>, ..}
 tutor-examples\{<a href="./tutor-examples/README.md">README.md</a>, <a href="./tutor-examples/Areas/">Areas</a>, <a href="./tutor-examples/Arrays/">Arrays</a>, ..}
 xds-examples\{<a href="xds-examples/README.md">README.md</a>. <a href="./xds-examples/exp/">exp</a>, <a href="./xds-examples/queens/">queens</a>, ..}
+winkler-examples\{<a href="./winkler-examples/README.md>README.md</a>, <a href="./winkler-examples/Code/">Code</a>, <a href="./winkler-examples/Felder/">Felder</a>, <a href="./winkler-examples/Nullstellen/">Nullstellent</a>, ..}
 README.md
 <a href="ADW_M2.md">ADW_M2.md</a>
 <a href="GCC_M2.md">GCC_M2.md</a>
@@ -66,6 +67,7 @@ where
 - directory [**`examples\`**](examples/) contains [Modula-2][pim4] examples grabbed from various websites (see file [**`examples\README.md`**](examples/README.md)).
 - directory [**`tutor-examples\`**](examples/) contains [Modula-2][pim4] examples from the online [Modula-2 Tutor](https://www.modula2.org/tutor/).
 - directory [**`xds-examples\`**](xds-examples/) contains [Modula-2][pim4] examples from the XDS Modula-2 distribution.
+- directory [**`winkler-examples\`**](./winkler-examples/) contains [Modula-2][pim4] examples written by Eckart Winkler.
 - file [**`ADW_M2.md`**](ADW_M2.md) is the [Markdown][github_markdown] document presenting [ADW Modula-2][adwm2] related informations.
 - file **`README.md`** is the [Markdown][github_markdown] document for this page.
 - file [**`RESOURCES.md`**](RESOURCES.md) is the [Markdown][github_markdown] document presenting external resources.
