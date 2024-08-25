@@ -6,7 +6,7 @@
     <a href="https://en.wikipedia.org/wiki/Modula-2" rel="external"><img src="../docs/images/m2-logo.png" width="160" alt="Modula-2 project"/></a>
   </td>
   <td style="border:0;padding:0;vertical-align:text-top;">
-    Directory <strong><code>winkler-examples\</code></strong> contains our own <a href="https://en.wikipedia.org/wiki/Modula-2" rel="external">Modula-2</a> code examples from the web page <a href="http://www.eckart-winkler.de/computer/modula2.htm" rel="external">Die Programmiersprache Modula-2</a> which reproduces two articles written by Eckart Winkler (1987 and 1989).
+    Directory <strong><code>winkler-examples\</code></strong> contains <a href="https://en.wikipedia.org/wiki/Modula-2" rel="external">Modula-2</a> code examples from the web page <a href="http://www.eckart-winkler.de/computer/modula2.htm" rel="external">Die Programmiersprache Modula-2</a> which reproduces two articles written by Eckart Winkler (1987 and 1989).
   </td>
   </tr>
 </table>
