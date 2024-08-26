@@ -6,6 +6,7 @@ target/
 errinfo.$$$
 *.crt
 *_LOCAL
+*_LOCAL.md
 *_LOCAL.txt
 *.err
 *.exe

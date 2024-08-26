@@ -5,7 +5,7 @@
 ##
 ##############################################################################
 
-DEBUG ?= false
+DEBUG ?= 0
 
 TOOLSET ?= xds
 
@@ -64,12 +64,11 @@ build_adw: $(DEFS) $(MODS)
 	"$(M2C)" $(M2C_OPTS) -quiet "$(TARGET_MOD_DIR)/$(APP_NAME).mod"
 	##done
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
-	$(eval ABS_TARGET := $(shell realpath $(TARGET)))
 	##$(ECHO) "-EXETYPE:exe"
 	@$(ECHO) "-MACHINE:X86_64" > "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-SUBSYSTEM:CONSOLE" >> "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-MAP:$(shell cygpath -w $(ABS_TARGET_DIR))/$(APP_NAME)" >> "$(LINKER_OPTS_FILE)"
-	@$(ECHO) "-OUT:$(shell cygpath -w $(ABS_TARGET))" >> "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "-OUT:$(shell cygpath -w $(ABS_TARGET_DIR))/$(APP_NAME)$(TARGET_EXT)" >> "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-LARGEADDRESSAWARE" >> "$(LINKER_OPTS_FILE)"
 	@for f in $(TARGET_MOD_DIR)/*.obj; do \
 	    $(ECHO) "$$(shell cygpath -w $$f)" >> "$(LINKER_OPTS_FILE)"; \
@@ -89,16 +88,19 @@ build_xds: $(DEFS) $(MODS)
 	fi
 	[ -d "$(TARGET_MOD_DIR)" ] || "$(MKDIR)" -p "$(TARGET_MOD_DIR)"
 	@$(CP) $(SOURCE_MOD_DIR)/*.mod "$(TARGET_MOD_DIR)"
+	@# we now copy the symbol/object files for library dependencies (if any)
 	[ -d "$(TARGET_BIN_DIR)" ] || "$(MKDIR)" -p "$(TARGET_BIN_DIR)"
-	@$(CP) $(LIB_DIR)/*.dll "$(TARGET_BIN_DIR)"
-	@$(CP) $(LIB_DIR)/*.lib "$(TARGET_BIN_DIR)"
 	[ -d "$(TARGET_SYM_DIR)" ] || "$(MKDIR)" -p "$(TARGET_SYM_DIR)"
-	@$(CP) $(LIB_DIR)/*.sym "$(TARGET_SYM_DIR)"
+	if [ -d "$(LIB_DIR)" ]; then \
+	    "$(CP)" $(LIB_DIR)/*.dll "$(TARGET_BIN_DIR)"; \
+	    "$(CP)" $(LIB_DIR)/*.lib "$(TARGET_BIN_DIR)"; \
+	    "$(CP)" $(LIB_DIR)/*.sym "$(TARGET_SYM_DIR)"; \
+	fi
 	@# we compute the absolute path for PRJ_FILE since we use TARGET_DIR as current directory.
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	$(eval PRJ_FILE := $(ABS_TARGET_DIR)/$(APP_NAME).prj)
 	@$(ECHO) "%% generated on $(shell date '+%F %T')" > "$(PRJ_FILE)"
-	if $(DEBUG); then \
+	if [ $(DEBUG) -eq 1 ]; then \
 	    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"; \
 	    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"; \
 	    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"; \
@@ -110,6 +112,10 @@ build_xds: $(DEFS) $(MODS)
 	@$(ECHO) "-m2" >> "$(PRJ_FILE)"
 	@$(ECHO) "-verbose" >> "$(PRJ_FILE)"
 	@$(ECHO) "-werr" >> "$(PRJ_FILE)"
+	@$(ECHO) "%% disable warning 301 (parameter \"xxx\" is never used)" >> "$(PRJ_FILE)"
+	@$(ECHO) "-woff301+" >> "$(PRJ_FILE)"
+	@$(ECHO) "%% disable warning 303 (procedure \"xxx\" declared but never used)" >> "$(PRJ_FILE)"
+	@$(ECHO) "-woff303+" >> "$(PRJ_FILE)"
 	for f in $(TARGET_MOD_DIR)/*.mod; do \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
@@ -121,7 +127,7 @@ build_xds: $(DEFS) $(MODS)
 
 clean:
 	"$(RM)" -rf "$(TARGET_DIR)"
-	"$(RM)" -f "$(APP_NAME).err" "errinfo.$$$$$$"
+	"$(RM)" -f "linker.err" "errinfo.$$$$$$"
 
 run: build
 	"$(TARGET)"

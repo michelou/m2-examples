@@ -9,8 +9,8 @@
 </table>
 
 In this project we deal with two build scenarios :
-- we build a *Modula-2 application*.
-- we build a *Modula-2 library*.
+- we build a Modula-2 *application*.
+- we build a Modula-2 *library*.
 
 In most cases our code will depend on some other Modula-2 libraries :
 - XDS standard libraries such as **`InOut`**,
@@ -140,6 +140,14 @@ Let's again have a closer look at the build directory **`target`** :
     -m2
     <span style="color:green;">% main module of the program</span>
     !module mod\Terminal2.mod
+    </pre>
+    **Note** : The following command prints the full list of compiler options :
+    <pre style="font-size:80%;">
+    <b>&gt; "%XDS_HOME%\bin\xc.exe" =compile =options</b>
+    Options:
+    -ALWAYSINLINE      +ASSERT            -BSALPHA           -BSCLOSURE
+    -BSREDEFINE        -CHANGESYM         +CHECKDINDEX       +CHECKDIV
+   [...]
     </pre>
 
 Finally we support 3 ways to build a Modula-2 library, namely with a batch file (**`build.bat`**), a shell script (**`build.sh`**) or a GNU make file (**`Makefile`**). For instance :

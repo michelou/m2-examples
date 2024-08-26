@@ -1,1 +1,1 @@
-Source: http://www.eckart-winkler.de/computer/modula2.htm
+Source: http://www.eckart-winkler.de/computer/modula2/corout_m.htm

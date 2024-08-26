@@ -360,7 +360,7 @@ if not %ERRORLEVEL%==0 (
 goto :eof
 
 :compile_gm2
-echo %_WARNING_LABEL% Not supported
+echo %_WARNING_LABEL% Not yet supported
 goto :eof
 
 @rem input parameter: %1=.def files are out of date

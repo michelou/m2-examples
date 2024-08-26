@@ -390,10 +390,10 @@ if %__ACTION_DEF%==1 (
         pushd "%_TARGET_SYM_DIR%"
         if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "!CD!" 1>&2
 
-        if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" "!__DEF_FILE!" 1>&2
+        if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =compile "!__DEF_FILE!" 1>&2
         ) else if %_VERBOSE%==1 ( echo Compile Modula-2 definition module "!__DEF_FILE:%_ROOT_DIR%=!" 1>&2
         )
-        call "%_XC_CMD%" "!__DEF_FILE!"
+        call "%_XC_CMD%" =compile "!__DEF_FILE!"
         if not !ERRORLEVEL!==0 (
             popd
             echo %_ERROR_LABEL% Failed to compile Modula-2 definition module "!__DEF_FILE:%_ROOT_DIR%=!" 1>&2

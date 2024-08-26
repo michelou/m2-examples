@@ -1,8 +1,8 @@
 MODULE RealSpeedTest;
 
-IMPORT RealMath, STextIO, SRealIO, SLWholeIO , WIN32;
+IMPORT (*RealMath,*) STextIO, (*SRealIO,*) SLWholeIO , WIN32;
 
-CONST LOOPS=100000000;
+CONST LOOPS = 100000000;
 
 VAR
     r  : REAL;
@@ -11,24 +11,25 @@ VAR
     ch : CHAR;
     t  : CARDINAL;
 BEGIN
-    t:=WIN32.GetTickCount();
-    r:=0.0;
-    FOR i:=0 TO LOOPS DO
-        r:=r*3.14;
+    t := WIN32.GetTickCount();
+    r := 0.0;
+    FOR i := 0 TO LOOPS DO
+        r := r*3.14;
     END;
     STextIO.WriteString("REAL     : ");
     SLWholeIO.WriteLongInt(WIN32.GetTickCount()-t,5);
     STextIO.WriteLn;
 
-    r:=0.0;
-    t:=WIN32.GetTickCount();
-    R:=0.0;
-    FOR i:=0 TO LOOPS DO
-        R:=R*3.14;
+    r := 0.0;
+    t := WIN32.GetTickCount();
+    R := 0.0;
+    FOR i := 0 TO LOOPS DO
+        R := R*3.14;
     END;
     STextIO.WriteString("LONGREAL : ");
-    SLWholeIO.WriteLongInt(WIN32.GetTickCount()-t,5);
+    SLWholeIO.WriteLongInt(WIN32.GetTickCount()-t, 5);
     STextIO.WriteLn;
 
+    STextIO.WriteString("Press any key to quit");
     STextIO.ReadChar(ch);
 END RealSpeedTest.

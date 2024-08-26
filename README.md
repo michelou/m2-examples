@@ -54,7 +54,7 @@ xds-examples\{<a href="xds-examples/README.md">README.md</a>. <a href="./xds-exa
 winkler-examples\{<a href="./winkler-examples/README.md>README.md</a>, <a href="./winkler-examples/Code/">Code</a>, <a href="./winkler-examples/Felder/">Felder</a>, <a href="./winkler-examples/Nullstellen/">Nullstellent</a>, ..}
 README.md
 <a href="ADW_M2.md">ADW_M2.md</a>
-<a href="GCC_M2.md">GCC_M2.md</a>
+<a href="GNU_M2.md">GNU_M2.md</a>
 <a href="RESOURCES.md">RESOURCES.md</a>
 <a href="setenv.bat">setenv.bat</a>
 <a href="XDS_M2.md">XDS_M2.md</a>
@@ -69,12 +69,14 @@ where
 - directory [**`xds-examples\`**](xds-examples/) contains [Modula-2][pim4] examples from the XDS Modula-2 distribution.
 - directory [**`winkler-examples\`**](./winkler-examples/) contains [Modula-2][pim4] examples written by Eckart Winkler.
 - file [**`ADW_M2.md`**](ADW_M2.md) is the [Markdown][github_markdown] document presenting [ADW Modula-2][adwm2] related informations.
+- file [**`GNU_M2.md`**](GNU_M2.md) is the [Markdown][github_markdown] document presenting [GNU Modula-2][gm2] related informations.
 - file **`README.md`** is the [Markdown][github_markdown] document for this page.
 - file [**`RESOURCES.md`**](RESOURCES.md) is the [Markdown][github_markdown] document presenting external resources.
 - file [**`setenv.bat`**](setenv.bat) is the batch command for setting up our environment.
 - file [**`XDS_M2.md`**](XDS_M2.md) is the [Markdown][github_markdown] document presenting [XDS Modula-2][xdsm2] related informations.
 
 We also define a virtual drive &ndash; e.g. drive **`T:`** &ndash; in our working environment in order to reduce/hide the real path of our project directory (see article ["Windows command prompt limitation"][windows_limitation] from Microsoft Support).
+
 > **:mag_right:** We use the Windows external command [**`subst`**][windows_subst] to create virtual drives; for instance:
 >
 > <pre style="font-size:80%;">
@@ -118,6 +120,7 @@ In our case we downloaded the following installation files (<a href="#proj_deps"
 <a href="https://code.visualstudio.com/Download#" rel="external">VSCode-win32-x64-1.92.1.zip</a>       <i>(131 MB)</i>
 <a href="https://github.com/excelsior-oss/xds-ide/releases">xds-ide-1.7.0-060713-1-win32.zip</a>  <i>(198 MB)</i>
 </pre>
+<b>Note</b> : A binary distribution of GNU Modula-2 doesn't exist for the Windows platform; we must create it from the source distribution (we describe our last attempt in document <a href="./GNU_M2.md"><code><b>GNU_M2.md</b></code></a>). 
 </dd></dl>
 
 <span id="footnote_02">[2]</span> ***Excelsior XDS Modula-2*** [↩](#anchor_02)
