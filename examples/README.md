@@ -11,28 +11,38 @@
   </tr>
 </table>
 
+Modula-2 examples presented below share two characteristics :
+- they can be built/run with 3 different command line tools.
+- their source code can be compiled with 2 Modula-2 compilers.
+
+| Build&nbsp;tool | Build&nbsp;script  | Build&nbsp;option | Parent&nbsp;file |
+|:----------------|:-------------------|:------|:-----------------|
+| [**`cmd.exe`**][cmd_cli] | [`build.bat`](./Factorial/build.bat) | `-adw`, `-xds` | |
+| [**`make.exe`**][make_cli] | [`Makefile`](./Factorial/Makefile) | `TOOLSET=adw\|xds` | [`Makefile.inc`](./Makefile.inc) |
+| [**`sh.exe`**][sh_cli]  | [`build.sh`](./Factorial/build.sh) | `-adw`, `-xds` | |
+
+<!--=======================================================================-->
+
 ### <span id="factorial">`Factorial` Example</span>
 
-The project directory is organized as follows :
+This project has the following directory structure :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
 |   <a href="./Factorial/build.bat">build.bat</a>
 |   <a href="./Factorial/build.sh">build.sh</a>
 |   <a href="./Factorial/Makefile">Makefile</a>
-|
-\---src
-    \---main
-        +---mod
+\---<b>src</b>
+    \---<b>main</b>
+        +---<b>mod</b>
         |       <a href="./Factorial/src/main/mod/Factorial.mod">Factorial.mod</a>
-        |
-        \---mod-adw
+        \---<b>mod-adw</b>
                 <a href="./Factorial/src/main/mod-adw/Factorial.mod">Factorial.mod</a>
 </pre>
 
 > **Note**: We maintain two source versions of `Factorial.mod` as the import clauses differ between ADW Modula-2 and XDS Modula-2 (options `-adw` and `-xds` &ndash; the default &ndash; allow us to switch between both versions).
 
-We generate the application using one of the build scripts [`build.bat`](./Factorial/build.bat), [`build.sh`](./Factorial/build.sh) or [`Makefile`](./Factorial/Makefile).
+Batch file [**`build.bat`**](./Factorial/build.bat)`-verbose clean run` generates and executes the Modula-2 program `target\Factorial.exe` :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Factorial/build.bat">build</a> -verbose clean run</b>
@@ -60,7 +70,9 @@ Execute program "target\Factorial.exe"
   8       40320
 </pre>
 
-The output directory `target\` looks as follows :
+> **Note**: The other two build scripts [`build.sh`](./Factorial/build.sh) and [`Makefile`](./Factorial/Makefile) work in the same way.
+
+The output directory `target\` looks as follows when using build option `-xds` (default) :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f target | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
@@ -68,11 +80,11 @@ The output directory `target\` looks as follows :
 |   Factorial.obj
 |   Factorial.prj
 |   tmp.lnk
-\---mod
+\---<b>mod</b>
         Factorial.mod
 </pre>
 
-The generated project file `target\Factorial.prj` contains the XDS compiler options and the source files (`mod\Factorial.mod` in this case) :
+We first create the project file `target\Factorial.prj` and then invoke the XDS compiler with option **`=p`**`<project file>` :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/type">type</a> target\Factorial.prj</b>
@@ -90,26 +102,60 @@ The generated project file `target\Factorial.prj` contains the XDS compiler opti
 !module mod\Factorial.mod
 </pre>
 
+The output directory `target\` looks as follows when using build option `-adw` :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /f /a target | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
+|   Factorial.exe
+|   Factorial.map
+|   linker_opts.txt
++---<b>mod</b>
+|       Factorial.mod
+|       Factorial.obj
+|       Terminal2.obj
+\---<b>sym</b>
+        AES.sym
+        [...]
+        Terminal2.sym
+        [...]
+        WINX.sym
+</pre>
+
+We create the response file `linker_opts.txt` and give it as parameter to the ADW linker :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/type" rel="external">type</a> target\linker_opts.txt</b>
+-MACHINE:X86_64
+-SUBSYSTEM:CONSOLE
+-MAP:G:\examples\Factorial\target\Factorial
+-OUT:G:\examples\Factorial\target\Factorial.exe
+-LARGEADDRESSAWARE
+target\mod\Factorial.obj
+target\mod\Terminal2.obj
+C:\opt\ADW-Modula-2\ASCII\rtl-win-amd64.lib
+C:\opt\ADW-Modula-2\ASCII\win64api.lib
+</pre>
+
+<!--=======================================================================-->
+
 ### <span id="hello">`Hello` Example</span>
 
-The project directory is organized as follows :
+This project has the following directory structure :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
 |   <a href="./Hello/build.bat">build.bat</a>
 |   <a href="./Hello/build.sh">build.sh</a>
 |   <a href="./Hello/Makefile">Makefile</a>
-|
-\---src
-    \---main
-        +---mod
+\---<b>src</b>
+    \---<b>main</b>
+        +---<b>mod</b>
         |       <a href="./Hello/src/main/mod/Hello.mod">Hello.mod</a>
-        |
-        \---mod-adw
+        \---<b>mod-adw</b>
                 <a href="./Hello/src/main/mod-adw/Hello.mod">hello.mod</a>
 </pre>
 
-We generate the application using one of the build scripts such as [`build.bat`](./Hello/build.bat), [`build.sh`](./Hello/build.sh) or [`Makefile`](./Hello/Makefile).
+Command [**`build.bat`**](./Hello/build.bat)`-verbose clean run` generates and executes the Modula-2 program `target\Hello.exe` :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Hello/build.bat">build</a> -verbose clean run</b>
@@ -129,11 +175,13 @@ Execute program "target\Hello.exe"
 Hello world!
 </pre>
 
-> **Note:** The generated files in output directory `target\` are similar to the ones in example [`Factorial`](#factorial).
+> **Note:** The other two build scripts [`build.sh`](./Hello/build.sh) and [`Makefile`](./Hello/Makefile).work in the same way and the generated files in output directory `target\` are similar to the ones in example [`Factorial`](#factorial).
 
 ### <span id="liste">`Liste` Example</span>
 
-The `Liste` code example is about creating a Modula-2 library; it contains the 3 source files [`Liste.def`](./Liste/src/main/def/Liste.def), [`Liste.mod`](./Liste/src/main/mod/Liste.mod) and [`ListeTest.mod`](./Liste/src/test/mod/ListeTest.mod). We generate the library and the test program using one of the build scripts [`build.bat`](./Hello/build.bat), [`build.sh`](./Hello/build.sh) or [`Makefile`](./Hello/Makefile).
+The `Liste` example is about creating a Modula-2 library; it contains the 3 source files [`Liste.def`](./Liste/src/main/def/Liste.def), [`Liste.mod`](./Liste/src/main/mod/Liste.mod) and [`ListeTest.mod`](./Liste/src/test/mod/ListeTest.mod).
+
+Batch file [**`build.bat`**](./Liste/build.bat)`-verbose clean run` generates both the library `target\Liste.lib` and the test program `target\ListeTest.exe` :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Liste/build.bat">build</a> -verbose clean run</b>
@@ -180,7 +228,7 @@ The output directory `target\` looks as follows :
 |   ListeTest.obj
 |   ListeTest.prj
 |   tmp.lnk
-+---def
++---<b>def</b>
 |       Liste.def
 +---mod
 |       Liste.mod
@@ -219,17 +267,16 @@ The generated project file `target\Liste.prj` contains the XDS compiler options 
 
 ### <span id="pascal">`PascalTriangle` Example</span>
 
-The project directory is organized as follows  :
+This project has the following directory structure :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
 |   <a href="./PascalTriangle/build.bat">build.bat</a>
 |   <a href="./PascalTriangle/build.sh">build.sh</a>
 |   <a href="./PascalTriangle/Makefile">Makefile</a>
-|
-\---src
-    \---main
-        \---mod
+\---<b>src</b>
+    \---<b>main</b>
+        \---<b>mod</b>
                 <a href="./PascalTriangle/src/main/mod/PascalTriangle.mod">PascalTriangle.mod</a>
 </pre>
 
@@ -297,3 +344,6 @@ Triangle height=7
 <!-- link refs -->
 
 [apache_ant_cli]: https://ant.apache.org/manual/running.html
+[cmd_cli]: https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd
+[make_cli]: https://www.gnu.org/software/make/manual/html_node/Running.html
+[sh_cli]: https://man7.org/linux/man-pages/man1/sh.1p.html

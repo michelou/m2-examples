@@ -20,7 +20,7 @@ getHome() {
 
 debug() {
     local DEBUG_LABEL="[46m[DEBUG][0m"
-    $DEBUG && echo "$DEBUG_LABEL $1" 1>&2
+    [[ $DEBUG -eq 1 ]] && echo "$DEBUG_LABEL $1" 1>&2
 }
 
 warning() {
@@ -48,19 +48,19 @@ args() {
         case "$arg" in
         ## options
         -adw)      TOOLSET=adw ;;
-        -debug)    DEBUG=true ;;
-        -help)     HELP=true ;;
-        -verbose)  VERBOSE=true ;;
+        -debug)    DEBUG=1 ;;
+        -help)     HELP=1 ;;
+        -verbose)  VERBOSE=1 ;;
         -xds)      TOOLSET=xds ;;
         -*)
             error "Unknown option $arg"
             EXITCODE=1 && return 0
             ;;
         ## subcommands
-        clean)     CLEAN=true ;;
-        compile)   COMPILE=true ;;
-        help)      HELP=true ;;
-        run)       COMPILE=true && RUN=true ;;
+        clean)     CLEAN=1 ;;
+        compile)   COMPILE=1 ;;
+        help)      HELP=1 ;;
+        run)       COMPILE=1 && RUN=1 ;;
         *)
             error "Unknown subcommand $arg"
             EXITCODE=1 && return 0
@@ -97,9 +97,9 @@ EOS
 
 clean() {
     if [[ -d "$TARGET_DIR" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "Delete directory \"$(mixed_path $TARGET_DIR)\""
-        elif $VERBOSE; then
+        elif [[ $VERBOSE -eq 1 ]]; then
             echo "Delete directory \"${TARGET_DIR/$ROOT_DIR\//}\"" 1>&2
         fi
         rm -rf "$(mixed_path $TARGET_DIR)"
@@ -143,18 +143,18 @@ action_required() {
 }
 
 compile_adw() {
-    if $DEBUG; then
+    if [[ $DEBUG -eq 1 ]]; then
         debug "cp \"$(mixed_path $ADWM2_HOME1)/winamd64sym/*.sym\" \"$(mixed_path $TARGET_SYM_DIR)\""
     fi
     cp "$(mixed_path $ADWM2_HOME1)/winamd64sym/"*.sym "$(mixed_path $TARGET_SYM_DIR)"
 
     if [[ -n "$(ls -A $SOURCE_DEF_DIR/*.def 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$SOURCE_DEF_DIR*.def\" \"$TARGET_DEF_DIR\""
         fi
         cp "$(mixed_path $SOURCE_DEF_DIR)/"*.def "$(mixed_path $TARGET_DEF_DIR)"
     fi
-    if $DEBUG; then
+    if [[ $DEBUG -eq 1 ]]; then
         debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
     fi
     cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
@@ -168,7 +168,7 @@ compile_adw() {
         n=$((n + 1))
     done
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.mod" 2>/dev/null); do
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "\"$M2C_CMD\" $m2c_opts \"$(win_path $f)\""
         fi
         eval "$M2C_CMD" $m2c_opts "$(win_path $f)"
@@ -192,7 +192,7 @@ compile_adw() {
         echo "$(win_path $ADWM2_HOME1)\\rtl-win-amd64.lib"
         echo "$(win_path $ADWM2_HOME1)\\win64api.lib"
     ) >> "$linker_opts_file"
-    if $DEBUG; then
+    if [[ $DEBUG -eq 1 ]]; then
         debug "\"$SBLINK_CMD\" @$linker_opts_file"
     fi
     ## command sblink does NOT support quoted argument file
@@ -205,20 +205,20 @@ compile_adw() {
 
 compile_xds() {
     if [[ -n "$(ls -A $SOURCE_DEF_DIR/*.def 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$SOURCE_DEF_DIR*.def\" \"$TARGET_DEF_DIR\""
         fi
         cp "$(mixed_path $SOURCE_DEF_DIR)/"*.def "$(mixed_path $TARGET_DEF_DIR)"
     fi
-    if $DEBUG; then
+    if [[ $DEBUG -eq 1 ]]; then
         debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
     fi
     cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
 
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
-    $DEBUG && debug "# Create XDS project file \"$prj_file\""
+    [[ $DEBUG -eq 1 ]] && debug "# Create XDS project file \"$prj_file\""
     (
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             echo "% debug ON" && \
             echo "-gendebug+" && \
             echo "-genhistory+" && \
@@ -242,9 +242,9 @@ compile_xds() {
     local s=; [[ $n -gt 1 ]] && s="s"
     local n_files="$n Modula-2 source file$s"
     pushd "$(mixed_path $TARGET_DIR)" 1>/dev/null
-    if $DEBUG; then
+    if [[ $DEBUG -eq 1 ]]; then
         debug "$XC_CMD =p \"$prj_file\""
-    elif $VERBOSE; then
+    elif [[ $VERBOSE -eq 1 ]]; then
         echo "Compile $n_files into directory \"$TARGET_DIR\"" 1>&2
     fi
     eval "$XC_CMD" =p "$prj_file"
@@ -305,32 +305,30 @@ TARGET_DEF_DIR="$TARGET_DIR/def"
 TARGET_MOD_DIR="$TARGET_DIR/mod"
 TARGET_SYM_DIR="$TARGET_DIR/sym"
 
-CLEAN=false
-COMPILE=false
-DEBUG=false
-HELP=false
-MAIN_CLASS=Main
-MAIN_ARGS=
-RUN=false
+CLEAN=0
+COMPILE=0
+DEBUG=0
+HELP=0
+RUN=0
 TOOLSET=xds
-VERBOSE=false
+VERBOSE=0
 
 COLOR_START="[32m"
 COLOR_END="[0m"
 
-cygwin=false
-mingw=false
-msys=false
-darwin=false
+cygwin=0
+mingw=0
+msys=0
+darwin=0
 case "$(uname -s)" in
-    CYGWIN*) cygwin=true ;;
-    MINGW*)  mingw=true ;;
-    MSYS*)   msys=true ;;
-    Darwin*) darwin=true
+    CYGWIN*) cygwin=1 ;;
+    MINGW*)  mingw=1 ;;
+    MSYS*)   msys=1 ;;
+    Darwin*) darwin=1
 esac
 unset CYGPATH_CMD
 PSEP=":"
-if $cygwin || $mingw || $msys; then
+if [[ $(($cygwin + $mingw + $msys)) -gt 0 ]]; then
     CYGPATH_CMD="$(which cygpath 2>/dev/null)"
     PSEP=";"
     [[ -n "$ADWM2_HOME" ]] && ADWM2_HOME="$(mixed_path $ADWM2_HOME)"
@@ -360,15 +358,15 @@ args "$@"
 ##############################################################################
 ## Main
 
-$HELP && help && cleanup
+[[ $HELP -eq 1 ]] && help && cleanup
 
-if $CLEAN; then
+if [[ $CLEAN -eq 1 ]]; then
     clean || cleanup 1
 fi
-if $COMPILE; then
+if [[ $COMPILE -eq 1 ]]; then
     compile || cleanup 1
 fi
-if $RUN; then
+if [[ $RUN -eq 1 ]]; then
     run || cleanup 1
 fi
 cleanup

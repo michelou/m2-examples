@@ -11,7 +11,9 @@ errinfo.$$$
 *.err
 *.exe
 *.key
+*.lnk
 *.msi
+*.obj
 *.pem
 *.pfx
 *.properties

@@ -50,7 +50,7 @@ set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
 set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
-@rem 2 choices: ASCII, Unicode
+@rem ADWM2 gives us 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
 
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
@@ -76,7 +76,7 @@ set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 set "_HIS_CMD=%XDSM2_HOME%\bin\his.exe"
 set "_XLIB_CMD=%XDSM2_HOME%\bin\xlib.exe"
 
-@rem use newer PowerShell version if available
+@rem we use the newer PowerShell version if available
 where /q pwsh.exe
 if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
 ) else ( set _PWSH_CMD=powershell.exe
@@ -184,7 +184,9 @@ if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
     echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    if defined GM2_HOME echo %_DEBUG_LABEL% Variables  : "GM2_HOME=%GM2_HOME%" 1>&2
     echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : _APP_NAME=%_APP_NAME% 1>&2
     echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
 goto :eof
@@ -218,7 +220,7 @@ goto :eof
 
 :clean
 call :rmdir "%_TARGET_DIR%"
-if exist "%_ROOT_DIR%%_APP_NAME%.err" del "%_ROOT_DIR%%_APP_NAME%.err"
+if exist "%_ROOT_DIR%*.err" del "%_ROOT_DIR%*.err"
 if exist "%_ROOT_DIR%errinfo.$$$" del "%_ROOT_DIR%errinfo.$$$"
 goto :eof
 
@@ -267,8 +269,8 @@ if exist "%_LIB_DIR%\*.sym" (
     xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_LIB_DIR%\*.obj" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
-    ycopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
@@ -283,15 +285,17 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
 )
 @rem We must specify a relative path for the SYM directories
 set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!"
+if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
+@rem definition modules
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
     ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_SYM_DIR:%_ROOT_DIR%=!" 1>&2
     )
-    call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
+    call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" %_STDOUT_REDIRECT%
     if not !ERRORLEVEL!==0 (
         echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_SYM_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
@@ -327,10 +331,10 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
 @rem object files of current program
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
-    echo %%f >> "%__LINKER_OPTS_FILE%"
+for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
+    echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
 )
-@rem object files of library depencencies
+@rem object files of library dependencies
 for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_BIN_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
 )
@@ -358,7 +362,22 @@ goto :eof
 echo %_WARNING_LABEL% Not yet implemented
 goto :eof
 
+@rem input parameter: %1=.def files are out of date
 :compile_xds
+set __ACTION_DEF=%~1
+
+if exist "%_LIB_DIR%\*.dll" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.dll" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.lib" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.lib" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.lib" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_LIB_DIR%\*.sym" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
+)
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
     xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" %_STDOUT_REDIRECT%
@@ -395,17 +414,21 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
-    set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE!
+for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
+    echo ^^!module !_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
 if %__N%==0 (
     echo %_WARNING_LABEL% No Modula-2 source file found 1>&2
     goto :eof
-) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
-) else ( set __N_FILES=%__N% Modula-2 implementation modules
+) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 source file
+) else ( set __N_FILES=%__N% Modula-2 source files
 )
+@rem add library dependencies to project file
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    set "__LIB_FILE=%%f"
+    echo ^^!module !__LIB_FILE!
+) >> "%__PRJ_FILE%"
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 
@@ -489,6 +512,10 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_TARGET_FILE%" 1>&2
 if not %ERRORLEVEL%==0 (
     echo %_ERROR_LABEL% Failed to execute program "!_TARGET_FILE:%_ROOT_DIR%=!" 1>&2
     set _EXITCODE=1
+    if %_DEBUG%==1 if exist "%_ROOT_DIR%errinfo.$$$" (
+        echo %_DEBUG_LABEL% "%_HIS_CMD%" "%_ROOT_DIR%errinfo.$$$" 1>&2
+        call "%_HIS_CMD%" "%_ROOT_DIR%errinfo.$$$"
+    )
     goto :eof
 )
 goto :eof

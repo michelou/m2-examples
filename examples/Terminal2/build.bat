@@ -412,7 +412,7 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -m2
     echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
     echo %% -m2addtypes
-    echo -verbose
+    echo %% -verbose
     echo -werr
     echo %% disable warning 301 ^(parameter "xxx" is never used^)
     echo -woff301+
@@ -420,8 +420,9 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
-    set "__MOD_FILE=%%f"
+for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
+    @rem source file path is either absolute or relative to project file
+    set "__MOD_FILE=!_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f"
     echo ^^!module !__MOD_FILE!
     set /a __N+=1
 ) >> "%__PRJ_FILE%"

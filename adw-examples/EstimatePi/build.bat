@@ -428,9 +428,8 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
-    set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE!
+for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
+    echo ^^!module !_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (

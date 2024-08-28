@@ -1,6 +1,6 @@
-# <span id="top">Building GCC Modula-2 Frontend</span> <span style="font-size:90%;">[↩](./README.md#top)</span>
+# <span id="top">GNU Modula-2 Quick Reference</span> <span style="font-size:90%;">[↩](./README.md#top)</span>
 
-## <span id="build_gm2">`gm2` build</span>
+## <span id="build_gm2">Building `gm2` on Windows</span>
 
 Steps :
 
@@ -10,34 +10,34 @@ Steps :
    <b>&gt; <a href="">where</a> gcc</b>
    C:\opt\msys64\usr\bin\gcc.exe
    &nbsp;
-   <b>&gt; <a href="">where</a> /r c:\opt\mingw-w64 gcc</b>
-   c:\opt\mingw-w64\mingw64\bin\gcc.exe
+   <b>&gt; <a href="">where</a> /r c:\opt\mingw64 gcc</b>
+   c:\opt\mingw64\mingw64\bin\gcc.exe
    &nbsp;
-   <b>&gt; <a href="">set</a> "PATH=c:\opt\mingw-w64\mingw64\bin;%PATH%"</b>
+   <b>&gt; <a href="">set</a> "PATH=c:\opt\mingw64\bin;%PATH%"</b>
    &nbsp;
    <b>&gt; <a href="">where</a> gcc</b>
-   c:\opt\mingw-w64\mingw64\bin\gcc.exe
+   c:\opt\mingw64\bin\gcc.exe
    C:\opt\msys64\usr\bin\gcc.exe
    </pre>
 
-   > **Note:** In our case the locally installed MSYS2 and [MinGW][mingw_binaries] binary distributions include the same [`gcc`][gcc_cli] versions :
+   > **Note:** In our case the locally installed [MinGW][mingw_binaries] binary distribution include a newer [`gcc`][gcc_cli] version :
    > <pre style="font-size:80%;">
    > <b>&gt; C:\opt\msys64\usr\bin\<a href="https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html" rel="external">gcc.exe</a> --version | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /b gcc</b>
-   > gcc (GCC) 13.2.0
+   > gcc (GCC) 13.3.0
    > &nbsp;
-   > <b>&gt; c:\opt\mingw-w64\mingw64\bin\gcc --version | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /b gcc</b>
-   > gcc (x86_64-win32-seh-rev3, Built by MinGW-W64 project) 13.2.0
+   > <b>&gt; c:\opt\mingw64\bin\gcc --version | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /b gcc</b>
+   > gcc (x86_64-win32-seh-rev0, Built by MinGW-Builds project) 14.1.0
    > </pre>
 
-2. We enter the GCC source directory (e.g. `gcc-13.2.0`), start a Unix session with command [`sh`][sh_cli] and check the [`gcc`][gcc_cli] version :
+2. We enter the GCC source directory (e.g. `gcc\`), start a Unix session with command [`sh`][sh_cli] and check the [`gcc`][gcc_cli] version :
 
    <pre style="font-size:80%;border:1px solid #cccccc;">
    <b>&gt; C:\opt\msys64\usr\bin\<a href="https://linux.die.net/man/1/sh">sh.exe</a></b>
    <b>$ <a href="">pwd</a></b>
-   /c/Users/michelou/workspace-perso/m2-examples/gcc-13.2.0
+   /c/Users/michelou/workspace-perso/m2-examples/gcc
    &nbsp;
    <b>$ <a href="">which</a> gcc</b>
-   /c/opt/mingw-w64/mingw64/bin/gcc
+   /c/opt/mingw64/bin/gcc
    </pre>
 
    We execute shell script [`contrib/download_prerequisites`](https://github.com/gcc-mirror/gcc/blob/master/contrib/download_prerequisites) *once* to be sure we have the required packages : 
@@ -45,6 +45,8 @@ Steps :
     https://stackoverflow.com/questions/9253695/building-gcc-requires-gmp-4-2-mpfr-2-3-1-and-mpc-0-8-0
     -->
     <pre style="font-size:80%;border:1px solid #cccccc;">
+    <b>$ <a href="https://man7.org/linux/man-pages/man1/cd.1p.html">cd</a> gcc-source</b>
+    &nbsp;
     <b>$ ./contrib/<a href="https://github.com/gcc-mirror/gcc/blob/master/contrib/download_prerequisites" rel="external">download_prerequisites</a></b>
     2023-11-12 11:46:32 URL:http://gcc.gnu.org/pub/gcc/infrastructure/gmp-6.2.1.tar.bz2 [2493916/2493916] -> "gmp-6.2.1.tar.bz2" [1]
     2023-11-12 11:46:34 URL:http://gcc.gnu.org/pub/gcc/infrastructure/mpfr-4.1.0.tar.bz2 [1747243/1747243] -> "mpfr-4.1.0.tar.bz2" [1]
@@ -56,12 +58,12 @@ Steps :
     isl-0.24.tar.bz2: OK
     All prerequisites downloaded successfully.
     &nbsp;
-    <b>$ <a href="">where</a> /r gcc-source *.tar.*</b>
-    P:\gcc\gcc-source\gettext-0.22.tar.gz
-    P:\gcc\gcc-source\gmp-6.2.1.tar.bz2
-    P:\gcc\gcc-source\isl-0.24.tar.bz2
-    P:\gcc\gcc-source\mpc-1.2.1.tar.gz
-    P:\gcc\gcc-source\mpfr-4.1.0.tar.bz2
+    <b>$ <a href="https://man7.org/linux/man-pages/man1/find.1.html" rel="external">find</a> . "*.tar.*"</b>
+   ./gettext-0.22.tar.gz
+   ./gmp-6.2.1.tar.bz2
+   ./isl-0.24.tar.bz2
+   ./mpc-1.2.1.tar.gz
+   ./mpfr-4.1.0.tar.bz2
     </pre>
 
     > **Note:** We further install the following MSYS2 packages which are also required to generate the GCC distribution (but are missing in our local MSYS2 installation).
@@ -79,6 +81,10 @@ Steps :
 
    By default the [`configure`][configure_script] script doesn't include the Modula-2 frontend in the generated build file `Makefile`, e.g. 
 
+<!--
+$ find . -name configure |wc -l
+56
+-->
    <pre style="font-size:80%;border:1px solid #cccccc;">
    <b>$ <a href="https://www.gnu.org/prep/standards/html_node/Configuration.html" rel="external">./configure</a> \
    --host=x86_64-pc-mingw32 \
@@ -98,11 +104,11 @@ Steps :
    We have to specify option `--enable-languages` in order add value `m2` to the list of supported languages :
 
    <pre style="font-size:80%;border:1px solid #cccccc;">
-   <b>$ mkdir /tmp/gcc</b>
+   <b>$ mkdir /c/temp/gcc</b>
    &nbsp;
    <b>$ <a href="https://www.gnu.org/prep/standards/html_node/Configuration.html" rel="external">./configure</a> \
    --host=x86_64-pc-mingw32 \
-   --prefix=/tmp/gcc \
+   --prefix=/c/temp/gcc \
    <span style="color:blue;">--enable-languages=c,c++,lto,m2</span></b>
    </pre>
 
@@ -125,7 +131,7 @@ $ make
 
 <pre style="font-size:80%;">
 $ cd libiberty
-$ ../../libiberty/configure --host=x86_64-pc-mingw32 --prefix=/tmp --enable-languages=c,c++,lto,m2
+$ ../../libiberty/configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc --enable-languages=c,c++,lto,m2
 $  make
 </pre>
 
@@ -133,7 +139,7 @@ $  make
 
 <pre style="font-size:80%;">
 $ cd fixincludes
-$ ../../fixincludes/configure --host=x86_64-pc-mingw32 --prefix=/tmp --enable-languages=c,c++,lto,m2
+$ ../../fixincludes/configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc --enable-languages=c,c++,lto,m2
 $ make
 </pre>
 > **Note**:  Makefile on line 30
@@ -144,7 +150,7 @@ $ make
 
 <pre style="font-size:80%;">
 $ cd gettext
-$ ../../gettext/configure --host=x86_64-pc-mingw32 --prefix=/tmp --enable-languages=c,c++,lto,m2
+$ ../../gettext/configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc --enable-languages=c,c++,lto,m2
 $ make
 </pre>
 
@@ -154,7 +160,7 @@ $ make
 
 <span id="footnote_01">[1]</span> ***Additional MSYS packages*** [↩](#anchor_01)
 
-<dl><dd>
+<dl><dd style="margin:6px;">
 <pre style="font-size:70%;border:1px solid #cccccc;">
 <b>&gt; C:\opt\msys64\usr\bin\<a href="https://www.msys2.org/docs/package-management/" rel="external"><b>pacman.exe</b></a> -Sy <a href="https://packages.msys2.org/package/texinfo">msys/texinfo</a></b>
 :: Synchronizing package databases...
@@ -232,35 +238,35 @@ Total (7/7)                                    3.0 MiB   903 KiB/s 00:03
 </pre>
 </dd></dl>
 
-<span id="footnote_01">[1]</span> ***Source file modifications*** [↩](#anchor_01)
+<span id="footnote_02">[2]</span> ***Source file modifications*** [↩](#anchor_02)
 
-<dl><dd>
-We modify the C source file <code>m2-examples\gcc-13-20230219\libiberty\pex-win32.c</code> as follows :
+<dl><dd style="margin:6px;">
+We add the following code to the C source file <code>m2-examples\gcc\gcc-source\libiberty\pex-win32.c</code> as follows :
 <pre style="font-size:80%;border:1px solid #cccccc;">
- <span style="color:green;">/* See https://gcc.gnu.org/pipermail/gcc-cvs/2020-December/339598.html
- */</span>
- #<b>ifndef</b>_O_BINARY
- #  <b>define</b> _O_BINARY O_BINARY
- #  <b>define</b> _O_CREAT O_CREAT
- #  <b>define</b> _O_NOINHERIT O_CLOEXEC
- #  <b>define</b> _O_RDONLY O_RDONLY
- #  <b>define</b> _O_TEXT O_TEXT
- #  <b>define</b> _O_TRUNC O_TRUNC
- #  <b>define</b> _O_WRONLY O_WRONLY
- #
- #  <b>define</b> _close close
- #  <b>define</b> _dup dup
- #  <b>define</b> _open open
- #  <b>define</b> _read read
- #<b>endif</b>
+<span style="color:green;">/* See https://gcc.gnu.org/pipermail/gcc-cvs/2020-December/339598.html
+*/</span>
+#<b>ifndef</b>_O_BINARY
+#  <b>define</b> _O_BINARY O_BINARY
+#  <b>define</b> _O_CREAT O_CREAT
+#  <b>define</b> _O_NOINHERIT O_CLOEXEC
+#  <b>define</b> _O_RDONLY O_RDONLY
+#  <b>define</b> _O_TEXT O_TEXT
+#  <b>define</b> _O_TRUNC O_TRUNC
+#  <b>define</b> _O_WRONLY O_WRONLY
+#
+#  <b>define</b> _close close
+#  <b>define</b> _dup dup
+#  <b>define</b> _open open
+#  <b>define</b> _read read
+#<b>endif</b>
 &nbsp;
- #<b>ifndef</b> _S_IREAD
- #  <b>define</b> _S_IREAD S_IREAD
- #  <b>define</b> _S_IWRITE S_IWRITE
- #<b>endif</b>
+#<b>ifndef</b> _S_IREAD
+#  <b>define</b> _S_IREAD S_IREAD
+#  <b>define</b> _S_IWRITE S_IWRITE
+#<b>endif</b>
 </pre>
 
-We modify file `m2-examples\gcc-13-20230219\Makefile` (lines 396-297) :
+We modify file `m2-examples\gcc\Makefile` (lines 396-297) :
 
 <pre style="font-size:80%;border:1px solid #cccccc;">
  <span style="color:green;">#AS = x86_64-pc-mingw32-as</span>
@@ -269,19 +275,19 @@ We modify file `m2-examples\gcc-13-20230219\Makefile` (lines 396-297) :
  AR = /usr/x86_64-w64-pc-msys/bin/<a href="https://linux.die.net/man/1/ar"><b>ar</b></a>
 </pre>
 
-We modify file `m2-examples\gcc-13-20230219\gcc\config\i386\host-mingw32.cc` as follows (lines 29ff); our modification is based on file <code>m2-examples\gcc-13-20230219\gcc\ada\mingw32.h</code> (lines 50-55) :
+We modify file `m2-examples\gcc\gcc-source\gcc\config\i386\host-mingw32.cc` as follows (lines 29ff); our modification is based on file <code>m2-examples\gcc\gcc-source\gcc\ada\mingw32.h</code> (lines 50-55) :
 
 <pre style="font-size:80%;border:1px solid #cccccc;">
- <span style="color:blue;">#<b>if defined</b> (__CYGWIN__) && !defined (__CYGWIN32__) && !defined (IN_RTS)
- /* Note: windows.h on cygwin-64 includes x86intrin.h which uses malloc.
+<span style="color:blue;">#<b>if defined</b> (__CYGWIN__) && !defined (__CYGWIN32__) && !defined (IN_RTS)
+/* Note: windows.h on cygwin-64 includes x86intrin.h which uses malloc.
    That fails to compile, if malloc is poisoned, i.e. if !IN_RTS.  */
- #<b>define</b> _X86INTRIN_H_INCLUDED
- #<b>define</b> _EMMINTRIN_H_INCLUDED
- #<b>endif</b></span>
- #<b>define</b> WIN32_LEAN_AND_MEAN  <span style="color:green;">/* Not so important if we have windows.h.gch.  */</span>
- #<b>include</b> &lt;windows.h>
- #<b>include</b> &lt;stdlib.h>
- <span style="color:blue;">#include &lt;io.h></span>
+#<b>define</b> _X86INTRIN_H_INCLUDED
+#<b>define</b> _EMMINTRIN_H_INCLUDED
+#<b>endif</b></span>
+#<b>define</b> WIN32_LEAN_AND_MEAN  <span style="color:green;">/* Not so important if we have windows.h.gch.  */</span>
+#<b>include</b> &lt;windows.h>
+#<b>include</b> &lt;stdlib.h>
+<span style="color:blue;">#include &lt;io.h></span>
 </pre>
 </dd></dl>
 
@@ -467,11 +473,11 @@ Total Installed Size:  1.53 MiB
 :: Running post-transaction hooks...
 [####################################################] 100% (1/1) Updating the info directory file...
 -->
+<!--=======================================================================-->
 
+<span id="footnote_03">[3]</span> ***MingW64*** [↩](#anchor_03)
 
-<span id="footnote_02">[2]</span> ****** [↩](#anchor_02)
-
-<dl><dd>
+<dl><dd style="margin:6px;">
 <a href="https://nuwen.net/mingw.html">MinGW Distro &ndash; nuven.net</a>.
 </dd></dl>
 

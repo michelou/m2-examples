@@ -148,6 +148,7 @@ if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
     ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
@@ -185,6 +186,7 @@ if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
     echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    if defined GM2_HOME echo %_DEBUG_LABEL% Variables  : "GM2_HOME=%GM2_HOME%" 1>&2
     echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
     echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
@@ -220,7 +222,7 @@ goto :eof
 
 :clean
 call :rmdir "%_TARGET_DIR%"
-if exist "%_ROOT_DIR%%_APP_NAME%.err" del "%_ROOT_DIR%%_APP_NAME%.err"
+if exist "%_ROOT_DIR%*.err" del "%_ROOT_DIR%*.err"
 if exist "%_ROOT_DIR%errinfo.$$$" del "%_ROOT_DIR%errinfo.$$$"
 goto :eof
 
@@ -328,6 +330,7 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     echo -OUT:%_TARGET_FILE%
     echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
+@rem object files of current program
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
 )
@@ -419,12 +422,14 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
-    set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE:%_TARGET_DIR%\=!
+for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
+    echo ^^!module !_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
-if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
+if %__N%==0 (
+    echo %_WARNING_LABEL% No Modula-2 source file found 1>&2
+    goto :eof
+) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
 ) else ( set __N_FILES=%__N% Modula-2 implementation modules
 )
 pushd "%_TARGET_DIR%"
@@ -487,9 +492,8 @@ set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%Test.prj"
     echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_TEST_DIR%\*.mod" 2^>NUL') do (
-    set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE:%_TARGET_DIR%\=!
+for /f "delims=" %%f in ('dir /b "%_TARGET_TEST_DIR%\*.mod" 2^>NUL') do (
+    echo ^^!module !_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
 (

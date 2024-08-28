@@ -184,6 +184,7 @@ if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
     echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    if defined GM2_HOME echo %_DEBUG_LABEL% Variables  : "GM2_HOME=%GM2_HOME%" 1>&2
     echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
     echo %_DEBUG_LABEL% Variables  : _APP_NAME=%_APP_NAME% 1>&2
     echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
@@ -220,6 +221,7 @@ goto :eof
 :clean
 call :rmdir "%_TARGET_DIR%"
 if exist "%_ROOT_DIR%*.err" del "%_ROOT_DIR%*.err"
+if exist "%_ROOT_DIR%errinfo.$$$" del "%_ROOT_DIR%errinfo.$$$"
 goto :eof
 
 @rem input parameter: %1=directory path
@@ -282,7 +284,7 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     goto :eof
 )
 @rem We must specify a relative path for the SYM directories
-set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%=!"
+set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!"
 if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0
@@ -291,15 +293,19 @@ if %__ACTION_DEF%==0 goto compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_SYM_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" %_STDOUT_REDIRECT%
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_SYM_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
     set /a __N+=1
+)
+if exist "%_TARGET_DEF_DIR%\*.sym" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 :compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
@@ -408,15 +414,9 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
-    set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE!
+for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
+    echo ^^!module !_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
-) >> "%__PRJ_FILE%"
-@rem add library dependencies to project file
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
-    set "__LIB_FILE=%%f"
-    echo ^^!module !__LIB_FILE!
 ) >> "%__PRJ_FILE%"
 if %__N%==0 (
     echo %_WARNING_LABEL% No Modula-2 source file found 1>&2
@@ -424,6 +424,11 @@ if %__N%==0 (
 ) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 source file
 ) else ( set __N_FILES=%__N% Modula-2 source files
 )
+@rem add library dependencies to project file
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    set "__LIB_FILE=%%f"
+    echo ^^!module !__LIB_FILE!
+) >> "%__PRJ_FILE%"
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 

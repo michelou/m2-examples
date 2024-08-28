@@ -221,6 +221,7 @@ goto :eof
 :clean
 call :rmdir "%_TARGET_DIR%"
 if exist "%_ROOT_DIR%*.err" del "%_ROOT_DIR%*.err"
+if exist "%_ROOT_DIR%errinfo.$$$" del "%_ROOT_DIR%errinfo.$$$"
 goto :eof
 
 @rem input parameter: %1=directory path
@@ -283,7 +284,7 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     goto :eof
 )
 @rem We must specify a relative path for the SYM directories
-set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%=!,!_TARGET_DEF_DIR:%_ROOT_DIR%=!"
+set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!,!_TARGET_DEF_DIR:%_ROOT_DIR%=!"
 if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0
@@ -384,6 +385,18 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
+if %__ACTION_DEF%==1 (
+    if not exist "%_TARGET_SYM_DIR%" mkdir "%_TARGET_SYM_DIR%"
+    pushd "%_TARGET_SYM_DIR%"
+    for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
+        set "__DEF_FILE=%%f"
+        if %_DEBUG%==1 ( echo %_DEBUG_LABEL% call "%_XC_CMD%" -M2CMPSYM+ "!__DEF_FILE!" 1>&2
+        ) else if %_VERBOSE%==1 ( echo "%_XC_CMD%" -M2CMPSYM+ "!__DEF_FILE!" 1>&2
+        )
+        call "%_XC_CMD%" -M2CMPSYM+ "!__DEF_FILE!"
+    )
+    popd
+)
 set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
 ) else if %_VERBOSE%==1 ( echo Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
@@ -407,24 +420,26 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -woff301+
     echo %% disable warning 303 ^(procedure "xxx" declared but never used^)
     echo -woff303+
+    echo %% disable warning 306 ^(import of "xxx.yyy" is never used^)
+    echo -woff306+
 ) > "%__PRJ_FILE%"
 set __N=0
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
-    set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE!
+for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
+    echo ^^!module !_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
+if %__N%==0 (
+    echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
+    goto :eof
+) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
+) else ( set __N_FILES=%__N% Modula-2 implementation modules
+)
 @rem add library dependencies to project file
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
     set "__LIB_FILE=%%f"
     echo ^^!module !__LIB_FILE!
 ) >> "%__PRJ_FILE%"
-if %__N%==0 (
-    echo %_WARNING_LABEL% No Modula-2 source file found 1>&2
-    goto :eof
-) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 source file
-) else ( set __N_FILES=%__N% Modula-2 source files
-)
+
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 
