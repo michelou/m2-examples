@@ -101,6 +101,7 @@ if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
     ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
@@ -157,13 +158,14 @@ echo.
 echo   %__BEG_P%Options:%__END%
 echo     %__BEG_O%-adw%__END%         select ADW Modula-2 toolset
 echo     %__BEG_O%-debug%__END%       print commands executed by this script
+echo     %__BEG_O%-gm2%__END%         select GNU Modula-2 toolset
 echo     %__BEG_O%-verbose%__END%     print progress messages
 echo     %__BEG_O%-xds%__END%         select XDS Modula-2 toolset ^(default^)
 echo.
 echo   %__BEG_P%Subcommands:%__END%
 echo     %__BEG_O%clean%__END%        delete generated object files
 echo     %__BEG_O%compile%__END%      compile Modula-2 source files
-echo     %__BEG_O%run%__END%          execute main class "%__BEG_O%%_APP_NAME%%__END%"
+echo     %__BEG_O%run%__END%          execute main program
 goto :eof
 
 :clean

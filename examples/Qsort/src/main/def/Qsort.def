@@ -1,0 +1,20 @@
+DEFINITION MODULE Qsort;
+
+(*
+ * procedure types to compare and swap
+ * array elements
+ *)
+TYPE
+    CompProc = PROCEDURE(INTEGER, INTEGER): BOOLEAN;
+    SwapProc = PROCEDURE(INTEGER, INTEGER);
+
+(*
+ * Sort an array using the Quick Sort method.
+ * You must supply the array bounds and procedures
+ * to swap and compare array elements.
+ * Any array may be sorted, notice the array is not
+ * a parameter.
+*)
+PROCEDURE qsort(first, last: INTEGER; comp: CompProc; swap: SwapProc);
+
+END Qsort.

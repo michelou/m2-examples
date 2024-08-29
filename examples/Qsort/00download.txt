@@ -1,0 +1,1 @@
+Source: A Guide to Modula-2, by Kaare Christian, 1986 Springer-Verlag (ISBN 978-1-4612-9349-1)

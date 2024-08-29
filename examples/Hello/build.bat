@@ -182,7 +182,9 @@ if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
     echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
+    if defined GM2_HOME echo %_DEBUG_LABEL% Variables  : "GM2_HOME=%GM2_HOME%" 1>&2
     echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : _APP_NAME=%_APP_NAME% 1>&2
     echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
 goto :eof
@@ -392,6 +394,8 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
     echo -woff301+
     echo %% disable warning 303 ^(procedure "xxx" declared but never used^)
     echo -woff303+
+    echo %% disable warning 306 ^(import of "xxx.yyy" is never used^)
+    echo -woff306+
 ) > "%__PRJ_FILE%"
 set __N=0
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (

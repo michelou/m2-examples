@@ -90,6 +90,7 @@ We first create the project file `target\Factorial.prj` and then invoke the XDS 
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/type">type</a> target\Factorial.prj</b>
 -cpu = 486
 -lookup = *.sym = sym;C:\opt\XDS-Modula-2\sym
+-lookup = *.dll|*.lib = bin;C:\opt\XDS-Modula-2\bin
 -m2
 % recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
 % -m2addtypes

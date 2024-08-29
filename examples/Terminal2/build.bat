@@ -49,15 +49,14 @@ set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 set "_TARGET_TEST_DIR=%_TARGET_DIR%\test"
 
-for %%i in (%~dp0.) do set "_APP_NAME=%%~ni"
-set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.lib"
-set "_TARGET_TEST_FILE=%_TARGET_DIR%\%_APP_NAME%Test.exe"
+for /f "delims=" %%i in ("%~dp0.") do set "_LIB_NAME=%%~ni"
+set "_TARGET_FILE=%_TARGET_DIR%\%_LIB_NAME%.lib"
+set "_APP_NAME=%_LIB_NAME%Test"
+set "_TARGET_TEST_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
-@rem 2 choices: ASCII, Unicode
+@rem ADWM2 gives us 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
-@rem m2e.exe = ADW Modula-2 IDE
-@rem sbd.exe = ADW Modula-2 Debugger
-@rem sblink.exe = ADW Modula-2 Linker
+
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
     echo %_ERROR_LABEL% ADW Modula-2 installation not found 1>&2
     set _EXITCODE=1
@@ -190,6 +189,7 @@ if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
     echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
     echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
+    echo %_DEBUG_LABEL% Variables  : _LIB_NAME=%_LIB_NAME% 1>&2
     echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
 goto :eof
@@ -219,7 +219,7 @@ echo   %__BEG_P%Subcommands:%__END%
 echo     %__BEG_O%clean%__END%        delete generated object files
 echo     %__BEG_O%compile%__END%      compile Modula-2 source files
 echo     %__BEG_O%install%__END%      install library into directory "..\lib\%_TOOLSET%"
-echo     %__BEG_O%run%__END%          execute program "%__BEG_O%%_APP_NAME%Test%__END%"
+echo     %__BEG_O%run%__END%          execute program "%__BEG_O%%_APP_NAME%%__END%"
 goto :eof
 
 :clean
@@ -280,7 +280,7 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     goto :eof
 )
 @rem We must specify a relative path for the SYM directories
-set __M2C_OPTS=-sym:!_TARGET_SYM_DIR:%_ROOT_DIR%\=!
+set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!"
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
@@ -320,7 +320,7 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
     @rem echo -EXETYPE:exe
     echo -MACHINE:X86_64
     echo -SUBSYSTEM:CONSOLE
-    echo -MAP:%_TARGET_DIR%\%_APP_NAME%
+    echo -MAP:%_TARGET_DIR%\%_LIB_NAME%
     echo -OUT:%_TARGET_FILE%
     echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
@@ -390,7 +390,7 @@ if %__ACTION_DEF%==1 (
         popd
     )
 )
-set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
+set "__PRJ_FILE=%_TARGET_DIR%\%_LIB_NAME%.prj"
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
 ) else if %_VERBOSE%==1 ( echo Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
 )
@@ -422,14 +422,8 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
 set __N=0
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     @rem source file path is either absolute or relative to project file
-    set "__MOD_FILE=!_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f"
-    echo ^^!module !__MOD_FILE!
+    echo ^^!module !_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
-) >> "%__PRJ_FILE%"
-@rem add library dependencies to project file
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
-    set "__LIB_FILE=%%f"
-    echo ^^!module !__LIB_FILE!
 ) >> "%__PRJ_FILE%"
 if %__N%==0 (
     echo %_WARNING_LABEL% No Modula-2 test source file found 1>&2
@@ -437,6 +431,16 @@ if %__N%==0 (
 ) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
 ) else ( set __N_FILES=%__N% Modula-2 implementation modules
 )
+@rem add library dependencies to project file
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    set "__LIB_FILE=%%f"
+    echo ^^!module !__LIB_FILE!
+) >> "%__PRJ_FILE%"
+@rem add library dependencies to project file
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    set "__LIB_FILE=%%f"
+    echo ^^!module !__LIB_FILE!
+) >> "%__PRJ_FILE%"
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 
@@ -450,7 +454,7 @@ if not %ERRORLEVEL%==0 (
     set _EXITCODE=1
     goto :eof
 )
-set __XLIB_OPTS=/nologo /new "%_APP_NAME%" +%_APP_NAME%
+set __XLIB_OPTS=/nologo /new "%_LIB_NAME%" +%_LIB_NAME%
 
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XLIB_CMD%" %__XLIB_OPTS% 1>&2
 ) else if %_VERBOSE%==1 ( echo Create library file into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
@@ -464,6 +468,9 @@ if not %ERRORLEVEL%==0 (
     goto :eof
 )
 popd
+if exist "%_TARGET_DIR%\*.lib" (
+    xcopy /i /q /y "%_TARGET_DIR%\*.lib" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
+)
 if exist "%_SOURCE_TEST_MOD_DIR%\*.mod" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%\" 1>&2
     xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%\" %_STDOUT_REDIRECT%
@@ -474,7 +481,7 @@ if exist "%_SOURCE_TEST_MOD_DIR%\*.mod" (
 goto :eof
 
 :compile_xds_test
-set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%Test.prj"
+set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
 (
     if %_DEBUG%==1 (
         echo %% debug ON
@@ -496,18 +503,18 @@ set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%Test.prj"
     echo -woff303+
 ) > "%__PRJ_FILE%"
 set __N=0
-for /f "delims=" %%f in ('dir /s /b "%_TARGET_TEST_DIR%\*.mod" 2^>NUL') do (
-    set "__MOD_FILE=%%f"
-    echo ^^!module !__MOD_FILE:%_TARGET_DIR%\=!
+for /f "delims=" %%f in ('dir /b "%_TARGET_TEST_DIR%\*.mod" 2^>NUL') do (
+    @rem source file path is either absolute or relative to project file
+    echo ^^!module !_TARGET_TEST_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
-(
-    echo %% additional library
-    echo ^^!module !_TARGET_FILE:%_TARGET_DIR%\=!
-) >> "%__PRJ_FILE%"
-if %__N%==1 ( set __N_FILES=%__N% Modula-2 test module
-) else ( set __N_FILES=%__N% Modula-2 test modules
+if %__N%==1 ( set __N_FILES=%__N% Modula-2 test source file
+) else ( set __N_FILES=%__N% Modula-2 test source files
 )
+for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    @rem source file path is either absolute or relative to project file
+    echo ^^!module !_TARGET_BIN_DIR:%_TARGET_DIR%\=!\%%f
+) >> "%__PRJ_FILE%"
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 

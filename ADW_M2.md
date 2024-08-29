@@ -60,9 +60,10 @@ F:\adw-examples\EstimatePi\target\EstimatePi.exe
 <dd>
 Here a some references about response files :
 <ul style="">
-<li>GCC Wiki &ndash; <a href="https://gcc.gnu.org/wiki/Response_Files">Response Files</a></li>
-<li>Intel oneAPI C++ &ndash; <a href="https://www.intel.com/content/www/us/en/docs/dpcpp-cpp-compiler/developer-guide-reference/2023-0/use-response-files.html">Use Response Files</a></li>
-<li>Microsoft C++ &ndash; <a href="https://learn.microsoft.com/en-us/cpp/build/reference/at-specify-a-compiler-response-file">Specify a Compiler Response File</a></li>
+<li>GCC Wiki &ndash; <a href="https://gcc.gnu.org/wiki/Response_Files">Response Files</a>.</li>
+<li>Intel oneAPI C++ &ndash; <a href="https://www.intel.com/content/www/us/en/docs/dpcpp-cpp-compiler/developer-guide-reference/2023-0/use-response-files.html">Use Response Files</a>.</li>
+<li>The <code>javac</code> Command &ndash; <a href="https://docs.oracle.com/en/java/javase/17/docs/specs/man/javac.html#command-line-argument-files" rel="external">Command-Line Argument Files</a>.</li>
+<li>Microsoft C++ &ndash; <a href="https://learn.microsoft.com/en-us/cpp/build/reference/at-specify-a-compiler-response-file">Specify a Compiler Response File</a>.</li>
 </ul>
 </dd></dl>
 

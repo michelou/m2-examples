@@ -425,11 +425,12 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
 ) > "%__PRJ_FILE%"
 set __N=0
 for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
+    @rem source file path is either absolute or relative to project file
     echo ^^!module !_TARGET_MOD_DIR:%_TARGET_DIR%\=!\%%f
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
 if %__N%==0 (
-    echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
+    echo %_WARNING_LABEL% No Modula-2 test source file found 1>&2
     goto :eof
 ) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
 ) else ( set __N_FILES=%__N% Modula-2 implementation modules
@@ -439,7 +440,6 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
     set "__LIB_FILE=%%f"
     echo ^^!module !__LIB_FILE!
 ) >> "%__PRJ_FILE%"
-
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 

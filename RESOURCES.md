@@ -41,6 +41,7 @@
 ## <span id="teaching">Teaching</span>
 
 - [Practicum Structured Programming Modula-2](http://parallel.vub.ac.be/education/modula2/).
+  - [Modula-2 Compiler XDS](http://parallel.vub.ac.be/education/modula2/documentation/XDS-manual.html)
 - [Modula-2][teaching_moosbrugger] by Daniel Moosbrugger, January 2013<br/><span style="font-size:80%;">(seminar report, [University of Innsbruck][teaching_innsbruck])</span>.
 
 ## <span id="tools">Tools</span>

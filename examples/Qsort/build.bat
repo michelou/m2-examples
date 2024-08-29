@@ -39,6 +39,7 @@ set _WARNING_LABEL=%_STRONG_FG_YELLOW%Warning%_RESET%:
 set "_SOURCE_DIR=%_ROOT_DIR%src"
 set "_SOURCE_DEF_DIR=%_SOURCE_DIR%\main\def"
 set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod"
+set "_SOURCE_TEST_MOD_DIR=%_SOURCE_DIR%\test\mod"
 
 set "_TARGET_DIR=%_ROOT_DIR%target"
 set "_TARGET_DEF_DIR=%_TARGET_DIR%\def"
@@ -46,11 +47,14 @@ set "_TARGET_MOD_DIR=%_TARGET_DIR%\mod"
 @rem library dependencies
 set "_TARGET_BIN_DIR=%_TARGET_DIR%\bin"
 set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
+set "_TARGET_TEST_DIR=%_TARGET_DIR%\test"
 
-for /f "delims=" %%i in ("%~dp0.") do set "_APP_NAME=%%~ni"
-set "_TARGET_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
+for /f "delims=" %%i in ("%~dp0.") do set "_LIB_NAME=%%~ni"
+set "_TARGET_FILE=%_TARGET_DIR%\%_LIB_NAME%.lib"
+set "_APP_NAME=Test%_LIB_NAME%"
+set "_TARGET_TEST_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
-@rem 2 choices: ASCII, Unicode
+@rem ADWM2 gives us 2 choices: ASCII, Unicode
 set "_ADWM2_HOME=%ADWM2_HOME%\ASCII"
 
 if not exist "%_ADWM2_HOME%\m2amd64.exe" (
@@ -73,6 +77,8 @@ if not exist "%XDSM2_HOME%\bin\xc.exe" (
     goto :eof
 )
 set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
+set "_HIS_CMD=%XDSM2_HOME%\bin\his.exe"
+set "_XLIB_CMD=%XDSM2_HOME%\bin\xlib.exe"
 
 @rem use newer PowerShell version if available
 where /q pwsh.exe
@@ -132,8 +138,8 @@ goto :eof
 @rem input parameter: %*
 :args
 set _COMMANDS=
-set _VERBOSE=0
 set _TOOLSET=xds
+set _VERBOSE=0
 set __N=0
 :args_loop
 set "__ARG=%~1"
@@ -159,6 +165,7 @@ if "%__ARG:~0,1%"=="-" (
     if "%__ARG%"=="clean" ( set _COMMANDS=!_COMMANDS! clean
     ) else if "%__ARG%"=="compile" ( set _COMMANDS=!_COMMANDS! compile
     ) else if "%__ARG%"=="help" ( set _COMMANDS=help
+    ) else if "%__ARG%"=="install" ( set _COMMANDS=!_COMMANDS! compile run install
     ) else if "%__ARG%"=="run" ( set _COMMANDS=!_COMMANDS! compile run
     ) else (
         echo %_ERROR_LABEL% Unknown subcommand "%__ARG%" 1>&2
@@ -184,7 +191,7 @@ if %_DEBUG%==1 (
     echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
     if defined GM2_HOME echo %_DEBUG_LABEL% Variables  : "GM2_HOME=%GM2_HOME%" 1>&2
     echo %_DEBUG_LABEL% Variables  : "XDSM2_HOME=%XDSM2_HOME%" 1>&2
-    echo %_DEBUG_LABEL% Variables  : _APP_NAME=%_APP_NAME% 1>&2
+    echo %_DEBUG_LABEL% Variables  : _LIB_NAME=%_LIB_NAME% 1>&2
     echo %_DEBUG_LABEL% Variables  : "_LIB_DIR=%_LIB_DIR%" 1>&2
 )
 goto :eof
@@ -213,7 +220,8 @@ echo.
 echo   %__BEG_P%Subcommands:%__END%
 echo     %__BEG_O%clean%__END%        delete generated object files
 echo     %__BEG_O%compile%__END%      compile Modula-2 source files
-echo     %__BEG_O%run%__END%          execute Modula-2 program "%__BEG_O%%_APP_NAME%%__END%"
+echo     %__BEG_O%install%__END%      install library into directory "..\lib\%_TOOLSET%"
+echo     %__BEG_O%run%__END%          execute program "%__BEG_O%%_APP_NAME%%__END%"
 goto :eof
 
 :clean
@@ -283,23 +291,25 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
 )
 @rem We must specify a relative path for the SYM directories
 set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%\=!"
-if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0
 if %__ACTION_DEF%==0 goto compile_adw_mod
-@rem we generate symbol files for definition modules
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_DEF_DIR%\*.def" 2^>NUL') do (
     set "__DEF_FILE=%%f"
     if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!" 1>&2
-    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
+    ) else if %_VERBOSE%==1 ( echo Compile "!__DEF_FILE!" into directory "!_TARGET_SYM_DIR:%_ROOT_DIR%=!" 1>&2
     )
     call "%_M2C_CMD%" %__M2C_OPTS% "!__DEF_FILE!"
     if not !ERRORLEVEL!==0 (
-        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_DEF_DIR:%_ROOT_DIR%=!" 1>&2
+        echo %_ERROR_LABEL% Failed to compile "!__DEF_FILE!" into directory "!_TARGET_SYM_DIR:%_ROOT_DIR%=!" 1>&2
         set _EXITCODE=1
         goto :eof
     )
     set /a __N+=1
+)
+if exist "%_TARGET_DEF_DIR%\*.sym" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_TARGET_SYM_DIR%\" 1>&2
+    xcopy /i /q /y "%_TARGET_DEF_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 :compile_adw_mod
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
@@ -319,14 +329,14 @@ set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
 (
     @rem echo -EXETYPE:exe
     echo -MACHINE:X86_64
-    echo -SUBSYSTEM:WINDOWS
-    echo -MAP:%_TARGET_DIR%\%_APP_NAME%
+    echo -SUBSYSTEM:CONSOLE
+    echo -MAP:%_TARGET_DIR%\%_LIB_NAME%
     echo -OUT:%_TARGET_FILE%
     echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
 @rem object files of current program
-for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
-    echo !_TARGET_MOD_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
+    echo %%f >> "%__LINKER_OPTS_FILE%"
 )
 @rem object files of library depencencies
 for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
@@ -356,7 +366,6 @@ goto :eof
 echo %_WARNING_LABEL% Not yet implemented
 goto :eof
 
-@rem input parameter: %1=.def files are out of date
 :compile_xds
 set __ACTION_DEF=%~1
 
@@ -371,7 +380,27 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
     goto :eof
 )
-set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
+if %__ACTION_DEF%==1 (
+    if not exist "%_TARGET_SYM_DIR%" mkdir "%_TARGET_SYM_DIR%"
+    for /f "delims=" %%f in ('dir /b /s "%_TARGET_DEF_DIR%\*.def"') do (
+        set "__DEF_FILE=%%f"
+        pushd "%_TARGET_SYM_DIR%"
+        if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "!CD!" 1>&2
+
+        if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" "%%f" 1>&2
+        ) else if %_VERBOSE%==1 ( echo Compile Modula-2 definition module "!__DEF_FILE:%_ROOT_DIR%=!" 1>&2
+        )
+        call "%_XC_CMD%" "%%f"
+        if not !ERRORLEVEL!==0 (
+            popd
+            echo %_ERROR_LABEL% Failed to compile Modula-2 definition module "!__DEF_FILE:%_ROOT_DIR%=!" 1>&2
+            set _EXITCODE=1
+            goto :eof
+        )
+        popd
+    )
+)
+set "__PRJ_FILE=%_TARGET_DIR%\%_LIB_NAME%.prj"
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
 ) else if %_VERBOSE%==1 ( echo Create XDS project file "!__PRJ_FILE:%_ROOT_DIR%=!" 1>&2
 )
@@ -382,9 +411,14 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% @rem Create XDS project file "!__PRJ_FILE:%
         echo -genhistory+
         echo -lineno+
     )
+    echo %% write -gendll- to generate an .exe
+    echo -gendll+
+    echo -usedll+
+    echo -dllexport+
+    echo -implib-
     echo -cpu = 486
     echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
-    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
+    echo -lookup = %XDSM2_HOME%\bin
     echo -m2
     echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
     echo %% -m2addtypes
@@ -404,7 +438,7 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     set /a __N+=1
 ) >> "%__PRJ_FILE%"
 if %__N%==0 (
-    echo %_WARNING_LABEL% No Modula-2 implementation module found 1>&2
+    echo %_WARNING_LABEL% No Modula-2 source file found 1>&2
     goto :eof
 ) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
 ) else ( set __N_FILES=%__N% Modula-2 implementation modules
@@ -415,6 +449,82 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
     echo ^^!module !__LIB_FILE!
 ) >> "%__PRJ_FILE%"
 pushd "%_TARGET_DIR%"
+if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
+
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2
+) else if %_VERBOSE%==1 ( echo Compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
+)
+call "%_XC_CMD%" =p "%__PRJ_FILE%"
+if not %ERRORLEVEL%==0 (
+    popd
+    echo %_ERROR_LABEL% Failed to compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+set __XLIB_OPTS=/nologo /new "%_LIB_NAME%" +%_LIB_NAME%
+
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XLIB_CMD%" %__XLIB_OPTS% 1>&2
+) else if %_VERBOSE%==1 ( echo Create library file into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
+)
+call "%_XLIB_CMD%" %__XLIB_OPTS%
+if not %ERRORLEVEL%==0 (
+    set __ERRORLEVEL=%ERRORLEVEL%
+    popd
+    echo %_ERROR_LABEL% Failed to create library file into directory "!_TARGET_DIR:%_ROOT_DIR%=!" ^(!__ERRORLEVEL!^) 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+popd
+if exist "%_TARGET_DIR%\*.lib" (
+    xcopy /i /q /y "%_TARGET_DIR%\*.lib" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
+)
+if exist "%_SOURCE_TEST_MOD_DIR%\*.mod" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%\" %_STDOUT_REDIRECT%
+
+    call :compile_xds_test
+    if not !_EXITCODE!==0 goto :eof
+)
+goto :eof
+
+:compile_xds_test
+set "__PRJ_FILE=%_TARGET_DIR%\%_APP_NAME%.prj"
+(
+    if %_DEBUG%==1 (
+        echo %% debug ON
+        echo -gendebug+
+        echo -genhistory+
+        echo -lineno+
+    )
+    echo -cpu = 486
+    echo -lookup = *.sym = sym;%XDSM2_HOME%\sym
+    echo -lookup = *.dll^|*.lib = bin;%XDSM2_HOME%\bin
+    echo -m2
+    echo %% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
+    echo %% -m2addtypes
+    echo -verbose
+    echo -werr
+    echo %% disable warning 301 ^(parameter "xxx" is never used^)
+    echo -woff301+
+    echo %% disable warning 303 ^(procedure "xxx" declared but never used^)
+    echo -woff303+
+) > "%__PRJ_FILE%"
+set __N=0
+for /f "delims=" %%f in ('dir /b "%_TARGET_TEST_DIR%\*.mod" 2^>NUL') do (
+    @rem source file path is either absolute or relative to project file
+    echo ^^!module !_TARGET_TEST_DIR:%_TARGET_DIR%\=!\%%f
+    set /a __N+=1
+) >> "%__PRJ_FILE%"
+if %__N%==1 ( set __N_FILES=%__N% Modula-2 test source file
+) else ( set __N_FILES=%__N% Modula-2 test source files
+)
+for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
+    @rem source file path is either absolute or relative to project file
+    echo ^^!module !_TARGET_BIN_DIR:%_TARGET_DIR%\=!\%%f
+) >> "%__PRJ_FILE%"
+pushd "%_TARGET_DIR%"
+if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
+
 if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2
 ) else if %_VERBOSE%==1 ( echo Compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
 )
@@ -483,17 +593,45 @@ if %__DATE1% gtr %__DATE2% ( set _NEWER=1
 goto :eof
 
 :run
-if not exist "%_TARGET_FILE%" (
-    echo %_ERROR_LABEL% Program "!_TARGET_FILE:%_ROOT_DIR%=!" not found 1>&2
+if not exist "%_TARGET_TEST_FILE%" (
+    echo %_ERROR_LABEL% Test program "!_TARGET_TEST_FILE:%_ROOT_DIR%=!" not found 1>&2
     set _EXITCODE=1
     goto :eof
 )
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_TARGET_FILE%" 1>&2
-) else if %_VERBOSE%==1 ( echo Execute program "!_TARGET_FILE:%_ROOT_DIR%=!" 1>&2
-)
-"%_TARGET_FILE%"
+"%_TARGET_TEST_FILE%"
 if not %ERRORLEVEL%==0 (
-    echo %_ERROR_LABEL% Failed to execute program "!_TARGET_FILE:%_ROOT_DIR%=!" 1>&2
+    echo %_ERROR_LABEL% Failed to exexute test program "!_TARGET_TEST_FILE:%_ROOT_DIR%=!" 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+goto :eof
+
+:install
+if not exist "%_TARGET_FILE%" (
+    echo %_ERROR_LABEL% Library "!_TARGET_FILE:%_ROOT_DIR%=!" not found 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+set __XLIB_OPTS=/nologo /list "%_TARGET_FILE%"
+
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XLIB_CMD%" %__XLIB_OPTS% 1>&2
+) else if %_VERBOSE%==1 ( echo List exports in "!_TARGET_FILE:%_ROOT_DIR%=!" 1>&2
+)
+call "%_XLIB_CMD%" %__XLIB_OPTS%
+if not %ERRORLEVEL%==0 (
+    echo %_ERROR_LABEL% Failed to list exports in "!_TARGET_FILE:%_ROOT_DIR%=!" 1>&2
+    set _EXITCODE=1
+    goto :eof
+)
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%\" 1>&2
+) else if %_VERBOSE%==1 ( echo Copy library files to "%_LIB_DIR%\" 1>&2
+)
+@rem copy only if source time is newer than destination time.
+xcopy /d /i /q /y "%_TARGET_DIR%\*.dll" "%_LIB_DIR%\" 1>NUL
+xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%\" 1>NUL
+xcopy /d /i /q /y "%_TARGET_SYM_DIR%\*.sym" "%_LIB_DIR%\" 1>NUL
+if not %ERRORLEVEL%==0 (
+    echo %_ERROR_LABEL% Failed to copy library files to "%_LIB_DIR%" 1>&2
     set _EXITCODE=1
     goto :eof
 )
