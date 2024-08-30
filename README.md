@@ -51,7 +51,7 @@ docs\
 examples\{<a href="examples/README.md">README.md</a>, <a href="./examples/Factorial/">Factorial</a>, <a href="./examples/Hello/">Hello</a>, <a href="./examples/PascalTriangle/">PascalTriangle</a>, ..}
 tutor-examples\{<a href="./tutor-examples/README.md">README.md</a>, <a href="./tutor-examples/Areas/">Areas</a>, <a href="./tutor-examples/Arrays/">Arrays</a>, ..}
 xds-examples\{<a href="xds-examples/README.md">README.md</a>. <a href="./xds-examples/exp/">exp</a>, <a href="./xds-examples/queens/">queens</a>, ..}
-winkler-examples\{<a href="./winkler-examples/README.md>README.md</a>, <a href="./winkler-examples/Code/">Code</a>, <a href="./winkler-examples/Felder/">Felder</a>, <a href="./winkler-examples/Nullstellen/">Nullstellent</a>, ..}
+winkler-examples\{<a href="./winkler-examples/README.md">README.md</a>, <a href="./winkler-examples/Code/">Code</a>, <a href="./winkler-examples/Felder/">Felder</a>, <a href="./winkler-examples/Nullstellen/">Nullstellent</a>, ..}
 README.md
 <a href="ADW_M2.md">ADW_M2.md</a>
 <a href="GNU_M2.md">GNU_M2.md</a>
