@@ -34,16 +34,16 @@ all: build
 build: $(TARGET)
    
 $(TARGET): $(DEFS) $(MODS)
+	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	if [ -d "$(SOURCE_DEF_DIR)" ]; then \
 	    [ -d "$(TARGET_DEF_DIR)" ] || "$(MKDIR)" -p "$(TARGET_DEF_DIR)"; \
 	    [ -d "$(TARGET_SYM_DIR)" ] || "$(MKDIR)" -p "$(TARGET_SYM_DIR)"; \
 	    "$(CP)" "$(SOURCE_DEF_DIR)"/*.def "$(TARGET_DEF_DIR)"; \
+	    cd "$(TARGET_SYM_DIR)" && \
+	    for f in $(ABS_TARGET_DIR)/def/*.def; do \
+	        "$(XC)" $${f}; \
+	    done \
 	fi
-	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
-	cd "$(TARGET_SYM_DIR)" && \
-	for f in $(ABS_TARGET_DIR)/def/*.def; do \
-	    "$(XC)" $${f}; \
-	done
 	[ -d "$(TARGET_MOD_DIR)" ] || "$(MKDIR)" -p "$(TARGET_MOD_DIR)"
 	@$(CP) $(SOURCE_MOD_DIR)/*.mod "$(TARGET_MOD_DIR)"
 	@# we compute the absolute path for PRJ_FILE since we use TARGET_DIR as current directory.

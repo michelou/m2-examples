@@ -30,6 +30,7 @@
 ## <span id="projects">Projects</span> [**&#x25B4;**](#top)
 
 - GitHub/[afborchert](https://github.com/afborchert/lilith-multipass-modula2-compiler) &ndash; historical ETH Zürich Modula-2 Compiler.
+- GitHub/[ghoss/m2emul](https://github.com/ghoss/m2emul) &ndash; Modula-2 M-Code Interpreter.
 - GitHub/[GunterMueller](https://github.com/GunterMueller?tab=repositories&q=Modula) &ndash; Modula-2 related archives.
 - Github/[m2lang](https://github.com/redstar/m2lang) &ndash; the LLVM-based Modula-2 compiler.
 
@@ -52,7 +53,7 @@
 - [XDS Modula-2/Oberon-2 programing system](https://github.com/excelsior-oss/xds)
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/August 2024* [**&#9650;**](#top)  <!-- February 2023 -->
+*[mics](https://lampwww.epfl.ch/~michelou/)/September 2024* [**&#9650;**](#top)  <!-- February 2023 -->
 
 <span id="bottom">&nbsp;</span>
 

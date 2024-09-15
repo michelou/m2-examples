@@ -10,15 +10,14 @@ set _DEBUG=0
 set _EXITCODE=0
 
 @rem files README.md, RESOURCES.md, etc.
-set _LAST_MODIFIED_OLD=michelou/)/July 2024
-set _LAST_MODIFIED_NEW=michelou/)/August 2024
+set _LAST_MODIFIED_OLD=michelou/)/August 2024
+set _LAST_MODIFIED_NEW=michelou/)/September 2024
 
-set _LAST_DOWNLOAD_OLD=(\*July 2024\*)
-set _LAST_DOWNLOAD_NEW=(*August 2024*)
+set _LAST_DOWNLOAD_OLD=(\*August 2024\*)
+set _LAST_DOWNLOAD_NEW=(*September 2024*)
 
 @rem to be transformed into -not -path "./<dirname>/*"
-set _EXCLUDE_TOPDIRS=bin docs gcc-13.2.0 gcc-13-20230219 ^
-    gcc-releases-gcc-13.2.0 m2j-master
+set _EXCLUDE_TOPDIRS=bin docs gcc m2j-master
 set _EXCLUDE_SUBDIRS=_LOCAL
 
 call :env
