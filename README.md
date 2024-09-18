@@ -2,7 +2,7 @@
 
 <table style="font-family:Helvetica,Arial;line-height:1.6;">
   <tr>
-  <td style="border:0;padding:0 10px 0 0;min-width:25%;"><a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1"><img src="./docs/images/pim4.png" width="120" alt="Modula-2 project"/></a></td>
+  <td style="border:0;padding:0 10px 0 0;min-width:25%;"><a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1"><img src="./docs/images/pim4.png" width="200" alt="Modula-2 project"/></a></td>
   <td style="border:0;padding:0;vertical-align:text-top;">This repository gathers <a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1" rel="external">Modula-2</a> code examples coming from various websites and books.<br/>
   It also includes several build scripts (<a href="https://cloudblogs.microsoft.com/opensource/2023/02/21/introducing-bash-for-beginners/" rel="external">Bash scripts</a>, <a href="https://en.wikibooks.org/wiki/Windows_Batch_Scripting" rel="external">batch files</a>, <a href="https://makefiletutorial.com/" rel="external">Make scripts</a>) for experimenting with <a href="https://link.springer.com/chapter/10.1007/978-3-642-96757-3_1" rel="external">Modula-2</a> on a Windows machine.
   </td>
