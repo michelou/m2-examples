@@ -29,7 +29,7 @@ Optionally one may also install the following software:
 > **&#9755;** ***Installation policy***<br/>
 > When possible we install software from a [Zip archive][zip_archive] rather than via a [Windows installer][windows_installer]. In our case we defined **`C:\opt\`** as the installation directory for optional software tools (*in reference to* the [`/opt/`][unix_opt] directory on Unix).
 
-For instance our development environment looks as follows (*September 2024*) <sup id="anchor_01">[1](#footnote_01)</sup>:
+For instance our development environment looks as follows (*October 2024*) <sup id="anchor_01">[1](#footnote_01)</sup>:
 
 <pre style="font-size:80%;">
 C:\opt\ADW-Modula-2\    <i>(108 MB)</i>
@@ -95,7 +95,7 @@ We execute command [**`setenv.bat`**](setenv.bat) once to setup our development 
    <b>&gt; <a href="./setenv.bat">setenv</a></b>
    Tool versions:
       m2amd64 1.6.879, xc v2.60, make 4.4.1,
-      git 2.46.0, diff 3.10, bash 5.2.26(1)
+      git 2.46.2, diff 3.10, bash 5.2.37(1)
    &nbsp;
    <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/where" rel="external">where</a> git sh</b>
    C:\opt\Git\bin\git.exe
@@ -116,8 +116,8 @@ In our case we downloaded the following installation files (<a href="#proj_deps"
 <pre style="font-size:80%;">
 <a href="https://www.modula2.org/adwm2/download.php" rel="external">ADWM2Setup.exe</a>                    <i>( 18 MB)</i>
 <a href="https://github.com/Maximus5/ConEmu/releases/tag/v23.07.24" rel="external">ConEmuPack.230724.7z</a>              <i>(  5 MB)</i>
-<a href="https://git-scm.com/download/win" rel="external">PortableGit-2.46.0-64-bit.7z.exe</a>  <i>( 41 MB)</i>
-<a href="https://code.visualstudio.com/Download#" rel="external">VSCode-win32-x64-1.93.0.zip</a>       <i>(131 MB)</i>
+<a href="https://git-scm.com/download/win" rel="external">PortableGit-2.46.2-64-bit.7z.exe</a>  <i>( 41 MB)</i>
+<a href="https://code.visualstudio.com/Download#" rel="external">VSCode-win32-x64-1.93.1.zip</a>       <i>(131 MB)</i>
 <a href="https://github.com/excelsior-oss/xds-ide/releases">xds-ide-1.7.0-060713-1-win32.zip</a>  <i>(198 MB)</i>
 </pre>
 <b>Note</b> : A binary distribution of GNU Modula-2 doesn't exist for the Windows platform; we must create it from the source distribution (we describe our last attempt in document <a href="./GNU_M2.md"><code><b>GNU_M2.md</b></code></a>). 
@@ -184,7 +184,7 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/September 2024* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/October 2024* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- link refs -->
@@ -212,7 +212,7 @@ Concretely, in our GitHub projects which depend on Visual Studio (e.g. <a href="
 [git_downloads]: https://git-scm.com/download/win
 [git_cli]: https://git-scm.com/docs/git
 [git_releases]: https://git-scm.com/download/win
-[git_relnotes]: https://raw.githubusercontent.com/git/git/master/Documentation/RelNotes/2.46.0.txt
+[git_relnotes]: https://raw.githubusercontent.com/git/git/master/Documentation/RelNotes/2.46.2.txt
 [github_markdown]: https://github.github.com/gfm/
 [gm2_downloads]: https://gcc.gnu.org/onlinedocs/gcc-13.1.0/gm2/Overview.html
 [golang_examples]: https://github.com/michelou/golang-examples#top
