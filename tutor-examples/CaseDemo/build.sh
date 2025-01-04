@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2018-2024 Stéphane Micheloud
+# Copyright (c) 2018-2025 Stéphane Micheloud
 #
 # Licensed under the MIT License.
 #
@@ -20,7 +20,7 @@ getHome() {
 
 debug() {
     local DEBUG_LABEL="[46m[DEBUG][0m"
-    $DEBUG && echo "$DEBUG_LABEL $1" 1>&2
+    [[ $DEBUG -eq 1 ]] && echo "$DEBUG_LABEL $1" 1>&2
 }
 
 warning() {
@@ -42,26 +42,26 @@ cleanup() {
 }
 
 args() {
-    [[ $# -eq 0 ]] && HELP=true && return 1
+    [[ $# -eq 0 ]] && HELP=1 && return 1
 
     for arg in "$@"; do
         case "$arg" in
         ## options
         -adw)      TOOLSET=adw ;;
-        -debug)    DEBUG=true ;;
+        -debug)    DEBUG=1 ;;
         -gm2)      TOOLSET=gm2 ;;
-        -help)     HELP=true ;;
-        -verbose)  VERBOSE=true ;;
+        -help)     HELP=1 ;;
+        -verbose)  VERBOSE=1 ;;
         -xds)      TOOLSET=xds ;;
         -*)
             error "Unknown option $arg"
             EXITCODE=1 && return 0
             ;;
         ## subcommands
-        clean)     CLEAN=true ;;
-        compile)   COMPILE=true ;;
-        help)      HELP=true ;;
-        run)       COMPILE=true && RUN=true ;;
+        clean)     CLEAN=1 ;;
+        compile)   COMPILE=1 ;;
+        help)      HELP=1 ;;
+        run)       COMPILE=1 && RUN=1 ;;
         *)
             error "Unknown subcommand $arg"
             EXITCODE=1 && return 0
@@ -102,9 +102,9 @@ EOS
 
 clean() {
     if [[ -d "$TARGET_DIR" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "Delete directory \"$(mixed_path $TARGET_DIR)\""
-        elif $VERBOSE; then
+        elif [[ $VERBOSE -eq 1 ]]; then
             echo "Delete directory \"${TARGET_DIR/$ROOT_DIR\//}\"" 1>&2
         fi
         rm -rf "$(mixed_path $TARGET_DIR)"
@@ -153,31 +153,31 @@ compile_adw() {
     local action_def=$1
 
     if [[ -n "$(ls -A $ADWM2_HOME/winamd64sym/*.sym 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$ADWM2_HOME/winamd64sum/*.sym\" \"$TARGET_SYM_DIR\""
         fi
         cp "$ADWM2_HOME/winamd64sym/"*.sym "$(mixed_path $TARGET_SYM_DIR)"
     fi
     if [[ -n "$(ls -A $LIB_DIR/*.sym 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$LIB_DIR/*.sym\" \"$TARGET_SYM_DIR\""
         fi
         cp "$LIB_DIR/"*.sym "$(mixed_path $TARGET_SYM_DIR)"
     fi
     if [[ -n "$(ls -A $LIB_DIR/*.obj 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$LIB_DIR/*.obj\" \"$TARGET_BIN_DIR\""
         fi
         cp "$LIB_DIR/"*.obj "$(mixed_path $TARGET_BIN_DIR)"
     fi
     if [[ -n "$(ls -A $SOURCE_DEF_DIR/*.def 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$SOURCE_DEF_DIR/\"*.def \"$TARGET_DEF_DIR\""
         fi
         cp "$SOURCE_DEF_DIR/"*.def "$(mixed_path $TARGET_DEF_DIR)"
     fi
     if [[ -n "$(ls -A $SOURCE_MOD_DIR/*.mod 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$SOURCE_MOD_DIR/*.mod\" \"$TARGET_MOD_DIR\""
         fi
         cp "$SOURCE_MOD_DIR/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
@@ -187,14 +187,14 @@ compile_adw() {
     fi
     ## We must specify a relative path to the SYM directory
     local m2c_opts="-sym:$(cygpath -w $TARGET_SYM_DIR),$(cygpath -w $TARGET_DEF_DIR)"
-    $DEBUG || m2c_opts="-quiet $m2c_opts"
+    [[ $DEBUG -eq 1 ]] || m2c_opts="-quiet $m2c_opts"
 
     local n=0
     for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
         local def_file="$(mixed_path $f)"
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "\"$M2C_CMD\" $m2c_opts \"$def_file\""
-        elif $VERBOSE; then
+        elif [[ $VERBOSE -eq 1 ]]; then
             echo "Compile \"$def_file\"" 1>&2
         fi
         eval "$M2C_CMD" $m2c_opts "$def_file"
@@ -206,9 +206,9 @@ compile_adw() {
     done
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.mod" 2>/dev/null); do
         local mod_file="$(cygpath -w $f)"
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "\"$M2C_CMD\" $m2c_opts \"$(mixed_path $mod_file)\""
-        elif $VERBOSE; then
+        elif [[ $VERBOSE -eq 1 ]]; then
             echo "Compile \"$mod_file\"" 1>&2
         fi
         eval "$M2C_CMD" $m2c_opts $(mixed_path $mod_file)
@@ -238,17 +238,17 @@ compile_adw() {
         echo "$ADWM2_HOME/win64api.lib"
     ) >> "$linker_opts_file"
 
-    if $DEBUG; then
+    if [[ $DEBUG -eq 1 ]]; then
         debug "\"$SBLINK_CMD\" @$linker_opts_file"
-    elif $VERBOSE; then
-        verbose "Execute ADW linker"
+    elif [[ $VERBOSE -eq 1 ]]; then
+        echo "Execute ADW linker" 1>&2
     fi
     eval "$SBLINK_CMD" @linker_opts_file
     if [[ $? -ne 0 ]]; then
         error "Failed to execute ADW linker"
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             [[ -f "$ROOT_DIR/linker.err" ]] && cat "$ROOT_DIR/linker.err"
-        elif $VERBOSE; then
+        elif [[ $VERBOSE -eq 1 ]]; then
             [[ -f "$ROOT_DIR/linker.err" ]] && cat "$ROOT_DIR/linker.err"
         fi
         cleanup 1
@@ -264,31 +264,31 @@ compile_xds() {
     local action_def=$1
 
     if [[ -n "$(ls -A $LIB_DIR/*.dll 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$(mixed_path $LIB_DIR)/*.dll\" \"$(mixed_path $TARGET_BIN_DIR)\""
         fi
         cp "$(mixed_path $LIB_DIR)/"*.dll "$(mixed_path $TARGET_BIN_DIR)"
     fi
     if [[ -n "$(ls -A $LIB_DIR/*.lib 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$LIB_DIR/*.lib\" \"$TARGET_BIN_DIR\""
         fi
         cp "$(mixed_path $LIB_DIR)/"*.lib "$(mixed_path $TARGET_BIN_DIR)"
     fi
     if [[ -n "$(ls -A $LIB_DIR/*.sym 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$LIB_DIR/*.sym\" \"$TARGET_SYM_DIR\""
         fi
         cp "$(mixed_path $LIB_DIR)/"*.sym "$(mixed_path $TARGET_SYM_DIR)"
     fi
     if [[ -n "$(ls -A $SOURCE_DEF_DIR/*.def 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$SOURCE_DEF_DIR/*.def\" \"$TARGET_DEF_DIR\""
         fi
         cp "$(mixed_path $SOURCE_DEF_DIR)/"*.def "$(mixed_path $TARGET_DEF_DIR)"
     fi
     if [[ -n "$(ls -A $SOURCE_MOD_DIR/*.mod 2>/dev/null)" ]]; then
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             debug "cp \"$(mixed_path $SOURCE_MOD_DIR)/*.mod\" \"$(mixed_path $TARGET_MOD_DIR)\""
         fi
         cp "$(mixed_path $SOURCE_MOD_DIR)/"*.mod "$(mixed_path $TARGET_MOD_DIR)"
@@ -297,9 +297,9 @@ compile_xds() {
         return 1
     fi
     local prj_file="$(mixed_path $TARGET_DIR)/${APP_NAME}.prj"
-    $DEBUG && debug "# Create XDS project file \"$prj_file\""
+    [[ $DEBUG -eq 1 ]] && debug "# Create XDS project file \"$prj_file\""
     (
-        if $DEBUG; then
+        if [[ $DEBUG -eq 1 ]]; then
             echo "% debug ON" && \
             echo "-gendebug+" && \
             echo "-genhistory+" && \
@@ -333,9 +333,9 @@ compile_xds() {
     local s=; [[ $n -gt 1 ]] && s="s"
     local n_files="$n Modula-2 source file$s"
     pushd "$(mixed_path $TARGET_DIR)" 1>/dev/null
-    if $DEBUG; then
+    if [[ $DEBUG -eq 1 ]]; then
         debug "$XC_CMD =p \"$prj_file\""
-    elif $VERBOSE; then
+    elif [[ $VERBOSE -eq 1 ]]; then
         echo "Compile $n_files into directory \"$TARGET_DIR\"" 1>&2
     fi
     eval "$XC_CMD" =p "$prj_file"
@@ -350,7 +350,7 @@ compile_xds() {
 mixed_path() {
     if [[ -x "$CYGPATH_CMD" ]]; then
         $CYGPATH_CMD -am $1
-    elif $mingw || $msys; then
+    elif [[ $(($mingw + $msys)) -gt 0 ]]; then
         echo $1 | sed 's|/|\\\\|g'
     else
         echo $1
@@ -389,30 +389,32 @@ TARGET_MOD_DIR="$TARGET_DIR/mod"
 TARGET_BIN_DIR="$TARGET_DIR/bin"
 TARGET_SYM_DIR="$TARGET_DIR/sym"
 
-CLEAN=false
-COMPILE=false
-DEBUG=false
-HELP=false
-RUN=false
+## We refrain from using `true` and `false` which are Bash commands
+## (see https://man7.org/linux/man-pages/man1/false.1.html)
+CLEAN=0
+COMPILE=0
+DEBUG=0
+HELP=0
+RUN=0
 TOOLSET=xds
-VERBOSE=false
+VERBOSE=0
 
 COLOR_START="[32m"
 COLOR_END="[0m"
 
-cygwin=false
-mingw=false
-msys=false
-darwin=false
+cygwin=0
+mingw=0
+msys=0
+darwin=0
 case "$(uname -s)" in
-    CYGWIN*) cygwin=true ;;
-    MINGW*)  mingw=true ;;
-    MSYS*)   msys=true ;;
-    Darwin*) darwin=true
+    CYGWIN*) cygwin=1 ;;
+    MINGW*)  mingw=1 ;;
+    MSYS*)   msys=1 ;;
+    Darwin*) darwin=1
 esac
 unset CYGPATH_CMD
 PSEP=":"
-if $cygwin || $mingw || $msys; then
+if [[ $(($cygwin + $mingw + $msys)) -gt 0 ]]; then
     CYGPATH_CMD="$(which cygpath 2>/dev/null)"
     PSEP=";"
     [[ -n "$ADWM2_HOME" ]] && ADWM2_HOME="$(mixed_path $ADWM2_HOME)/ASCII"
@@ -444,15 +446,15 @@ args "$@"
 ##############################################################################
 ## Main
 
-$HELP && help && cleanup
+[[ $HELP -eq 1 ]] && help && cleanup
 
-if $CLEAN; then
+if [[ $CLEAN -eq 1 ]]; then
     clean || cleanup 1
 fi
-if $COMPILE; then
+if [[ $COMPILE -eq 1 ]]; then
     compile || cleanup 1
 fi
-if $RUN; then
+if [[ $RUN -eq 1 ]]; then
     run || cleanup 1
 fi
 cleanup

@@ -53,7 +53,7 @@
 - [XDS Modula-2/Oberon-2 programing system](https://github.com/excelsior-oss/xds)
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/December 2024* [**&#9650;**](#top)  <!-- February 2023 -->
+*[mics](https://lampwww.epfl.ch/~michelou/)/January 2025* [**&#9650;**](#top)  <!-- February 2023 -->
 
 <span id="bottom">&nbsp;</span>
 

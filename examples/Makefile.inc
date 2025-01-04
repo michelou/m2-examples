@@ -15,6 +15,7 @@ ADWM2_SYM_DIR = $(ADWM2_BIN_DIR)/winamd64sym
 M2C        = $(ADWM2_BIN_DIR)/m2amd64.exe
 SBLINK     = $(ADWM2_BIN_DIR)/sblink.exe
 XC         = $(subst \,/,$(XDSM2_HOME))/bin/xc.exe
+XLIB       = $(subst \,/,$(XDSM2_HOME))/bin/xlib.exe
 #
 PSEP       = ;
 ## $(MSYS_HOME)\usr\bin\{cp.exe, make.exe, wget.exe}
@@ -31,6 +32,7 @@ else
 M2C        = m2amd64
 SBLINK     = sblink
 XC         = xc
+XLIB       = xlib
 #
 PSEP       = :
 CP         = cp

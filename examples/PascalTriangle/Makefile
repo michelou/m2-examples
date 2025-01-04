@@ -1,5 +1,5 @@
 ##
-## Copyright (c) 2018-2024 Stéphane Micheloud
+## Copyright (c) 2018-2025 Stéphane Micheloud
 ##
 ## Licensed under the MIT License.
 ##
@@ -10,6 +10,7 @@ include ../Makefile.inc
 SOURCE_DIR = src
 SOURCE_DEF_DIR = src/main/def
 SOURCE_MOD_DIR = src/main/mod
+
 TARGET_DIR = target
 TARGET_DEF_DIR = $(TARGET_DIR)/def
 TARGET_MOD_DIR = $(TARGET_DIR)/mod
