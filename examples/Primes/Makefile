@@ -1,5 +1,5 @@
 ##
-## Copyright (c) 2018-2024 Stéphane Micheloud
+## Copyright (c) 2018-2025 Stéphane Micheloud
 ##
 ## Licensed under the MIT License.
 ##
@@ -32,7 +32,7 @@ TARGET_SYM_DIR = $(TARGET_DIR)/sym
 DEFS = $(shell [ -d "$(SOURCE_DEF_DIR)" ] && $(FIND) "$(SOURCE_DEF_DIR)" -type f -name "*.def")
 MODS = $(shell $(FIND) "$(SOURCE_MOD_DIR)" -type f -name "*.mod")
 
-APP_NAME = Hello
+APP_NAME = Primes
 TARGET = $(TARGET_DIR)/$(APP_NAME)$(TARGET_EXT)
 
 M2C_OPTS =
