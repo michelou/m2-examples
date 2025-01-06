@@ -195,7 +195,7 @@ This project has the following directory structure :
                 <a href="./Whetstone_benchmark/src/main/mod/Whetstone.mod">Whetstone.mod</a>
 </pre>
 
-Command [`build.bat`](./Whetstone_benchmark/build.bat)`-verbose clean run` genreates and executes the Modula-2 program `target\Whetstone.exe` :
+Command [`build.bat`](./Whetstone_benchmark/build.bat)`-verbose clean run` generates and executes the Modula-2 program `target\Whetstone.exe` :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Whetstone_benchmark/build.bat">build</a> -verbose clean run</b>
