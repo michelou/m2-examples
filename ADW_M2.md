@@ -2,7 +2,7 @@
 
 <table style="font-family:Helvetica,Arial;line-height:1.6;">
   <tr>
-  <td style="border:0;padding:0 10px 0 0;;min-width:120px;"><a href="https://www.modula2.org/adwm2/"><img src="docs/imagess/m2.svg" width="120" alt="ADW Modula-2"/></a></td>
+  <td style="border:0;padding:0 10px 0 0;;min-width:120px;"><a href="https://www.modula2.org/adwm2/"><img src="./docs/images/m2.svg" width="120" alt="ADW Modula-2"/></a></td>
   <td style="border:0;padding:0;vertical-align:text-top;">This document gathers <a href="https://www.modula2.org/adwm2/" rel="external">ADW Modula-2</a> related informations.
   </td>
   </tr>
