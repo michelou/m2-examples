@@ -1,0 +1,14 @@
+DEFINITION MODULE GenericSorting;
+
+FROM SYSTEM IMPORT WORD;
+(*
+EXPORT QUALIFIED
+    (* proc *) GenericSort;
+*)
+  TYPE UserProc = PROCEDURE(ARRAY OF WORD, ARRAY OF WORD): BOOLEAN;
+
+  PROCEDURE GenericSort(VAR objectArray: ARRAY OF WORD;
+                        object1, object2: ARRAY OF WORD;
+                        Gtr: UserProc);
+
+END GenericSorting.

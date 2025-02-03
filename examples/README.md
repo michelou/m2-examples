@@ -139,6 +139,65 @@ C:\opt\ADW-Modula-2\ASCII\win64api.lib
 
 <!--=======================================================================-->
 
+### <span id="generic_sorting">`GenericSorting` Example</span> [**&#x25B4;**](#top)
+
+This code example is presented in Richard S. Wiener article "[A generic sorting module in Modula-2"](https://dl.acm.org/doi/10.1145/948576.948588) (ACM SIGPLAN, Vol.19, Issue 3).
+It has the following directory structure :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
+|   <a href="./GenericSorting/00download.txt">00download.txt</a>
+|   <a href="./GenericSorting/build.bat">build.bat</a>
+|   <a href="./GenericSorting/build.sh">build.sh</a>
+|   <a href="./GenericSorting/Makefile">Makefile</a>
+\---<b>src</b>
+    +---<b>main</b>
+    |   +---def</b>
+    |   |       GenericSorting.def</a>
+    |   \---<b>mod</b>
+    |           <a href="./GenericSorting/src/main/mod/GenericSorting.mod">GenericSorting.mod</a>
+    \---<b>test</b>
+        \---<b>mod</b>
+                <a href="./GenericSorting/src/test/mod/TestGenericSorting.mod">TestGenericSorting.mod</a>
+</pre>
+
+Command [**`build.bat`**](./GenericSorting/build.bat)`clean run` generates and execute the Modula-2 program `target\TestGenericSorting.exe` :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="./GenericSorting/build.bat">build</a> -verbose clean run</b>
+Compile Modula-2 definition module "target\def\GenericSorting.def"
+XDS Modula-2 v2.40 [x86, v1.50] - build 07.06.2012
+Compiling "N:\examples\GenericSorting\target\def\GenericSorting.def"
+no errors, no warnings, lines   14, time  0.01, new symfile
+Create XDS project file "target\GenericSorting.prj"
+Compile 1 Modula-2 implementation module into directory "target"
+O2/M2 development system v2.60 TS  (c) 1991-2011 Excelsior, LLC. (build 07.06.2012)
+Make project "N:\examples\GenericSorting\target\GenericSorting.prj"
+#file "N:\examples\GenericSorting\target\GenericSorting.prj" (line 8.23): syntax error
+XDS Modula-2 v2.40 [x86, v1.50] - build 07.06.2012
+Compiling "N:\examples\GenericSorting\target\mod\GenericSorting.mod"
+no errors, no warnings, lines   66, time  0.01
+New "tmp.lnk" is generated using template "C:/opt/XDS-Modula-2/bin/xc.tem"
+
+XDS Link Version 2.13.3 Copyright (c) Excelsior 1995-2009.
+No errors, no warnings
+Create library file into directory "target"
+Compile 1 Modula-2 test source file into directory "target"
+O2/M2 development system v2.60 TS  (c) 1991-2011 Excelsior, LLC. (build 07.06.2012)
+Make project "N:\examples\GenericSorting\target\TestGenericSorting.prj"
+XDS Modula-2 v2.40 [x86, v1.50] - build 07.06.2012
+Compiling "test\TestGenericSorting.mod"
+no errors, no warnings, lines  199, time  0.01
+New "tmp.lnk" is generated using template "C:/opt/XDS-Modula-2/bin/xc.tem"
+
+XDS Link Version 2.13.3 Copyright (c) Excelsior 1995-2009.
+No errors, no warnings
+Enter real number 11 :
+[...]
+</pre>
+
+<!--=======================================================================-->
+
 ### <span id="hello">`Hello` Example</span>
 
 This project has the following directory structure :
@@ -156,7 +215,7 @@ This project has the following directory structure :
                 <a href="./Hello/src/main/mod-adw/Hello.mod">hello.mod</a>
 </pre>
 
-Command [**`build.bat`**](./Hello/build.bat)`-verbose clean run` generates and executes the Modula-2 program `target\Hello.exe` :
+Command [**`build.bat`**](./Hello/build.bat)`clean run` generates and executes the Modula-2 program `target\Hello.exe` :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Hello/build.bat">build</a> -verbose clean run</b>
@@ -178,7 +237,9 @@ Hello world!
 
 > **Note:** The other two build scripts [`build.sh`](./Hello/build.sh) and [`Makefile`](./Hello/Makefile).work in the same way and the generated files in output directory `target\` are similar to the ones in example [`Factorial`](#factorial).
 
-### <span id="liste">`Liste` Example</span>
+<!--=======================================================================-->
+
+### <span id="liste">`Liste` Example</span> [**&#x25B4;**](#top)
 
 The `Liste` example is about creating a Modula-2 library; it contains the 3 source files [`Liste.def`](./Liste/src/main/def/Liste.def), [`Liste.mod`](./Liste/src/main/mod/Liste.mod) and [`ListeTest.mod`](./Liste/src/test/mod/ListeTest.mod).
 
@@ -266,7 +327,9 @@ The generated project file `target\Liste.prj` contains the XDS compiler options 
 !module mod\Liste.mod
 </pre>
 
-### <span id="pascal">`PascalTriangle` Example</span>
+<!--=======================================================================-->
+
+### <span id="pascal">`PascalTriangle` Example</span> [**&#x25B4;**](#top)
 
 This project has the following directory structure :
 
@@ -339,7 +402,7 @@ Triangle height=7
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/January 2025* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/February 2025* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- link refs -->

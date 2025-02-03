@@ -81,14 +81,10 @@ Steps :
 
    By default the [`configure`][configure_script] script doesn't include the Modula-2 frontend in the generated build file `Makefile`, e.g. 
 
-<!--
-$ find . -name configure |wc -l
-56
--->
    <pre style="font-size:80%;border:1px solid #cccccc;">
    <b>$ <a href="https://www.gnu.org/prep/standards/html_node/Configuration.html" rel="external">./configure</a> \
    --host=x86_64-pc-mingw32 \
-   --prefix=/c/opt/gcc-13.2.0</b>
+   --prefix=/c/temp/gcc</b>
    checking build system type... x86_64-pc-msys
    checking host system type... x86_64-pc-mingw32
    checking target system type... x86_64-pc-mingw32
@@ -104,7 +100,7 @@ $ find . -name configure |wc -l
    We have to specify option `--enable-languages` in order add value `m2` to the list of supported languages :
 
    <pre style="font-size:80%;border:1px solid #cccccc;">
-   <b>$ mkdir /c/temp/gcc</b>
+   <b>$ <a href="">mkdir</a> /c/temp/gcc</b>
    &nbsp;
    <b>$ <a href="https://www.gnu.org/prep/standards/html_node/Configuration.html" rel="external">./configure</a> \
    --host=x86_64-pc-mingw32 \
@@ -112,7 +108,7 @@ $ find . -name configure |wc -l
    <span style="color:blue;">--enable-languages=c,c++,lto,m2</span></b>
    </pre>
 
-3. Build execution
+4. Build execution
 
    > **Note:** GNU make version 3.80 or newer is required.
 
@@ -122,35 +118,38 @@ $ find . -name configure |wc -l
 
 ### <span id="steps">Build steps</span>
 
-<pre style="font-size:80%;">
-$ cd gcc-source\build
-$ make
-</pre>
-
 #### Step 1 : `libiberty`
 
 <pre style="font-size:80%;">
-$ cd libiberty
-$ ../../libiberty/configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc --enable-languages=c,c++,lto,m2
-$  make
+$ <a href="">cd</a> libiberty
+$ ./configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc
+$ make
+$ make install
 </pre>
 
 #### Step 2 : `fixincludes`
 
 <pre style="font-size:80%;">
 $ cd fixincludes
-$ ../../fixincludes/configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc --enable-languages=c,c++,lto,m2
+$ ./configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc
 $ make
 </pre>
-> **Note**:  Makefile on line 30
-> old : `CFLAGS = -g -O2`
+> **Note**:  Makefile on line 30<br/>
+> old : `CFLAGS = -g -O2`<br/>
 > new : `CFLAGS = -g -O2 -save-temps=obj`
 
 #### Step 3 : `gettext`
 
 <pre style="font-size:80%;">
 $ cd gettext
-$ ../../gettext/configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc --enable-languages=c,c++,lto,m2
+$ ./configure --host=x86_64-pc-mingw32 --prefix=/c/temp/gcc
+$ make
+</pre>
+
+#### Step 4 : `gcc`
+
+<pre style="font-size:80%;">
+$ cd ..
 $ make
 </pre>
 
@@ -483,7 +482,7 @@ Total Installed Size:  1.53 MiB
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/January 2025* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/February 2025* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- href links -->

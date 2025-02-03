@@ -205,7 +205,7 @@ The following command prints the full list of compiler options :
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/January 2025* [**&#9650;**](#top)  <!-- February 2023 -->
+*[mics](https://lampwww.epfl.ch/~michelou/)/February 2025* [**&#9650;**](#top)  <!-- February 2023 -->
 
 <span id="bottom">&nbsp;</span>
 
