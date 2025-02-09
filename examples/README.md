@@ -42,7 +42,7 @@ This project has the following directory structure :
 
 > **Note**: We maintain two source versions of `Factorial.mod` as the import clauses differ between ADW Modula-2 and XDS Modula-2 (options `-adw` and `-xds` &ndash; the default &ndash; allow us to switch between both versions).
 
-Batch file [**`build.bat`**](./Factorial/build.bat)`-verbose clean run` generates and executes the Modula-2 program `target\Factorial.exe` :
+Batch file [**`build.bat`**](./Factorial/build.bat)`clean run` generates and executes the Modula-2 program `target\Factorial.exe` :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="./Factorial/build.bat">build</a> -verbose clean run</b>
@@ -59,6 +59,18 @@ New "tmp.lnk" is generated using template "C:/opt/XDS-Modula-2/bin/xc.tem"
 XDS Link Version 2.13.3 Copyright (c) Excelsior 1995-2009.
 No errors, no warnings
 Execute program "target\Factorial.exe"
+Iterative Factorial function
+  0           1
+  1           1
+  2           2
+  3           6
+  4          24
+  5         120
+  6         720
+  7        5040
+  8       40320
+&nbsp;
+Tail recursive Factorial function
   0           1
   1           1
   2           2
@@ -75,7 +87,7 @@ Execute program "target\Factorial.exe"
 The output directory `target\` looks as follows when using build option `-xds` (default) :
 
 <pre style="font-size:80%;">
-<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f target | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a /f target | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
 |   Factorial.exe
 |   Factorial.obj
 |   Factorial.prj
@@ -139,9 +151,57 @@ C:\opt\ADW-Modula-2\ASCII\win64api.lib
 
 <!--=======================================================================-->
 
+### <span id="fibonacci">`Fibonacci` Example</span> [**&#x25B4;**](#top)
+
+This example has the following directory structure :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
+|   <a href="./Fibonacci/00download.txt">00download.txt</a>
+|   <a href="./Fibonacci/build.bat">build.bat</a>
+|   <a href="./Fibonacci/build.sh">build.sh</a>
+|   <a href="./Fibonacci/Makefile">Makefile</a>
+\---<b>src</b>
+    \---<b>main</b>
+        \---<b>mod</b>
+                <a href="./Fibonacci/src/main/mod/Fibonacci.mod">Fibonacci.mod</a>
+</pre>
+
+Command [**`build.bat`**](./Fibonacci/build.bat)`clean run` generates and execute the Modula-2 program `target\Fibonacci.exe` :
+
+<pre style="font-size:80%;">
+Recursive Fibonacci function
+  0           0
+  1           1
+  2           1
+  3           2
+  4           3
+  5           5
+  6           8
+  7          13
+  8          21
+
+Tail recursive Fibonacci function
+  0           0
+  [...]
+  8          21
+
+Iterative Fibonacci function
+  0           0
+  [...]
+  8          21
+
+Matrix Fibonacci function
+  0           0
+  [...]
+  8          21
+</pre>
+
+<!--=======================================================================-->
+
 ### <span id="generic_sorting">`GenericSorting` Example</span> [**&#x25B4;**](#top)
 
-This code example is presented in Richard S. Wiener article "[A generic sorting module in Modula-2"](https://dl.acm.org/doi/10.1145/948576.948588) (ACM SIGPLAN, Vol.19, Issue 3).
+This code example is presented in Wiener's article "[A generic sorting module in Modula-2"](https://dl.acm.org/doi/10.1145/948576.948588) (ACM SIGPLAN, Vol.19, Issue 3).
 It has the following directory structure :
 
 <pre style="font-size:80%;">
@@ -200,7 +260,7 @@ Enter real number 11 :
 
 ### <span id="hello">`Hello` Example</span>
 
-This project has the following directory structure :
+This example has the following directory structure :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
@@ -241,7 +301,7 @@ Hello world!
 
 ### <span id="liste">`Liste` Example</span> [**&#x25B4;**](#top)
 
-The `Liste` example is about creating a Modula-2 library; it contains the 3 source files [`Liste.def`](./Liste/src/main/def/Liste.def), [`Liste.mod`](./Liste/src/main/mod/Liste.mod) and [`ListeTest.mod`](./Liste/src/test/mod/ListeTest.mod).
+This example is about creating a Modula-2 library; it contains the 3 source files [`Liste.def`](./Liste/src/main/def/Liste.def), [`Liste.mod`](./Liste/src/main/mod/Liste.mod) and [`ListeTest.mod`](./Liste/src/test/mod/ListeTest.mod).
 
 Batch file [**`build.bat`**](./Liste/build.bat)`-verbose clean run` generates both the library `target\Liste.lib` and the test program `target\ListeTest.exe` :
 
@@ -292,11 +352,11 @@ The output directory `target\` looks as follows :
 |   tmp.lnk
 +---<b>def</b>
 |       Liste.def
-+---mod
++---<b>mod</b>
 |       Liste.mod
-+---sym
++---<b>sym</b>
 |       Liste.sym
-\---test
+\---<b>test</b>
         ListeTest.mod
 </pre>
 
@@ -331,7 +391,7 @@ The generated project file `target\Liste.prj` contains the XDS compiler options 
 
 ### <span id="pascal">`PascalTriangle` Example</span> [**&#x25B4;**](#top)
 
-This project has the following directory structure :
+This example has the following directory structure :
 
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>

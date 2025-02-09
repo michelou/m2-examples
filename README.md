@@ -24,7 +24,7 @@ This project depends on the following external software for the **Microsoft Wind
 Optionally one may also install the following software:
 
 - [ConEmu 2023][conemu_downloads] ([*release notes*][conemu_relnotes])
-- [Visual Studio Code 1.96][vscode_downloads] ([*release notes*][vscode_relnotes])
+- [Visual Studio Code 1.97][vscode_downloads] ([*release notes*][vscode_relnotes])
 
 > **&#9755;** ***Installation policy***<br/>
 > When possible we install software from a [Zip archive][zip_archive] rather than via a [Windows installer][windows_installer]. In our case we defined **`C:\opt\`** as the installation directory for optional software tools (*in reference to* the [`/opt/`][unix_opt] directory on Unix).
@@ -35,7 +35,7 @@ For instance our development environment looks as follows (*February 2025*) <sup
 C:\opt\ADW-Modula-2\    <i>(108 MB)</i>
 C:\opt\ConEmu\          <i>( 26 MB)</i>
 C:\opt\Git\             <i>(367 MB)</i>
-C:\opt\VSCode\          <i>(341 MB)</i>
+C:\opt\VSCode\          <i>(404 MB)</i>
 C:\opt\XDS-Modula-2\<sup id="anchor_02"><a href="#footnote_02">2</a></sup>   <i>( 29 MB)</i>
 </pre>
 
@@ -117,7 +117,7 @@ In our case we downloaded the following installation files (<a href="#proj_deps"
 <a href="https://www.modula2.org/adwm2/download.php" rel="external">ADWM2Setup.exe</a>                    <i>( 18 MB)</i>
 <a href="https://github.com/Maximus5/ConEmu/releases/tag/v23.07.24" rel="external">ConEmuPack.230724.7z</a>              <i>(  5 MB)</i>
 <a href="https://git-scm.com/download/win" rel="external">PortableGit-2.47.1-64-bit.7z.exe</a>  <i>( 41 MB)</i>
-<a href="https://code.visualstudio.com/Download#" rel="external">VSCode-win32-x64-1.96.2.zip</a>       <i>(131 MB)</i>
+<a href="https://code.visualstudio.com/Download#" rel="external">VSCode-win32-x64-1.97.0.zip</a>       <i>(131 MB)</i>
 <a href="https://github.com/excelsior-oss/xds-ide/releases">xds-ide-1.7.0-060713-1-win32.zip</a>  <i>(198 MB)</i>
 </pre>
 <b>Note</b> : A binary distribution of GNU Modula-2 doesn't exist for the Windows platform; we must create it from the source distribution (we describe our last attempt in document <a href="./GNU_M2.md"><code><b>GNU_M2.md</b></code></a>). 
