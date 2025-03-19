@@ -17,7 +17,11 @@
 - [Modula, zum Zweiten: Modula-2 im Überblick][blog_hanna] by Tam Hanna, November 2017.
 - [Working in MODULA-2][blog_mauder] by Marek Mauder, April 2009.
 
-## <span id="news">News</span>
+## <span id="books">Books</span>
+
+- [Modula-2 &ndash; A Complete Guide](http://knking.com/books/modula2/) by K.N. King, January 1988.<br/><span style="font-size:80%;">(Houghton Mifflin College, ISBN 978-0669110913, 656 pages)</span>.
+
+## <span id="news">News</span> [**&#x25B4;**](#top)
 
 - [Free Modula-2 Pages](https://freepages.modula2.org/).
 - [GNU] &ndash; [gm2 Archives](https://lists.gnu.org/archive/html/gm2/).
@@ -26,17 +30,19 @@
 
 - [Coronado Enterprises Modula-2 TUTOR][paper_dodrill] by Gordon Dodrill, March 1987.
 - [A Proposal for a Revision of ISO Modula-2](https://arxiv.org/abs/2006.07193) by Benjamin Kowarsch, June 2020.
+- [Modula-2: a solution to Pascal's problems](https://dl.acm.org/doi/10.1145/947955.947958) by Roger T. Summer and R.E. Gleaves, 1982.
 
-## <span id="projects">Projects</span> [**&#x25B4;**](#top)
+## <span id="projects">Projects</span>
 
 - GitHub/[afborchert](https://github.com/afborchert/lilith-multipass-modula2-compiler) &ndash; historical ETH Zürich Modula-2 Compiler.
 - GitHub/[ghoss/m2emul](https://github.com/ghoss/m2emul) &ndash; Modula-2 M-Code Interpreter.
 - GitHub/[GunterMueller](https://github.com/GunterMueller?tab=repositories&q=Modula) &ndash; Modula-2 related archives.
 - Github/[m2lang](https://github.com/redstar/m2lang) &ndash; the LLVM-based Modula-2 compiler.
 
-## <span id="resources">Resources</span>
+## <span id="resources">Resources</span> [**&#x25B4;**](#top)
 
 - [CFB Software &ndash; Lilith and Modula-2](https://www.astrobe.com/Modula2/)
+- [Modula-2 Coding Standard](https://github.com/m2sf/m2bsk/wiki/Coding-Standard)
 - [WG13 &ndash; ISO working group for Modula-2](http://sc22wg13.twi.tudelft.nl/)
 
 ## <span id="teaching">Teaching</span>
@@ -53,7 +59,7 @@
 - [XDS Modula-2/Oberon-2 programing system](https://github.com/excelsior-oss/xds)
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/February 2025* [**&#9650;**](#top)  <!-- February 2023 -->
+*[mics](https://lampwww.epfl.ch/~michelou/)/March 2025* [**&#9650;**](#top)  <!-- February 2023 -->
 
 <span id="bottom">&nbsp;</span>
 
