@@ -460,9 +460,117 @@ Triangle height=7
 
 > **Note:** The generated files in output directory `target\` are similar to the ones in example [`Factorial`](#factorial).
 
+<!--=======================================================================-->
+
+### <span id="sortdemo">`SortDemo` Example</span> [**&#x25B4;**](#top)
+
+This example has the following directory structure :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
+|   <a href="./SortDemo/00download.txt">00download.txt</a>
+|   <a href="./SortDemo/build.bat">build.bat</a>
+|   <a href="./SortDemo/build.sh">build.sh</a>
+|   <a href="./SortDemo/Makefile">Makefile</a>
+\---<b>src</b>
+    \---<b>main</b>
+        +---<b>def</b>
+        |       <a href="./SortDemo/src/main/def/Sort.def">Sort.def</a>
+        \---<b>mod</b>
+                <a href="./SortDemo/src/main/mod/Sort.mod">Sort.mod</a>
+                <a href="./SortDemo/src/main/mod/SortDemo.mod">SortDemo.mod</a>
+</pre>
+
+Batch file `build.bat clean run` generates and executes the Modula-2 program `target\SortDemo.exe` :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="./SortDemo/build.bat">build</a> clean run</b>
+XDS Modula-2 v2.40 [x86, v1.50] - build 07.06.2012
+Compiling "I:\examples\SortDemo\target\def\Sort.def"
+no errors, no warnings, lines    8, time  0.00, new symfile
+O2/M2 development system v2.60 TS  (c) 1991-2011 Excelsior, LLC. (build 07.06.2012)
+Make project "I:\examples\SortDemo\target\SortDemo.prj"
+XDS Modula-2 v2.40 [x86, v1.50] - build 07.06.2012
+Compiling "mod\Sort.mod"
+no errors, no warnings, lines   21, time  0.02
+XDS Modula-2 v2.40 [x86, v1.50] - build 07.06.2012
+Compiling "mod\SortDemo.mod"
+no errors, no warnings, lines   27, time  0.00
+New "tmp.lnk" is generated using template "C:/opt/XDS-Modula-2/bin/xc.tem"
+-------------------------------------------------------------------
+files: 2  errors: 0(0)  lines 48  time: 0:00  speed 10000 l/m
+
+XDS Link Version 2.13.3 Copyright (c) Excelsior 1995-2009.
+No errors, no warnings
+
+
+ UNSORTED ARRAY  SORTED ARRAY
+       18             3
+       59             4
+      131            18
+        4            24
+       32            30
+      121            32
+       95            45
+        3            59
+      112            70
+       24            95
+       45           112
+      182           120
+       70           121
+      165           121
+      199           126
+       30           127
+      127           131
+      126           165
+      168           168
+      121           182
+      120           199
+</pre>
+
+The output directory `target\` looks as follows :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a /f target | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr" rel="external">findstr</a> /v /b [A-Z]</b>
+|   Sort.obj
+|   SortDemo.exe
+|   SortDemo.obj
+|   SortDemo.prj
+|   tmp.lnk
++---<b>def</b>
+|       Sort.def
++---<b>mod</b>
+|       Sort.mod
+|       SortDemo.mod
+\---<b>sym</b>
+        Sort.sym
+</pre>
+
+The generated project file `target\SortDemo.prj` contains the XDS compiler options and the source files (`mod\Sort.mod` and `mod\SortDemo.mod` in this case) :
+
+<pre style="font-size:80%;">
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/type" rel="external">type</a> target\SortDemo.prj</b>
+-cpu = 486
+-lookup = *.sym = sym;C:\opt\XDS-Modula-2\sym
+-lookup = *.dll|*.lib = bin;C:\opt\XDS-Modula-2\bin
+-m2
+% recognize types SHORTINT, LONGINT, SHORTCARD and LONGCARD
+% -m2addtypes
+% -verbose
+-werr
+% disable warning 301 (parameter "xxx" is never used)
+-woff301+
+% disable warning 303 (procedure "xxx" declared but never used)
+-woff303+
+% disable warning 306 (import of "xxx.yyy" is never used)
+-woff306+
+!module mod\Sort.mod
+!module mod\SortDemo.mod
+</pre>
+
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/March 2025* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/November 2025* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- link refs -->

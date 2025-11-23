@@ -10,11 +10,11 @@ set _DEBUG=0
 set _EXITCODE=0
 
 @rem files README.md, RESOURCES.md, etc.
-set _LAST_MODIFIED_OLD=michelou/)/February 2025
-set _LAST_MODIFIED_NEW=michelou/)/March 2025
+set _LAST_MODIFIED_OLD=michelou/)/October 2025
+set _LAST_MODIFIED_NEW=michelou/)/November 2025
 
-set _LAST_DOWNLOAD_OLD=(\*February 2025\*)
-set _LAST_DOWNLOAD_NEW=(*March 2025*)
+set _LAST_DOWNLOAD_OLD=(\*October 2025\*)
+set _LAST_DOWNLOAD_NEW=(*November 2025*)
 
 @rem to be transformed into -not -path "./<dirname>/*"
 set _EXCLUDE_TOPDIRS=bin docs gcc gcc-14.2.0 m2j-master
