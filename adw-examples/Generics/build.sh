@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2018-2025 Stéphane Micheloud
+# Copyright (c) 2018-2026 Stéphane Micheloud
 #
 # Licensed under the MIT License.
 #
@@ -191,7 +191,7 @@ compile_adw() {
 
     local n=0
     for f in $(find "$TARGET_DEF_DIR/" -type f -name "*.def" 2>/dev/null); do
-        local def_file="$(win_path $f)"
+        local def_file="$(mixed_path $f)"
         if [[ $DEBUG -eq 1 ]]; then
             debug "\"$M2C_CMD\" $m2c_opts \"$def_file\""
         elif [[ $VERBOSE -eq 1 ]]; then
@@ -205,7 +205,7 @@ compile_adw() {
         n=$((n + 1))
     done
     for f in $(find "$TARGET_MOD_DIR/" -type f -name "*.mod" 2>/dev/null); do
-        local mod_file="$(win_path $f)"
+        local mod_file="$(mixed_path $f)"
         if [[ $DEBUG -eq 1 ]]; then
             debug "\"$M2C_CMD\" $m2c_opts \"$(mixed_path $mod_file)\""
         elif [[ $VERBOSE -eq 1 ]]; then

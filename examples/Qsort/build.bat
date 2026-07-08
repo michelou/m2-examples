@@ -50,7 +50,7 @@ set "_TARGET_SYM_DIR=%_TARGET_DIR%\sym"
 set "_TARGET_TEST_DIR=%_TARGET_DIR%\test"
 
 for /f "delims=" %%i in ("%~dp0.") do set "_LIB_NAME=%%~ni"
-set "_TARGET_FILE=%_TARGET_DIR%\%_LIB_NAME%.lib"
+set "_TARGET_FILE=%_TARGET_DIR%\Test%_LIB_NAME%.lib"
 set "_APP_NAME=Test%_LIB_NAME%"
 set "_TARGET_TEST_FILE=%_TARGET_DIR%\%_APP_NAME%.exe"
 
@@ -183,6 +183,9 @@ if %_DEBUG%==1 set _STDOUT_REDIRECT=
 if exist "%_SOURCE_DIR%\main\mod-%_TOOLSET%" (
     set "_SOURCE_MOD_DIR=%_SOURCE_DIR%\main\mod-%_TOOLSET%"
 )
+if exist "%_SOURCE_DIR%\test\mod-%_TOOLSET%" (
+    set "_SOURCE_TEST_MOD_DIR=%_SOURCE_DIR%\test\mod-%_TOOLSET%"
+)
 for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 
 if %_DEBUG%==1 (
@@ -275,8 +278,8 @@ if exist "%_LIB_DIR%\*.sym" (
     xcopy /i /q /y "%_LIB_DIR%\*.sym" "%_TARGET_SYM_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_LIB_DIR%\*.obj" (
-    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" 1>&2
-    xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_MOD_DIR%\" %_STDOUT_REDIRECT%
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_BIN_DIR%\" 1>&2
+    xcopy /i /q /y "%_LIB_DIR%\*.obj" "%_TARGET_BIN_DIR%\" %_STDOUT_REDIRECT%
 )
 if exist "%_SOURCE_DEF_DIR%\*.def" (
     if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_DEF_DIR%\*.def" "%_TARGET_DEF_DIR%\" 1>&2
@@ -325,22 +328,42 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.mod" 2^>NUL') do (
     )
     set /a __N+=1
 )
+if exist "%_SOURCE_TEST_MOD_DIR%\*.mod" (
+    if %_DEBUG%==1 echo %_DEBUG_LABEL% xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%\" 1>&2
+    xcopy /i /q /y "%_SOURCE_TEST_MOD_DIR%\*.mod" "%_TARGET_TEST_DIR%\" %_STDOUT_REDIRECT%
+
+    for /f "delims=" %%f in ('dir /s /b "%_TARGET_TEST_DIR%\*.mod" 2^>NUL') do (
+        set "__MOD_FILE=%%f"
+        if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" 1>&2
+        ) else if %_VERBOSE%==1 ( echo Compile "!__MOD_FILE!" into directory "!_TARGET_TEST_DIR:%_ROOT_DIR%=!" 1>&2
+        )
+        call "%_M2C_CMD%" %__M2C_OPTS% "!__MOD_FILE!" %_STDOUT_REDIRECT%
+        if not !ERRORLEVEL!==0 (
+            echo %_ERROR_LABEL% Failed to compile "!__MOD_FILE!" into directory "!_TARGET_TEST_DIR:%_ROOT_DIR%=!" 1>&2
+            set _EXITCODE=1
+            goto :eof
+        )
+    )
+)
 set "__LINKER_OPTS_FILE=%_TARGET_DIR%\linker_opts.txt"
 (
     @rem echo -EXETYPE:exe
     echo -MACHINE:X86_64
     echo -SUBSYSTEM:CONSOLE
-    echo -MAP:%_TARGET_DIR%\%_LIB_NAME%
-    echo -OUT:%_TARGET_FILE%
+    echo -MAP:%_TARGET_DIR%\%_APP_NAME%
+    echo -OUT:%_TARGET_TEST_FILE%
     echo -LARGEADDRESSAWARE
 ) > "%__LINKER_OPTS_FILE%"
 @rem object files of current program
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_TEST_DIR%\*.obj" 2^>NUL') do (
+    echo %%f >> "%__LINKER_OPTS_FILE%"
+)
 for /f "delims=" %%f in ('dir /s /b "%_TARGET_MOD_DIR%\*.obj" 2^>NUL') do (
     echo %%f >> "%__LINKER_OPTS_FILE%"
 )
 @rem object files of library depencencies
-for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
-    echo !_TARGET_BIN_DIR:%_ROOT_DIR%=!\%%f >> "%__LINKER_OPTS_FILE%"
+for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.obj" 2^>NUL') do (
+    echo %%f >> "%__LINKER_OPTS_FILE%"
 )
 (
     echo %_ADWM2_HOME%\rtl-win-amd64.lib
@@ -451,10 +474,10 @@ for /f "delims=" %%f in ('dir /s /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =project "%__PRJ_FILE%" 1>&2
 ) else if %_VERBOSE%==1 ( echo Compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
 )
-call "%_XC_CMD%" =p "%__PRJ_FILE%"
+call "%_XC_CMD%" =project "%__PRJ_FILE%"
 if not %ERRORLEVEL%==0 (
     popd
     echo %_ERROR_LABEL% Failed to compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2

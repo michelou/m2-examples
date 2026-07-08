@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2018-2025 Stéphane Micheloud
+# Copyright (c) 2018-2026 Stéphane Micheloud
 #
 # Licensed under the MIT License.
 #
@@ -307,6 +307,7 @@ SOURCE_MOD_DIR="$SOURCE_DIR/main/mod"
 TARGET_DIR="$ROOT_DIR/target"
 TARGET_DEF_DIR="$TARGET_DIR/def"
 TARGET_MOD_DIR="$TARGET_DIR/mod"
+TARGET_BIN_DIR="$TARGET_DIR/bin"
 TARGET_SYM_DIR="$TARGET_DIR/sym"
 
 ## We refrain from using `true` and `false` which are Bash commands

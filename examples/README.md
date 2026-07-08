@@ -17,9 +17,10 @@ Modula-2 examples presented below share two characteristics :
 
 | Build&nbsp;tool | Build&nbsp;script  | Build&nbsp;option | Parent&nbsp;file |
 |:----------------|:-------------------|:------|:-----------------|
-| [**`cmd.exe`**][cmd_cli] | [`build.bat`](./Factorial/build.bat) | `-adw`, `-xds` | |
+| [**`cmd.exe`**][cmd_cli]   | [`build.bat`](./Factorial/build.bat) | `-adw`, `-xds` | |
 | [**`make.exe`**][make_cli] | [`Makefile`](./Factorial/Makefile) | `TOOLSET=adw\|xds` | [`Makefile.inc`](./Makefile.inc) |
-| [**`sh.exe`**][sh_cli]  | [`build.sh`](./Factorial/build.sh) | `-adw`, `-xds` | |
+| [**`pwsh.exe`**][pwsh_cli] | [`build.ps1`](./Factorial/build.ps1) | `-adw`, `-xds` | |
+| [**`sh.exe`**][sh_cli]     | [`build.sh`](./Factorial/build.sh) | `-adw`, `-xds` | |
 
 <!--=======================================================================-->
 
@@ -30,6 +31,7 @@ This project has the following directory structure :
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
 |   <a href="./Factorial/build.bat">build.bat</a>
+|   <a href="./Factorial/build.ps1">build.ps1</a>
 |   <a href="./Factorial/build.sh">build.sh</a>
 |   <a href="./Factorial/Makefile">Makefile</a>
 \---<b>src</b>
@@ -87,7 +89,7 @@ Tail recursive Factorial function
 The output directory `target\` looks as follows when using build option `-xds` (default) :
 
 <pre style="font-size:80%;">
-<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a /f target | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
+<b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external" title="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tre">tree</a> /a /f target | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
 |   Factorial.exe
 |   Factorial.obj
 |   Factorial.prj
@@ -159,6 +161,7 @@ This example has the following directory structure :
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree" rel="external">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /v /b [A-Z]</b>
 |   <a href="./Fibonacci/00download.txt">00download.txt</a>
 |   <a href="./Fibonacci/build.bat">build.bat</a>
+|   <a href="./Fibonacci/build.ps1">build.ps1</a>
 |   <a href="./Fibonacci/build.sh">build.sh</a>
 |   <a href="./Fibonacci/Makefile">Makefile</a>
 \---<b>src</b>
@@ -265,6 +268,7 @@ This example has the following directory structure :
 <pre style="font-size:80%;">
 <b>&gt; <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tree">tree</a> /a /f . | <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/findstr">findstr</a> /b /v [A-Z]</b>
 |   <a href="./Hello/build.bat">build.bat</a>
+|   <a href="./Hello/build.ps1">build.ps1</a>
 |   <a href="./Hello/build.sh">build.sh</a>
 |   <a href="./Hello/Makefile">Makefile</a>
 \---<b>src</b>
@@ -570,12 +574,13 @@ The generated project file `target\SortDemo.prj` contains the XDS compiler optio
 
 ***
 
-*[mics](https://lampwww.epfl.ch/~michelou/)/November 2025* [**&#9650;**](#top)
+*[mics](https://lampwww.epfl.ch/~michelou/)/July 2026* [**&#9650;**](#top)
 <span id="bottom">&nbsp;</span>
 
 <!-- link refs -->
 
-[apache_ant_cli]: https://ant.apache.org/manual/running.html
-[cmd_cli]: https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd
+[apache_ant_cli]: https://ant.apache.org/manual/running.html "https://ant.apache.org/manual/running.html"
+[cmd_cli]: https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd"
 [make_cli]: https://www.gnu.org/software/make/manual/html_node/Running.html
-[sh_cli]: https://man7.org/linux/man-pages/man1/sh.1p.html
+[pwsh_cli]: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh"
+[sh_cli]: https://man7.org/linux/man-pages/man1/sh.1p.html "https://man7.org/linux/man-pages/man1/sh.1p.html"

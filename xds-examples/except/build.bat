@@ -416,10 +416,10 @@ if %__N%==0 (
 ) else ( set __N_FILES=%__% Modula-2 source files
 )
 pushd "%_TARGET_DIR%"
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =project "%__PRJ_FILE%" 1>&2
 ) else if %_VERBOSE%==1 ( echo Compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
 )
-call "%_XC_CMD%" =p "%__PRJ_FILE%"
+call "%_XC_CMD%" =project "%__PRJ_FILE%"
 if not %ERRORLEVEL%==0 (
     popd
     echo %_ERROR_LABEL% Failed to compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2

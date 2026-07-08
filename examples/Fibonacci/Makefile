@@ -1,11 +1,11 @@
 ##
-## Copyright (c) 2018-2025 Stéphane Micheloud
+## Copyright (c) 2018-2026 Stéphane Micheloud
 ##
 ## Licensed under the MIT License.
 ##
 ##############################################################################
 
-DEBUG ?= false
+DEBUG ?= 0
 
 TOOLSET ?= xds
 
@@ -80,16 +80,19 @@ build_xds: $(DEFS) $(MODS)
 	fi
 	[ -d "$(TARGET_MOD_DIR)" ] || "$(MKDIR)" -p "$(TARGET_MOD_DIR)"
 	@$(CP) $(SOURCE_MOD_DIR)/*.mod "$(TARGET_MOD_DIR)"
+	@# we now copy the symbol/object files for library dependencies (if any)
 	[ -d "$(TARGET_BIN_DIR)" ] || "$(MKDIR)" -p "$(TARGET_BIN_DIR)"
-	@$(CP) $(LIB_DIR)/*.dll "$(TARGET_BIN_DIR)"
-	@$(CP) $(LIB_DIR)/*.lib "$(TARGET_BIN_DIR)"
 	[ -d "$(TARGET_SYM_DIR)" ] || "$(MKDIR)" -p "$(TARGET_SYM_DIR)"
-	@$(CP) $(LIB_DIR)/*.sym "$(TARGET_SYM_DIR)"
+	if [ -d "$(LIB_DIR)" ]; then \
+	    "$(CP)" $(LIB_DIR)/*.dll "$(TARGET_BIN_DIR)"; \
+	    "$(CP)" $(LIB_DIR)/*.lib "$(TARGET_BIN_DIR)"; \
+	    "$(CP)" $(LIB_DIR)/*.sym "$(TARGET_SYM_DIR)"; \
+	fi
 	@# we compute the absolute path for PRJ_FILE since we use TARGET_DIR as current directory.
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	$(eval PRJ_FILE := $(shell cygpath -m $(ABS_TARGET_DIR))/$(APP_NAME).prj)
 	@$(ECHO) "%% generated on $(shell date '+%F %T')" > "$(PRJ_FILE)"
-	if $(DEBUG); then \
+	if [ $(DEBUG) -eq 1 ]; then \
 	    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"; \
 	    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"; \
 	    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"; \
@@ -101,6 +104,10 @@ build_xds: $(DEFS) $(MODS)
 	@$(ECHO) "-m2" >> "$(PRJ_FILE)"
 	@$(ECHO) "-verbose" >> "$(PRJ_FILE)"
 	@$(ECHO) "-werr" >> "$(PRJ_FILE)"
+	@$(ECHO) "%% disable warning 301 (parameter \"xxx\" is never used)" >> "$(PRJ_FILE)"
+	@$(ECHO) "-woff301+" >> "$(PRJ_FILE)"
+	@$(ECHO) "%% disable warning 303 (procedure \"xxx\" declared but never used)" >> "$(PRJ_FILE)"
+	@$(ECHO) "-woff303+" >> "$(PRJ_FILE)"
 	for f in $(TARGET_MOD_DIR)/*.mod; do \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
@@ -108,7 +115,7 @@ build_xds: $(DEFS) $(MODS)
 	    [ -f "$$f" ] || continue; \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
-	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
+	cd "$(TARGET_DIR)" && "$(XC)" =project "$(PRJ_FILE)"
 
 clean:
 	"$(RM)" -rf "$(TARGET_DIR)"
@@ -133,4 +140,4 @@ help:
 .PHONY: all build clean help run test
 
 .SUFFIXES:
-.SUFFIXES: .def .exe .mod .obj .prj
+.SUFFIXES: .def .err .exe .map .mod .obj .prj

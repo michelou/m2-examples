@@ -18,6 +18,10 @@ if not %_EXITCODE%==0 goto end
 @rem #########################################################################
 @rem ## Main
 
+if %_HELP%==1 (
+    call :print_help
+    exit /b 0
+)
 for %%i in (%_COMMANDS%) do (
     call :%%i
     if not !_EXITCODE!==0 goto end
@@ -132,20 +136,22 @@ goto :eof
 @rem input parameter: %*
 :args
 set _COMMANDS=
+set _HELP=0
 set _VERBOSE=0
 set _TOOLSET=xds
 set __N=0
 :args_loop
 set "__ARG=%~1"
 if not defined __ARG (
-    if !__N!==0 set _COMMANDS=help
+    if !__N!==0 set _HELP=1
     goto args_done
 )
 if "%__ARG:~0,1%"=="-" (
     @rem option
     if "%__ARG%"=="-adw" ( set _TOOLSET=adw
     ) else if "%__ARG%"=="-debug" ( set _DEBUG=1
-    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gm2
+    ) else if "%__ARG%"=="-gm2" ( set _TOOLSET=gnu
+    ) else if "%__ARG%"=="-gnu" ( set _TOOLSET=gnu
     ) else if "%__ARG%"=="-help" ( set _HELP=1
     ) else if "%__ARG%"=="-verbose" ( set _VERBOSE=1
     ) else if "%__ARG%"=="-xds" ( set _TOOLSET=xds
@@ -158,7 +164,7 @@ if "%__ARG:~0,1%"=="-" (
     @rem subcommand
     if "%__ARG%"=="clean" ( set _COMMANDS=!_COMMANDS! clean
     ) else if "%__ARG%"=="compile" ( set _COMMANDS=!_COMMANDS! compile
-    ) else if "%__ARG%"=="help" ( set _COMMANDS=help
+    ) else if "%__ARG%"=="help" ( set _HELP=1
     ) else if "%__ARG%"=="run" ( set _COMMANDS=!_COMMANDS! compile run
     ) else (
         echo %_ERROR_LABEL% Unknown subcommand "%__ARG%" 1>&2
@@ -179,7 +185,7 @@ if exist "%_SOURCE_DIR%\main\mod-%_TOOLSET%" (
 for /f "delims=" %%f in ("%~dp0.") do set "_LIB_DIR=%%~dpflib\%_TOOLSET%"
 
 if %_DEBUG%==1 (
-    echo %_DEBUG_LABEL% Options    : _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
+    echo %_DEBUG_LABEL% Options    : _HELP=%_HELP% _TOOLSET=%_TOOLSET% _VERBOSE=%_VERBOSE% 1>&2
     echo %_DEBUG_LABEL% Subcommands: %_COMMANDS% 1>&2
     echo %_DEBUG_LABEL% Variables  : "ADWM2_HOME=%ADWM2_HOME%" 1>&2
     if defined GM2_HOME echo %_DEBUG_LABEL% Variables  : "GM2_HOME=%GM2_HOME%" 1>&2
@@ -189,7 +195,7 @@ if %_DEBUG%==1 (
 )
 goto :eof
 
-:help
+:print_help
 if %_VERBOSE%==1 (
     set __BEG_P=%_STRONG_FG_CYAN%
     set __BEG_O=%_STRONG_FG_GREEN%
@@ -206,13 +212,14 @@ echo.
 echo   %__BEG_P%Options:%__END%
 echo     %__BEG_O%-adw%__END%         select ADW Modula-2 toolset
 echo     %__BEG_O%-debug%__END%       print commands executed by this script
-echo     %__BEG_O%-gm2%__END%         select GNU Modula-2 toolset
+echo     %__BEG_O%-gm2, -gnu%__END%   select GNU Modula-2 toolset
 echo     %__BEG_O%-verbose%__END%     print progress messages
 echo     %__BEG_O%-xds%__END%         select XDS Modula-2 toolset ^(default^)
 echo.
 echo   %__BEG_P%Subcommands:%__END%
 echo     %__BEG_O%clean%__END%        delete generated object files
 echo     %__BEG_O%compile%__END%      compile Modula-2 source files
+echo     %__BEG_O%help%__END%         print this help message
 echo     %__BEG_O%run%__END%          execute Modula-2 program "%__BEG_O%%_APP_NAME%%__END%"
 goto :eof
 
@@ -352,7 +359,7 @@ if not %ERRORLEVEL%==0 (
 )
 goto :eof
 
-:compile_gm2
+:compile_gnu
 echo %_WARNING_LABEL% Not yet implemented
 goto :eof
 

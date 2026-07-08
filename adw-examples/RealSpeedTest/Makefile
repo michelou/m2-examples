@@ -1,5 +1,5 @@
 ##
-## Copyright (c) 2018-2024 Stéphane Micheloud
+## Copyright (c) 2018-2026 Stéphane Micheloud
 ##
 ## Licensed under the MIT License.
 ##
@@ -7,7 +7,7 @@
 
 DEBUG ?= 0
 
-TOOLSET ?= xds
+TOOLSET ?= adw
 
 include ../Makefile.inc
 
@@ -64,12 +64,11 @@ build_adw: $(DEFS) $(MODS)
 	"$(M2C)" $(M2C_OPTS) -quiet "$(TARGET_MOD_DIR)/$(APP_NAME).mod"
 	##done
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
-	$(eval ABS_TARGET := $(shell realpath $(TARGET)))
-	##$(ECHO) "-EXETYPE:exe"
+	##@$(ECHO) "-EXETYPE:exe"
 	@$(ECHO) "-MACHINE:X86_64" > "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-SUBSYSTEM:CONSOLE" >> "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-MAP:$(shell cygpath -w $(ABS_TARGET_DIR))/$(APP_NAME)" >> "$(LINKER_OPTS_FILE)"
-	@$(ECHO) "-OUT:$(shell cygpath -w $(ABS_TARGET))" >> "$(LINKER_OPTS_FILE)"
+	@$(ECHO) "-OUT:$(shell cygpath -w $(ABS_TARGET_DIR))/$(APP_NAME)$(TARGET_EXT)" >> "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "-LARGEADDRESSAWARE" >> "$(LINKER_OPTS_FILE)"
 	@for f in $(TARGET_MOD_DIR)/*.obj; do \
 	    $(ECHO) "$$(shell cygpath -w $$f)" >> "$(LINKER_OPTS_FILE)"; \
@@ -149,4 +148,4 @@ help:
 .PHONY: all build clean help run test
 
 .SUFFIXES:
-.SUFFIXES: .def .exe .map .mod .obj .prj
+.SUFFIXES: .def .err .exe .map .mod .obj .prj

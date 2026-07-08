@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2018-2025 Stéphane Micheloud
+# Copyright (c) 2018-2026 Stéphane Micheloud
 #
 # Licensed under the MIT License.
 #
@@ -49,21 +49,22 @@ args() {
         ## options
         -adw)      TOOLSET=adw ;;
         -debug)    DEBUG=1 ;;
-        -gm2)      TOOLSET=gm2 ;;
+        -gm2)      TOOLSET=gnu ;;
+        -gnu)      TOOLSET=gnu ;;
         -help)     HELP=1 ;;
         -verbose)  VERBOSE=1 ;;
         -xds)      TOOLSET=xds ;;
         -*)
-            error "Unknown option $arg"
+            error "Unknown option \"$arg\""
             EXITCODE=1 && return 0
             ;;
         ## subcommands
-        clean)     CLEAN=1 ;;
-        compile)   COMPILE=1 ;;
+        clean)     COMMANDS+=' clean' ;;
+        compile)   COMMANDS+=' compile' ;;
         help)      HELP=1 ;;
-        run)       COMPILE=1 && RUN=1 ;;
+        run)       COMMANDS+=' compile run' ;;
         *)
-            error "Unknown subcommand $arg"
+            error "Unknown subcommand \"$arg\""
             EXITCODE=1 && return 0
             ;;
         esac
@@ -73,22 +74,21 @@ args() {
     fi
     LIB_DIR="$(mixed_path $(dirname $ROOT_DIR)/lib/$TOOLSET)"
 
-    debug "Options    : TOOLSET=$TOOLSET VERBOSE=$VERBOSE"
-    debug "Subcommands: CLEAN=$CLEAN COMPILE=$COMPILE HELP=$HELP RUN=$RUN"
+    debug "Options    : HELP=$HELP TOOLSET=$TOOLSET VERBOSE=$VERBOSE"
+    debug "Subcommands: $COMMANDS"
     debug "Variables  : ADWM2_HOME=\"$ADWM2_HOME\""
-    debug "Variables  : GIT_HOME=\"$GIT_HOME\""
     debug "Variables  : XDSM2_HOME=\"$XDSM2_HOME\""
     debug "Variables  : LIB_DIR=\"$LIB_DIR\""
 }
 
-help() {
+print_help() {
     cat << EOS
 Usage: $BASENAME { <option> | <subcommand> }
 
   Options:
     -adw         select ADW Modula-2 toolset
     -debug       print commands executed by this script
-    -gm2         select GNU Modula-2 toolset
+    -gm2, -gnu   select GNU Modula-2 toolset
     -verbose     print progress messages
     -xds         select XDS Modula-2 toolset
 
@@ -422,11 +422,9 @@ TARGET_SYM_DIR="$TARGET_DIR/sym"
 
 ## We refrain from using `true` and `false` which are Bash commands
 ## (see https://man7.org/linux/man-pages/man1/false.1.html)
-CLEAN=0
-COMPILE=0
+COMMANDS=
 DEBUG=0
 HELP=0
-RUN=0
 TOOLSET=xds
 VERBOSE=0
 
@@ -437,11 +435,13 @@ cygwin=0
 mingw=0
 msys=0
 darwin=0
+linux=0
 case "$(uname -s)" in
     CYGWIN*) cygwin=1 ;;
     MINGW*)  mingw=1 ;;
     MSYS*)   msys=1 ;;
-    Darwin*) darwin=1
+    Darwin*) darwin=1 ;;
+    Linux*)  linux=1
 esac
 unset CYGPATH_CMD
 PSEP=":"
@@ -477,15 +477,10 @@ args "$@"
 ##############################################################################
 ## Main
 
-[[ $HELP -eq 1 ]] && help && cleanup
+[[ $HELP -eq 1 ]] && print_help && cleanup
 
-if [[ $CLEAN -eq 1 ]]; then
-    clean || cleanup 1
-fi
-if [[ $COMPILE -eq 1 ]]; then
-    compile || cleanup 1
-fi
-if [[ $RUN -eq 1 ]]; then
-    run || cleanup 1
-fi
+for cmd in $COMMANDS; do
+   $cmd
+   [[ $EXITCODE -eq 0 ]] || cleanup 1
+done
 cleanup

@@ -1,5 +1,5 @@
 ##
-## Copyright (c) 2018-2025 Stéphane Micheloud
+## Copyright (c) 2018-2026 Stéphane Micheloud
 ##
 ## Licensed under the MIT License.
 ##
@@ -117,7 +117,7 @@ build_xds: $(DEFS) $(MODS)
 	    [ -f "$$f" ] || continue; \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
-	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
+	cd "$(TARGET_DIR)" && "$(XC)" =project "$(PRJ_FILE)"
 
 clean:
 	"$(RM)" -rf "$(TARGET_DIR)"

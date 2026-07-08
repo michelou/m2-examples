@@ -80,7 +80,7 @@ set "_XC_CMD=%XDSM2_HOME%\bin\xc.exe"
 set "_HIS_CMD=%XDSM2_HOME%\bin\his.exe"
 set "_XLIB_CMD=%XDSM2_HOME%\bin\xlib.exe"
 
-@rem use newer PowerShell version if available
+@rem We use the newer PowerShell version if available
 where /q pwsh.exe
 if %ERRORLEVEL%==0 ( set _PWSH_CMD=pwsh.exe
 ) else ( set _PWSH_CMD=powershell.exe
@@ -443,13 +443,15 @@ if %__N%==0 (
 ) else if %__N%==1 ( set __N_FILES=%__N% Modula-2 implementation module
 ) else ( set __N_FILES=%__N% Modula-2 implementation modules
 )
+if not exist "%_TARGET_BIN_DIR%" mkdir "%_TARGET_BIN_DIR%"
+
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =project "%__PRJ_FILE%" 1>&2
 ) else if %_VERBOSE%==1 ( echo Compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
 )
-call "%_XC_CMD%" =p "%__PRJ_FILE%"
+call "%_XC_CMD%" =project "%__PRJ_FILE%"
 if not %ERRORLEVEL%==0 (
     popd
     echo %_ERROR_LABEL% Failed to compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
@@ -520,10 +522,10 @@ for /f "delims=" %%f in ('dir /b "%_TARGET_BIN_DIR%\*.lib" 2^>NUL') do (
 pushd "%_TARGET_DIR%"
 if %_DEBUG%==1 echo %_DEBUG_LABEL% Current directory is "%CD%" 1>&2
 
-if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =p "%__PRJ_FILE%" 1>&2
+if %_DEBUG%==1 ( echo %_DEBUG_LABEL% "%_XC_CMD%" =project "%__PRJ_FILE%" 1>&2
 ) else if %_VERBOSE%==1 ( echo Compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
 )
-call "%_XC_CMD%" =p "%__PRJ_FILE%"
+call "%_XC_CMD%" =project "%__PRJ_FILE%"
 if not %ERRORLEVEL%==0 (
     popd
     echo %_ERROR_LABEL% Failed to compile %__N_FILES% into directory "!_TARGET_DIR:%_ROOT_DIR%=!" 1>&2
@@ -622,13 +624,19 @@ if %_DEBUG%==1 ( echo %_DEBUG_LABEL% xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_
 ) else if %_VERBOSE%==1 ( echo Copy library files to "%_LIB_DIR%\" 1>&2
 )
 @rem copy only if source time is newer than destination time.
-xcopy /d /i /q /y "%_TARGET_DIR%\*.dll" "%_LIB_DIR%\" 1>NUL
-xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%\" 1>NUL
-xcopy /d /i /q /y "%_TARGET_SYM_DIR%\*.sym" "%_LIB_DIR%\" 1>NUL
-if not %ERRORLEVEL%==0 (
-    echo %_ERROR_LABEL% Failed to copy library files to "%_LIB_DIR%" 1>&2
-    set _EXITCODE=1
-    goto :eof
+if exist "%_TARGET_DIR%\*.dll" (
+    xcopy /d /i /q /y "%_TARGET_DIR%\*.dll" "%_LIB_DIR%\" 1>NUL
+)
+if exist "%_TARGET_DIR%\*.lib" (
+    xcopy /d /i /q /y "%_TARGET_DIR%\*.lib" "%_LIB_DIR%\" 1>NUL
+)
+if exist "%_TARGET_SYM_DIR%\*.sym" (
+    xcopy /d /i /q /y "%_TARGET_SYM_DIR%\*.sym" "%_LIB_DIR%\" 1>NUL
+    if not !ERRORLEVEL!==0 (
+        echo %_ERROR_LABEL% Failed to copy library files to "%_LIB_DIR%" 1>&2
+        set _EXITCODE=1
+       goto :eof
+   )
 )
 goto :eof
 

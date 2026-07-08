@@ -219,6 +219,7 @@ goto :eof
 :clean
 call :rmdir "%_TARGET_DIR%"
 if exist "%_ROOT_DIR%*.err" del "%_ROOT_DIR%*.err"
+if exist "%_ROOT_DIR%errinfo.$$$" del "%_ROOT_DIR%errinfo.$$$"
 goto :eof
 
 @rem input parameter: %1=directory path
@@ -281,7 +282,7 @@ if exist "%_SOURCE_MOD_DIR%\*.mod" (
     goto :eof
 )
 @rem We must specify a relative path for the SYM directories
-set __M2C_OPTS=-sym:"!_TARGET_DEF_DIR:%_ROOT_DIR%=!,!_TARGET_SYM_DIR:%_ROOT_DIR%=!"
+set __M2C_OPTS=-sym:"!_TARGET_SYM_DIR:%_ROOT_DIR%=!,!_TARGET_DEF_DIR:%_ROOT_DIR%=!"
 if %_DEBUG%==0 set __M2C_OPTS=-quiet %__M2C_OPTS%
 
 set __N=0

@@ -1,5 +1,5 @@
 ##
-## Copyright (c) 2018-2025 Stéphane Micheloud
+## Copyright (c) 2018-2026 Stéphane Micheloud
 ##
 ## Licensed under the MIT License.
 ##
@@ -101,7 +101,7 @@ build_xds: $(DEFS) $(MODS)
 	for f in $(TARGET_BIN_DIR)/*.lib; do \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
-	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
+	cd "$(TARGET_DIR)" && "$(XC)" =project "$(PRJ_FILE)"
 
 
 clean:
@@ -127,4 +127,4 @@ help:
 .PHONY: all build clean help run test
 
 .SUFFIXES:
-.SUFFIXES: .def .exe .mod .obj .prj
+.SUFFIXES: .def .err .exe .map .mod .obj .prj

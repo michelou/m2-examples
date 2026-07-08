@@ -1,11 +1,11 @@
 ##
-## Copyright (c) 2018-2024 Stéphane Micheloud
+## Copyright (c) 2018-2026 Stéphane Micheloud
 ##
 ## Licensed under the MIT License.
 ##
 ##############################################################################
 
-DEBUG ?= false
+DEBUG ?= 0
 
 TOOLSET ?= xds
 
@@ -96,7 +96,7 @@ build_xds: $(DEFS) $(MODS)
 	$(eval ABS_TARGET_DIR := $(shell realpath $(TARGET_DIR)))
 	$(eval PRJ_FILE := $(ABS_TARGET_DIR)/$(APP_NAME).prj)
 	@$(ECHO) "%% generated on $(shell date '+%F %T')" > "$(PRJ_FILE)"
-	if $(DEBUG); then \
+	if [ $(DEBUG) -eq 1 ]; then \
 	    @$(ECHO) "%% debug ON" >> "$(PRJ_FILE)"; \
 	    @$(ECHO) "-gendebug+" >> "$(PRJ_FILE)"; \
 	    @$(ECHO) "-genhistory+" >> "$(PRJ_FILE)"; \
@@ -115,7 +115,7 @@ build_xds: $(DEFS) $(MODS)
 	    [ -f "$$f" ] || continue; \
 	    $(ECHO) "!module $${f/$(TARGET_DIR)\//}" >> "$(PRJ_FILE)"; \
 	done
-	cd "$(TARGET_DIR)" && "$(XC)" =p "$(PRJ_FILE)"
+	cd "$(TARGET_DIR)" && "$(XC)" =project "$(PRJ_FILE)"
 
 clean:
 	"$(RM)" -rf "$(TARGET_DIR)"

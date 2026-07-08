@@ -1,5 +1,5 @@
 ##
-## Copyright (c) 2018-2025 Stéphane Micheloud
+## Copyright (c) 2018-2026 Stéphane Micheloud
 ##
 ## Licensed under the MIT License.
 ##
@@ -72,6 +72,9 @@ build_adw: $(DEFS) $(MODS)
 	@$(ECHO) "$(ADWM2_HOME)\rtl-win-amd64.lib" >> "$(LINKER_OPTS_FILE)"
 	@$(ECHO) "$(ADWM2_HOME)\win64api.lib" >> "$(LINKER_OPTS_FILE)"
 	"$(SBLINK)" "@$(LINKER_OPTS_FILE)"
+
+build_gnu: $(DEFS) $(MODS)
+	@$(ECHO) "Not yet supported"
 
 build_xds: $(DEFS) $(MODS)
 	if [ -d "$(SOURCE_DEF_DIR)" ]; then \
